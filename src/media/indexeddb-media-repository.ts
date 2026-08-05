@@ -58,10 +58,19 @@ function isMediaItem(value: unknown): value is MediaLibraryItem {
 }
 
 function parseLibrary(value: unknown): readonly MediaLibraryItem[] {
-  if (!Array.isArray(value) || value.some((item) => !isMediaItem(item))) {
+  if (!Array.isArray(value)) {
     throw new Error('媒體清單資料格式不正確。');
   }
-  return Object.freeze(value.map((item) => Object.freeze({ ...item })));
+
+  const items: MediaLibraryItem[] = [];
+  for (const candidate of value) {
+    const item: unknown = candidate;
+    if (!isMediaItem(item)) {
+      throw new Error('媒體清單資料格式不正確。');
+    }
+    items.push(Object.freeze({ ...item }));
+  }
+  return Object.freeze(items);
 }
 
 function parsePreferencesRecord(value: unknown): PersistedPreferencesRecord {
