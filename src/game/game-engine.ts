@@ -1,5 +1,11 @@
+import type { BonusResources } from '../domain/bonus.js';
 import type { GameSession, TurnErrorCode, TurnResult } from '../domain/game.js';
 import type { Idiom } from '../domain/idiom.js';
+import {
+  carryResourcesToNextLevel,
+  createBonusResources,
+  gainTurnEnergy
+} from './bonus/bonus-energy.js';
 import {
   getCandidatesByFirstChar,
   getIdiomByText,
@@ -15,6 +21,7 @@ export interface GameEngineOptions {
   readonly createSessionId?: () => string;
   readonly now?: () => string;
   readonly pickIndex?: (length: number) => number;
+  readonly initialBonusResources?: BonusResources;
 }
 
 function defaultSessionId(): string {
@@ -55,28 +62,36 @@ function makeTurnResult(
   answer: Idiom | null,
   nextRequiredChar: string
 ): TurnResult {
-  return Object.freeze({
-    correct,
-    errorCode,
-    scoreDelta,
-    combo,
-    answer,
-    nextRequiredChar
-  });
+  return Object.freeze({ correct, errorCode, scoreDelta, combo, answer, nextRequiredChar });
 }
 
 function rejectTurn(
   session: GameSession,
   errorCode: TurnErrorCode
 ): { readonly session: GameSession; readonly result: TurnResult } {
+  const hasShield = session.bonusResources.shieldLayers > 0;
+  const bonusResources = hasShield
+    ? createBonusResources({
+        ...session.bonusResources,
+        shieldLayers: session.bonusResources.shieldLayers - 1
+      })
+    : session.bonusResources;
   const updated = Object.freeze({
     ...session,
     wrongCount: session.wrongCount + 1,
-    combo: 0
+    combo: hasShield ? session.combo : 0,
+    bonusResources
   });
   return {
     session: updated,
-    result: makeTurnResult(false, errorCode, 0, 0, null, session.previousIdiom.lastChar)
+    result: makeTurnResult(
+      false,
+      errorCode,
+      0,
+      updated.combo,
+      null,
+      session.previousIdiom.lastChar
+    )
   };
 }
 
@@ -84,8 +99,8 @@ export function createClassicSession(
   index: IdiomIndex,
   options: GameEngineOptions = {}
 ): GameSession {
-  const eligible = [...index.byId.values()].filter((idiom) =>
-    unusedCandidates(index, idiom.lastChar, new Set([idiom.id])).length > 0
+  const eligible = [...index.byId.values()].filter(
+    (idiom) => unusedCandidates(index, idiom.lastChar, new Set([idiom.id])).length > 0
   );
 
   if (eligible.length === 0) {
@@ -110,7 +125,25 @@ export function createClassicSession(
     previousIdiom: start,
     usedIdiomIds: new Set([start.id]),
     history: Object.freeze([start]),
-    result: null
+    result: null,
+    bonusResources: options.initialBonusResources ?? createBonusResources(),
+    hintUsedForCurrentTurn: false,
+    appliedBonusSettlementIds: new Set<string>()
+  });
+}
+
+export function createNextClassicSession(
+  previous: GameSession,
+  index: IdiomIndex,
+  options: Omit<GameEngineOptions, 'initialBonusResources'> = {}
+): GameSession {
+  const next = createClassicSession(index, {
+    ...options,
+    initialBonusResources: carryResourcesToNextLevel(previous.bonusResources)
+  });
+  return Object.freeze({
+    ...next,
+    appliedBonusSettlementIds: new Set(previous.appliedBonusSettlementIds)
   });
 }
 
@@ -143,7 +176,21 @@ export function submitClassicTurn(
   }
 
   const combo = session.combo + 1;
-  const scoreDelta = BASE_SCORE + Math.min(session.combo * COMBO_STEP, MAX_COMBO_BONUS);
+  const normalScoreDelta = BASE_SCORE + Math.min(session.combo * COMBO_STEP, MAX_COMBO_BONUS);
+  const multiplierActive = session.bonusResources.scoreMultiplierTurns > 0;
+  const scoreDelta = multiplierActive ? normalScoreDelta * 2 : normalScoreDelta;
+  const bonusResources = createBonusResources({
+    ...session.bonusResources,
+    energy: gainTurnEnergy({
+      currentEnergy: session.bonusResources.energy,
+      combo,
+      difficulty: answer.difficulty,
+      usedHintForTurn: session.hintUsedForCurrentTurn
+    }),
+    scoreMultiplierTurns: multiplierActive
+      ? session.bonusResources.scoreMultiplierTurns - 1
+      : 0
+  });
   const usedIdiomIds = new Set(session.usedIdiomIds);
   usedIdiomIds.add(answer.id);
   const hasNext = unusedCandidates(index, answer.lastChar, usedIdiomIds).length > 0;
@@ -157,7 +204,9 @@ export function submitClassicTurn(
     usedIdiomIds,
     history: Object.freeze([...session.history, answer]),
     result: hasNext ? null : ('completed' as const),
-    endedAt: hasNext ? null : defaultNow()
+    endedAt: hasNext ? null : defaultNow(),
+    bonusResources,
+    hintUsedForCurrentTurn: false
   });
 
   return {
@@ -182,13 +231,29 @@ export function requestClassicHint(
   }
 
   const idiom = selectByIndex(candidates, options.pickIndex ?? defaultPickIndex);
+  const useTicket = session.bonusResources.hintTickets > 0;
+  const bonusResources = useTicket
+    ? createBonusResources({
+        ...session.bonusResources,
+        hintTickets: session.bonusResources.hintTickets - 1
+      })
+    : session.bonusResources;
   return {
     session: Object.freeze({
       ...session,
-      score: Math.max(0, session.score - HINT_COST),
+      score: useTicket ? session.score : Math.max(0, session.score - HINT_COST),
       hintsUsed: session.hintsUsed + 1,
-      combo: 0
+      combo: 0,
+      bonusResources,
+      hintUsedForCurrentTurn: true
     }),
     idiom
   };
+}
+
+export function replaceBonusResources(
+  session: GameSession,
+  resources: BonusResources
+): GameSession {
+  return Object.freeze({ ...session, bonusResources: resources });
 }
