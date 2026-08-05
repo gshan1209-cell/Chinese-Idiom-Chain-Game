@@ -36,7 +36,12 @@ export default tseslint.config(
     files: ['**/*.mjs', 'eslint.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'module'
+      sourceType: 'module',
+      globals: {
+        Buffer: 'readonly',
+        console: 'readonly',
+        process: 'readonly'
+      }
     }
   }
 );
