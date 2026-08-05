@@ -1,20 +1,32 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
+const typedSourceConfigs = tseslint.configs.recommendedTypeChecked.map((config) => ({
+  ...config,
+  files: ['src/**/*.{ts,tsx}'],
+  languageOptions: {
+    ...config.languageOptions,
+    parserOptions: {
+      projectService: true,
+      tsconfigRootDir: import.meta.dirname
+    }
+  }
+}));
+
 export default tseslint.config(
   {
-    ignores: ['dist', '.test-dist', 'coverage', 'public/generated/*.json']
+    ignores: [
+      'dist/**',
+      '.test-dist/**',
+      'coverage/**',
+      'node_modules/**',
+      'public/generated/*.json'
+    ]
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...typedSourceConfigs,
   {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname
-      }
-    },
+    files: ['src/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-misused-promises': 'error'
@@ -24,7 +36,12 @@ export default tseslint.config(
     files: ['**/*.mjs', 'eslint.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'module'
+      sourceType: 'module',
+      globals: {
+        Buffer: 'readonly',
+        console: 'readonly',
+        process: 'readonly'
+      }
     }
   }
 );

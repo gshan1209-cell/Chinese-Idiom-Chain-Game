@@ -55,7 +55,7 @@ export function PwaInstallCard() {
         <div className="ios-instructions" role="dialog" aria-modal="false" aria-labelledby="ios-title">
           <div className="ios-dialog-heading">
             <h3 id="ios-title">iPhone／iPad 安裝步驟</h3>
-            <button className="close-instructions" type="button" onClick={pwa.closeInstructions}>
+            <button className="close-instructions" type="button" onClick={() => pwa.closeInstructions()}>
               關閉
             </button>
           </div>

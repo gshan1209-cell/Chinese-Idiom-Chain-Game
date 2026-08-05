@@ -28,7 +28,7 @@ function freezeCandidateMap(source: ReadonlyMap<string, Idiom[]>): ReadonlyMap<s
   return new Map(
     [...source.entries()].map(([character, idioms]) => [
       character,
-      Object.freeze([...idioms]) as readonly Idiom[]
+      Object.freeze([...idioms])
     ])
   );
 }
