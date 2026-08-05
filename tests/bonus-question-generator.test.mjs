@@ -2,7 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createIdiomIndex } from '../.test-dist/src/idioms/idiom-index.js';
-import { createBonusQuestion } from '../.test-dist/src/game/bonus/question-generator.js';
+import {
+  countAvailableBonusQuestions,
+  createBonusQuestion,
+  hasMinimumBonusQuestions
+} from '../.test-dist/src/game/bonus/question-generator.js';
 
 const base = {
   bopomofo: '',
@@ -80,7 +84,13 @@ test('跳過已使用與停用成語，支援九洞配置', () => {
   assert.equal(question.holeCount, 9);
 });
 
-test('不足三個安全干擾字時不出題', () => {
+test('至少八題安全題目才允許啟動', () => {
+  assert.equal(countAvailableBonusQuestions(index), 9);
+  assert.equal(hasMinimumBonusQuestions(index), true);
+  assert.equal(hasMinimumBonusQuestions(index, 10), false);
+});
+
+test('不足三個安全干擾字時不出題，也不符合啟動門檻', () => {
   const tiny = createIdiomIndex([
     idiom('tiny-1', '畫龍點睛'),
     idiom('tiny-2', '一諾千金'),
@@ -90,4 +100,5 @@ test('不足三個安全干擾字時不出題', () => {
     createBonusQuestion(tiny, new Set(), 6, [], { pickIndex: pickFirst }),
     null
   );
+  assert.equal(hasMinimumBonusQuestions(tiny), false);
 });
