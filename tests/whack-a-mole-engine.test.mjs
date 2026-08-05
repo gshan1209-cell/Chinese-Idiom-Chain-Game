@@ -45,6 +45,7 @@ test('正確命中得分，舊題快速連點不會重複計分', () => {
   const deps = dependencies(clock);
   const round = startWhackRound('hint-ticket', 'normal', deps);
   assert.equal(round.remainingMs, 15_000);
+  assert.equal(round.questionDeadlineMs, 3_000);
 
   const correct = answerWhackRound(round, 'question-1', 0, deps);
   assert.equal(correct.score, 100);
@@ -76,7 +77,20 @@ test('四種難度套用正確的錯誤處罰，答錯題目也不會重複出�
   }
 });
 
-test('800ms 回饋後換題，背景暫停會延後期限', () => {
+test('每題依難度自動輪替，逾時題目不計入答錯', () => {
+  const clock = { now: 1_000 };
+  const deps = dependencies(clock);
+  const round = startWhackRound('shield', 'normal', deps);
+
+  clock.now = 3_000;
+  const next = tickWhackRound(round, deps);
+  assert.equal(next.question.id, 'question-2');
+  assert.equal(next.usedIdiomIds.has('idiom-1'), true);
+  assert.equal(next.wrongCount, 0);
+  assert.equal(next.questionDeadlineMs, 5_000);
+});
+
+test('800ms 回饋後換題，第一次背景暫停會延後所有期限', () => {
   const clock = { now: 1_000 };
   const deps = dependencies(clock);
   const round = startWhackRound('shield', 'normal', deps);
@@ -89,20 +103,35 @@ test('800ms 回饋後換題，背景暫停會延後期限', () => {
 
   const paused = pauseWhackRound(next, 2_000);
   assert.equal(paused.phase, 'paused');
+  assert.equal(paused.pauseCount, 1);
   const resumed = resumeWhackRound(paused, 5_000);
   assert.equal(resumed.deadlineMs, next.deadlineMs + 3_000);
-
-  clock.now = resumed.deadlineMs;
-  const expired = tickWhackRound(resumed, deps);
-  assert.equal(expired.phase, 'settled');
-  assert.equal(answerWhackRound(expired, 'question-2', 1, deps), expired);
-  assert.equal(pauseWhackRound(expired, 99_999), expired);
+  assert.equal(resumed.questionDeadlineMs, next.questionDeadlineMs + 3_000);
 });
 
-test('沒有可用題目時安全結束', () => {
+test('第二次切到背景視為放棄且回合立即結算', () => {
   const clock = { now: 1_000 };
-  const deps = dependencies(clock, []);
+  const deps = dependencies(clock);
   const round = startWhackRound('shield', 'normal', deps);
-  assert.equal(round.phase, 'settled');
-  assert.equal(round.remainingMs, 0);
+  const firstPause = pauseWhackRound(round, 1_500);
+  const resumed = resumeWhackRound(firstPause, 2_500);
+  const forfeited = pauseWhackRound(resumed, 3_000);
+
+  assert.equal(forfeited.phase, 'settled');
+  assert.equal(forfeited.remainingMs, 0);
+  assert.equal(answerWhackRound(forfeited, 'question-1', 0, deps), forfeited);
+});
+
+test('總時間到期或沒有可用題目時安全結束', () => {
+  const clock = { now: 1_000 };
+  const deps = dependencies(clock);
+  const round = startWhackRound('shield', 'normal', deps);
+  clock.now = round.deadlineMs;
+  const expired = tickWhackRound(round, deps);
+  assert.equal(expired.phase, 'settled');
+
+  const emptyDeps = dependencies({ now: 1_000 }, []);
+  const empty = startWhackRound('shield', 'normal', emptyDeps);
+  assert.equal(empty.phase, 'settled');
+  assert.equal(empty.remainingMs, 0);
 });
