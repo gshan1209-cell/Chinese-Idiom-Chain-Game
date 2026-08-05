@@ -161,6 +161,8 @@ export function answerWhackRound(
   }
 
   const penalty = wrongPenalty(round.difficulty);
+  const usedIdiomIds = new Set(round.usedIdiomIds);
+  usedIdiomIds.add(round.question.idiomId);
   const deadlineMs = round.deadlineMs - penalty.time;
   const remainingMs = remaining(deadlineMs, nowMs);
   const feedback: BonusFeedback = Object.freeze({
@@ -171,6 +173,7 @@ export function answerWhackRound(
   const wrongState = freezeRound({
     ...round,
     phase: 'feedback',
+    usedIdiomIds,
     deadlineMs,
     feedbackUntilMs: nowMs + FEEDBACK_DURATION_MS,
     remainingMs,
