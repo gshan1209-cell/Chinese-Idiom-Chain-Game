@@ -32,7 +32,7 @@
 隔離測試工作區使用 Node.js 22.16.0 與 TypeScript 5.8.3 執行：
 
 - 純 TypeScript 核心編譯：通過。
-- 新增與整合核心測試：19 項通過、0 失敗。
+- PR 內五組新增與整合核心測試：20 項通過、0 失敗。
 - React 控制器與介面最小靜態型別檢查：通過。
 
 測試涵蓋：
@@ -65,7 +65,7 @@ Repository 已有 GitHub Actions 工作流程，會在 Pull Request 執行 `npm 
 | 項目 | 狀態 |
 |---|---|
 | 核心 TypeScript 編譯 | 通過 |
-| 新增與整合核心測試 19 項 | 通過 |
+| PR 內五組核心測試 20 項 | 通過 |
 | React 最小靜態型別檢查 | 通過 |
 | GitHub Actions `verify.sh` | 待執行／待取得結果 |
 | 正式 Vite production build | 待驗證 |
