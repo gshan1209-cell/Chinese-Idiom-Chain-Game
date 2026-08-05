@@ -64,10 +64,18 @@ function parsePreferences(value: unknown): MediaPreferences {
 }
 
 function parseFavoriteIds(value: unknown): readonly string[] {
-  if (!Array.isArray(value) || value.some((id) => typeof id !== 'string')) {
+  if (!Array.isArray(value)) {
     throw new MediaImportError('收藏清單格式不正確。');
   }
-  return Object.freeze([...new Set(value)]);
+
+  const ids: string[] = [];
+  for (const id of value) {
+    if (typeof id !== 'string') {
+      throw new MediaImportError('收藏清單格式不正確。');
+    }
+    if (!ids.includes(id)) ids.push(id);
+  }
+  return Object.freeze(ids);
 }
 
 function parseMediaItemInput(
