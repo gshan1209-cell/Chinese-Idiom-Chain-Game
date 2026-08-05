@@ -54,7 +54,6 @@ interface UseWhackAMoleInput {
   readonly index: IdiomIndex | null;
   readonly setSession: Dispatch<SetStateAction<GameSession | null>>;
   readonly difficulty?: BonusDifficulty;
-  readonly ignoreEnergy?: boolean;
 }
 
 const MINIMUM_QUESTION_COUNT = 8;
@@ -75,8 +74,7 @@ export function useWhackAMole({
   session,
   index,
   setSession,
-  difficulty = 'normal',
-  ignoreEnergy = false
+  difficulty = 'normal'
 }: UseWhackAMoleInput): WhackAMoleController {
   const [view, setView] = useState<BonusView>('closed');
   const [round, setRound] = useState<BonusRound | null>(null);
@@ -158,27 +156,19 @@ export function useWhackAMole({
   }, [round, setSession, settlement]);
 
   const openRewardSelector = useCallback(() => {
-    if (!ignoreEnergy) {
-      if (session === null || session.result !== null || session.bonusResources.energy !== 100) return;
-    }
+    if (session?.result !== null || session.bonusResources.energy !== 100) return;
     const enoughQuestions =
       index !== null && hasMinimumBonusQuestions(index, MINIMUM_QUESTION_COUNT);
     setUnavailableReason(enoughQuestions ? null : INSUFFICIENT_QUESTIONS_MESSAGE);
     setView('selecting');
-  }, [ignoreEnergy, index, session]);
+  }, [index, session]);
 
   const startRound = useCallback(
     (rewardType: BonusRewardType) => {
-      if (!ignoreEnergy) {
-        if (
-          session === null ||
-          session.result !== null ||
-          session.bonusResources.energy !== 100
-        ) {
-          return;
-        }
-      }
       if (
+        session === null ||
+        session.result !== null ||
+        session.bonusResources.energy !== 100 ||
         !CLASSIC_REWARDS.includes(
           rewardType as (typeof CLASSIC_REWARDS)[number]
         )

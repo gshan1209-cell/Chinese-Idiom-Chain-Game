@@ -17,7 +17,6 @@ export default tseslint.config(
   {
     ignores: [
       'dist/**',
-      'dev-dist/**',
       '.test-dist/**',
       'coverage/**',
       'node_modules/**',

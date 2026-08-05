@@ -44,8 +44,8 @@ test('正確命中得分，舊題快速連點不會重複計分', () => {
   const clock = { now: 1_000 };
   const deps = dependencies(clock);
   const round = startWhackRound('hint-ticket', 'normal', deps);
-  assert.equal(round.remainingMs, 30_000);
-  assert.equal(round.questionDeadlineMs, 5_000);
+  assert.equal(round.remainingMs, 15_000);
+  assert.equal(round.questionDeadlineMs, 3_000);
 
   const correct = answerWhackRound(round, 'question-1', 0, deps);
   assert.equal(correct.score, 100);
@@ -73,7 +73,7 @@ test('四種難度套用正確的錯誤處罰，答錯題目也不會重複出�
     assert.equal(wrong.feedbackUntilMs, 1_800);
     assert.equal(wrong.score, score);
     assert.equal(wrong.combo, combo);
-    assert.equal(wrong.deadlineMs, 31_000 + deadlineDelta);
+    assert.equal(wrong.deadlineMs, 16_000 + deadlineDelta);
   }
 });
 
@@ -82,12 +82,12 @@ test('每題依難度自動輪替，逾時題目不計入答錯', () => {
   const deps = dependencies(clock);
   const round = startWhackRound('shield', 'normal', deps);
 
-  clock.now = 5_000;
+  clock.now = 3_000;
   const next = tickWhackRound(round, deps);
   assert.equal(next.question.id, 'question-2');
   assert.equal(next.usedIdiomIds.has('idiom-1'), true);
   assert.equal(next.wrongCount, 0);
-  assert.equal(next.questionDeadlineMs, 9_000);
+  assert.equal(next.questionDeadlineMs, 5_000);
 });
 
 test('800ms 回饋後換題，第一次背景暫停會延後所有期限', () => {

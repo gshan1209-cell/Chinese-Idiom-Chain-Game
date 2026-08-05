@@ -7,4 +7,3 @@ coverage/
 .test-dist/
 
 public/generated/*.json
-dev-dist/
