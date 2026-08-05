@@ -50,7 +50,9 @@ export interface BonusRound {
   readonly phaseBeforePause: Exclude<BonusRoundPhase, 'paused'> | null;
   readonly startedAtMs: number;
   readonly deadlineMs: number;
+  readonly questionDeadlineMs: number | null;
   readonly pausedAtMs: number | null;
+  readonly pauseCount: number;
   readonly feedbackUntilMs: number | null;
   readonly remainingMs: number;
   readonly question: BonusQuestion | null;
