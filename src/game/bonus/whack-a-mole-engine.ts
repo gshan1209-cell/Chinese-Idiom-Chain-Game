@@ -34,6 +34,19 @@ function remaining(deadlineMs: number, nowMs: number): number {
   return Math.max(0, deadlineMs - nowMs);
 }
 
+function questionDurationMs(difficulty: BonusDifficulty): number {
+  switch (difficulty) {
+    case 'easy':
+      return 2_500;
+    case 'normal':
+      return 2_000;
+    case 'challenge':
+      return 1_700;
+    case 'extreme':
+      return 1_500;
+  }
+}
+
 function feedbackMessage(combo: number): string {
   if (combo >= 5) return '成語高手！';
   if (combo >= 3) return '一擊命中！';
@@ -55,11 +68,37 @@ function settle(round: BonusRound, nowMs: number): BonusRound {
     ...round,
     phase: 'settled',
     phaseBeforePause: null,
+    questionDeadlineMs: null,
     pausedAtMs: null,
     feedbackUntilMs: null,
     remainingMs: 0,
     question: null,
     settledAtMs: nowMs
+  });
+}
+
+function withNextQuestion(
+  round: BonusRound,
+  nowMs: number,
+  dependencies: WhackEngineDependencies,
+  usedIdiomIds: ReadonlySet<string> = round.usedIdiomIds,
+  recentCorrectHoles: readonly number[] = round.recentCorrectHoles
+): BonusRound {
+  const nextQuestion = dependencies.nextQuestion(usedIdiomIds, recentCorrectHoles);
+  if (nextQuestion === null) return settle(round, nowMs);
+  return freezeRound({
+    ...round,
+    phase: 'active',
+    question: nextQuestion,
+    questionDeadlineMs: Math.min(
+      round.deadlineMs,
+      nowMs + questionDurationMs(round.difficulty)
+    ),
+    feedbackUntilMs: null,
+    remainingMs: remaining(round.deadlineMs, nowMs),
+    usedIdiomIds,
+    recentCorrectHoles,
+    feedback: null
   });
 }
 
@@ -71,6 +110,7 @@ export function startWhackRound(
   const nowMs = dependencies.now();
   const usedIdiomIds = new Set<string>();
   const question = dependencies.nextQuestion(usedIdiomIds, []);
+  const deadlineMs = nowMs + ROUND_DURATION_MS;
   return freezeRound({
     id: (dependencies.createRoundId ?? defaultRoundId)(),
     settlementId: (dependencies.createSettlementId ?? defaultSettlementId)(),
@@ -79,8 +119,13 @@ export function startWhackRound(
     phase: question === null ? 'settled' : 'active',
     phaseBeforePause: null,
     startedAtMs: nowMs,
-    deadlineMs: nowMs + ROUND_DURATION_MS,
+    deadlineMs,
+    questionDeadlineMs:
+      question === null
+        ? null
+        : Math.min(deadlineMs, nowMs + questionDurationMs(difficulty)),
     pausedAtMs: null,
+    pauseCount: 0,
     feedbackUntilMs: null,
     remainingMs: question === null ? 0 : ROUND_DURATION_MS,
     question,
@@ -128,6 +173,9 @@ export function answerWhackRound(
 
   const nowMs = dependencies.now();
   if (nowMs >= round.deadlineMs) return settle(round, nowMs);
+  if (round.questionDeadlineMs !== null && nowMs >= round.questionDeadlineMs) {
+    return tickWhackRound(round, dependencies);
+  }
   const choice = round.question.choices.find((item) => item.holeIndex === holeIndex);
   if (choice === undefined) return round;
 
@@ -140,10 +188,8 @@ export function answerWhackRound(
     const usedIdiomIds = new Set(round.usedIdiomIds);
     usedIdiomIds.add(round.question.idiomId);
     const recentCorrectHoles = [...round.recentCorrectHoles, holeIndex].slice(-2);
-    const nextQuestion = dependencies.nextQuestion(usedIdiomIds, recentCorrectHoles);
     const correctState = freezeRound({
       ...round,
-      question: nextQuestion,
       usedIdiomIds,
       recentCorrectHoles,
       correctCount: round.correctCount + 1,
@@ -157,7 +203,13 @@ export function answerWhackRound(
       }),
       remainingMs: remaining(round.deadlineMs, nowMs)
     });
-    return nextQuestion === null ? settle(correctState, nowMs) : correctState;
+    return withNextQuestion(
+      correctState,
+      nowMs,
+      dependencies,
+      usedIdiomIds,
+      recentCorrectHoles
+    );
   }
 
   const penalty = wrongPenalty(round.difficulty);
@@ -175,6 +227,7 @@ export function answerWhackRound(
     phase: 'feedback',
     usedIdiomIds,
     deadlineMs,
+    questionDeadlineMs: null,
     feedbackUntilMs: nowMs + FEEDBACK_DURATION_MS,
     remainingMs,
     wrongCount: round.wrongCount + 1,
@@ -200,19 +253,17 @@ export function tickWhackRound(
         ? round
         : freezeRound({ ...round, remainingMs: nextRemaining });
     }
-    const nextQuestion = dependencies.nextQuestion(
-      round.usedIdiomIds,
-      round.recentCorrectHoles
-    );
-    if (nextQuestion === null) return settle(round, nowMs);
-    return freezeRound({
-      ...round,
-      phase: 'active',
-      feedbackUntilMs: null,
-      remainingMs: remaining(round.deadlineMs, nowMs),
-      question: nextQuestion,
-      feedback: null
-    });
+    return withNextQuestion(round, nowMs, dependencies);
+  }
+
+  if (
+    round.question !== null &&
+    round.questionDeadlineMs !== null &&
+    nowMs >= round.questionDeadlineMs
+  ) {
+    const usedIdiomIds = new Set(round.usedIdiomIds);
+    usedIdiomIds.add(round.question.idiomId);
+    return withNextQuestion(round, nowMs, dependencies, usedIdiomIds);
   }
 
   const nextRemaining = remaining(round.deadlineMs, nowMs);
@@ -223,12 +274,14 @@ export function tickWhackRound(
 
 export function pauseWhackRound(round: BonusRound, nowMs: number): BonusRound {
   if (round.phase === 'settled' || round.phase === 'paused') return round;
+  if (round.pauseCount >= 1) return settle(round, nowMs);
   const phaseBeforePause: Exclude<BonusRoundPhase, 'paused'> = round.phase;
   return freezeRound({
     ...round,
     phase: 'paused',
     phaseBeforePause,
     pausedAtMs: nowMs,
+    pauseCount: round.pauseCount + 1,
     remainingMs: remaining(round.deadlineMs, nowMs)
   });
 }
@@ -248,6 +301,10 @@ export function resumeWhackRound(round: BonusRound, nowMs: number): BonusRound {
     phase: round.phaseBeforePause,
     phaseBeforePause: null,
     deadlineMs: round.deadlineMs + pauseDuration,
+    questionDeadlineMs:
+      round.questionDeadlineMs === null
+        ? null
+        : round.questionDeadlineMs + pauseDuration,
     feedbackUntilMs:
       round.feedbackUntilMs === null
         ? null
