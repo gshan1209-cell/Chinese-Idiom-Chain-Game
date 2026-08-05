@@ -18,7 +18,8 @@
     "src/idioms/**/*.ts",
     "src/game/**/*.ts",
     "src/pwa/**/*.ts",
-    "src/puzzle/**/*.ts"
+    "src/puzzle/**/*.ts",
+    "src/progress/**/*.ts"
   ],
   "exclude": [
     "**/*.test.ts",
