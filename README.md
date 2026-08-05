@@ -2,7 +2,7 @@
 
 **中文成語接龍遊戲（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語接龍 PWA。
 
-目前 Repository 已完成 **Phase 0–1：專案骨架與成語資料層**。遊戲引擎與完整遊戲畫面會在 Phase 2–3 接續實作。
+目前 Repository 已完成 **Phase 0–2：PWA 基礎、成語資料層與可玩的經典模式**。
 
 ## 目前完成範圍
 
@@ -13,14 +13,17 @@
 - CSV 驗證、重複偵測、首尾字索引及 SHA-256 校驗碼。
 - 37 筆可形成接龍關係的繁體中文示範資料。
 - 純 TypeScript 成語索引查詢服務。
+- 經典模式遊戲引擎：接龍判定、重複偵測、計分、連擊、提示與自然結束。
+- 大字體可玩介面：輸入、回饋、分數板、最近紀錄與重新開始。
+- 離線字典載入與資料格式防護。
 - Node 內建測試、GitHub Actions 與一鍵執行腳本。
 
 ## 尚未實作
 
-- 經典、60 秒限時、選擇題三種遊戲模式。
-- 接龍判定、計分、連擊、提示與生命值。
-- 遊戲頁、答題結果、結算頁、設定頁與成語小冊。
-- IndexedDB 成績保存與 PWA 安裝引導介面。
+- 60 秒限時模式與選擇題模式。
+- 生命值、難度篩選與完整結算頁。
+- 設定頁、成語小冊與發音輔助。
+- IndexedDB 歷史成績、最佳紀錄與 PWA 安裝引導介面。
 - Lighthouse、瀏覽器 E2E、Android 安裝及 iOS 加入主畫面實機驗證。
 
 ## 執行環境
@@ -50,7 +53,7 @@ HOST=127.0.0.1 PORT=4173 ./start.sh
 
 ```bash
 ./start.sh             # 安裝依賴、建置字典並啟動開發伺服器
-./test.sh              # 建置字典並執行資料與索引測試
+./test.sh              # 建置字典並執行全部核心測試
 ./build.sh             # 建立正式 PWA 產物
 ./scripts/verify.sh    # test、typecheck、lint、build 全面驗證
 ```
@@ -63,6 +66,15 @@ npm run dev
 npm run test
 npm run build
 ```
+
+## 經典模式規則
+
+- 下一個成語第一字必須等於目前成語最後一字。
+- 僅接受本機字典內啟用的四字成語。
+- 同一局不能重複使用相同成語。
+- 正確答案基礎分為 100 分；連擊每次增加 20 分，上限加成 200 分。
+- 使用提示扣 50 分，分數最低維持 0 分。
+- 當目前成語已無未使用的接續候選，本局自然完成。
 
 ## 成語資料維護
 
@@ -110,13 +122,14 @@ public/generated/manifest.json
 
 ```text
 src/domain       領域型別與遊戲契約
-src/idioms       純 TypeScript 字典索引服務
+src/idioms       純 TypeScript 字典索引與載入服務
+src/game         純 TypeScript 遊戲引擎
 scripts          成語資料建置與驗證
 public/generated 離線字典與首尾字索引
 src/app          React PWA 使用者介面
 ```
 
-遊戲規則不得直接寫在 React 元件內。Phase 2 會在獨立的 `game-engine` 模組以 TDD 實作，再由 UI 呼叫公開介面。
+遊戲規則不直接寫在 React 元件內；`game-engine` 以 TDD 實作，再由 UI 透過公開介面呼叫。
 
 ## PWA 驗收方式
 
@@ -139,3 +152,4 @@ npx vite preview --host 0.0.0.0
 
 - [開發規格書 v1.0](docs/specs/chinese-idiom-chain-game-v1.0-spec.md)
 - [Phase 0–1 Implementation Plan](docs/superpowers/plans/2026-08-05-phase-0-1-foundation.md)
+- [Phase 2 Classic Gameplay Plan](docs/superpowers/plans/2026-08-05-phase-2-classic-gameplay.md)

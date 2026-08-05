@@ -13,6 +13,6 @@
     "outDir": ".test-dist",
     "skipLibCheck": true
   },
-  "include": ["src/domain/**/*.ts", "src/idioms/**/*.ts"],
+  "include": ["src/domain/**/*.ts", "src/idioms/**/*.ts", "src/game/**/*.ts"],
   "exclude": ["**/*.test.ts", "node_modules"]
 }

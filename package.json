@@ -13,11 +13,13 @@
     "build": "npm run build:data && tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
-    "test": "npm run test:data && npm run test:index",
+    "test": "npm run test:data && npm run test:index && npm run test:game && npm run test:loader",
     "test:data": "node --test scripts/build-idioms.test.mjs",
     "test:index": "npm run compile:core && node --test tests/idiom-index.test.mjs",
     "compile:core": "tsc -p tsconfig.core.json",
-    "verify": "./scripts/verify.sh"
+    "verify": "./scripts/verify.sh",
+    "test:game": "npm run compile:core && node --test tests/game-engine.test.mjs",
+    "test:loader": "npm run compile:core && node --test tests/load-dictionary.test.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

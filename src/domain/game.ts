@@ -24,6 +24,7 @@ export interface GameSession {
   readonly hintsUsed: number;
   readonly previousIdiom: Idiom;
   readonly usedIdiomIds: ReadonlySet<string>;
+  readonly history: readonly Idiom[];
   readonly result: GameSessionResult | null;
 }
 
