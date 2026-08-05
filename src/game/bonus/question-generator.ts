@@ -87,6 +87,27 @@ function safeDistractors(
   ).slice(0, 3);
 }
 
+function isUsableQuestion(index: IdiomIndex, idiom: Idiom): boolean {
+  const answer = [...idiom.text][3];
+  return answer !== undefined && HAN.test(answer) && safeDistractors(index, idiom, () => 0).length >= 3;
+}
+
+export function countAvailableBonusQuestions(
+  index: IdiomIndex,
+  usedIdiomIds: ReadonlySet<string> = new Set()
+): number {
+  return [...index.byId.values()].filter(
+    (idiom) => !usedIdiomIds.has(idiom.id) && isUsableQuestion(index, idiom)
+  ).length;
+}
+
+export function hasMinimumBonusQuestions(index: IdiomIndex, minimum = 8): boolean {
+  if (!Number.isInteger(minimum) || minimum < 1) {
+    throw new Error('最低題數必須是正整數。');
+  }
+  return countAvailableBonusQuestions(index) >= minimum;
+}
+
 function chooseCorrectHole(
   holeCount: 6 | 9,
   recentCorrectHoles: readonly number[],
