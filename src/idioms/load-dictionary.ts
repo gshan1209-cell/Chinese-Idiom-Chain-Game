@@ -123,9 +123,9 @@ function parsePayload(value: unknown): IdiomDictionaryPayload {
   }
 
   return Object.freeze({
-    schemaVersion: value.schemaVersion as number,
-    dictionaryVersion: value.dictionaryVersion as number,
-    count: value.count as number,
+    schemaVersion: value.schemaVersion,
+    dictionaryVersion: value.dictionaryVersion,
+    count: value.count,
     idioms: Object.freeze(idioms)
   });
 }
