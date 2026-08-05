@@ -27,7 +27,10 @@ function question(id = 'question-1', idiomId = 'idiom-1', correctHoleIndex = 0) 
   });
 }
 
-function dependencies(clock, sequence = [question(), question('question-2', 'idiom-2', 1)]) {
+function dependencies(
+  clock,
+  sequence = [question(), question('question-2', 'idiom-2', 1)]
+) {
   let index = 0;
   return {
     now: () => clock.now,
@@ -50,7 +53,7 @@ test('正確命中得分，舊題快速連點不會重複計分', () => {
   assert.equal(answerWhackRound(correct, 'question-1', 0, deps), correct);
 });
 
-test('四種難度套用正確的錯誤處罰', () => {
+test('四種難度套用正確的錯誤處罰，答錯題目也不會重複出現', () => {
   const cases = [
     ['easy', 80, 3, 0],
     ['normal', 50, 0, 0],
@@ -65,6 +68,7 @@ test('四種難度套用正確的錯誤處罰', () => {
     round = { ...round, score: 100, combo: 3 };
     const wrong = answerWhackRound(round, 'question-1', 1, deps);
     assert.equal(wrong.phase, 'feedback');
+    assert.equal(wrong.usedIdiomIds.has('idiom-1'), true);
     assert.equal(wrong.feedbackUntilMs, 1_800);
     assert.equal(wrong.score, score);
     assert.equal(wrong.combo, combo);
