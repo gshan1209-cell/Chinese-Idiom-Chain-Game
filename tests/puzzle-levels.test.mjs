@@ -1,14 +1,44 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath, URL } from 'node:url';
 
+import { parseCsv } from '../scripts/build-idioms.mjs';
 import { PUZZLE_LEVELS } from '../.test-dist/src/puzzle/levels.js';
 import { buildPuzzleBoard } from '../.test-dist/src/puzzle/puzzle-board.js';
 import { createPuzzleSession, placePuzzleTile, selectPuzzleCell } from '../.test-dist/src/puzzle/puzzle-engine.js';
+
+const sourcePath = fileURLToPath(
+  new URL('../data/idioms.source.csv', import.meta.url)
+);
+const sourceIdioms = parseCsv(readFileSync(sourcePath, 'utf8'));
 
 test('provides exactly twenty sequential levels', () => {
   assert.equal(PUZZLE_LEVELS.length, 20);
   assert.deepEqual(PUZZLE_LEVELS.map((level) => level.levelNumber), Array.from({ length: 20 }, (_, i) => i + 1));
   assert.equal(new Set(PUZZLE_LEVELS.map((level) => level.id)).size, 20);
+});
+
+test('uses sixty-one unique idioms across chapter one', () => {
+  const placements = PUZZLE_LEVELS.flatMap((level) => level.placements);
+  const ids = placements.map((placement) => placement.idiomId);
+  const texts = placements.map((placement) => placement.text);
+
+  assert.equal(placements.length, 61);
+  assert.equal(new Set(ids).size, 61, 'chapter one repeats an idiomId');
+  assert.equal(new Set(texts).size, 61, 'chapter one repeats an idiom text');
+});
+
+test('every chapter one idiom exists as an enabled source entry', () => {
+  const enabledById = new Map(
+    sourceIdioms
+      .filter((idiom) => idiom.enabled)
+      .map((idiom) => [idiom.id, idiom.text])
+  );
+
+  for (const placement of PUZZLE_LEVELS.flatMap((level) => level.placements)) {
+    assert.equal(enabledById.get(placement.idiomId), placement.text, placement.idiomId);
+  }
 });
 
 test('every level builds a valid connected crossword board', () => {
