@@ -7,6 +7,7 @@ import {
   getTotalStars,
   isLevelUnlocked
 } from '../progress/progress-engine';
+import { useSoundEffects } from './use-sound-effects';
 import './LevelMap.css';
 
 export interface LevelMapProps {
@@ -14,6 +15,7 @@ export interface LevelMapProps {
   readonly loading: boolean;
   readonly storageWarning: string | null;
   readonly onOpenLevel: (levelNumber: number) => void;
+  readonly onOpenWhackAMole: () => void;
   readonly onReset: () => void;
   readonly onExit: () => void;
 }
@@ -33,10 +35,12 @@ export function LevelMap({
   loading,
   storageWarning,
   onOpenLevel,
+  onOpenWhackAMole,
   onReset,
   onExit
 }: LevelMapProps) {
-  const [message, setMessage] = useState('選擇已解鎖的關卡，或繼續上次進度。');
+  const sound = useSoundEffects();
+  const [message, setMessage] = useState('選擇已解鎖的關卡，或挑戰 30 秒打地鼠。');
   const continueLevel = getContinueLevelNumber(progress, PUZZLE_LEVELS.length);
   const totalStars = getTotalStars(progress);
 
@@ -57,7 +61,12 @@ export function LevelMap({
           <p className="eyebrow">第一章 · 成語之路</p>
           <h1 className="level-map-title">闖關地圖</h1>
         </div>
-        <button className="text-action" type="button" onClick={onReset}>重設進度</button>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button className="sound-toggle-btn" type="button" onClick={sound.toggleSound}>
+            {sound.isSoundEnabled ? '🔊' : '🔇'}
+          </button>
+          <button className="text-action" type="button" onClick={onReset}>重設進度</button>
+        </div>
       </header>
 
       {storageWarning === null ? null : (
@@ -70,39 +79,64 @@ export function LevelMap({
         <div><span>上次關卡</span><strong>第 {continueLevel} 關</strong></div>
       </section>
 
-      <button
-        className="primary-action continue-action"
-        type="button"
-        disabled={loading}
-        onClick={() => openLevel(continueLevel)}
-      >
-        {loading ? '讀取進度中…' : `繼續闖關：第 ${continueLevel} 關`}
-      </button>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button
+          className="primary-action continue-action"
+          type="button"
+          disabled={loading}
+          onClick={() => openLevel(continueLevel)}
+          style={{ flex: '1 1 14rem' }}
+        >
+          {loading ? '讀取進度中…' : `繼續闖關：第 ${continueLevel} 關`}
+        </button>
+        <button
+          className="secondary-action bonus-map-action"
+          type="button"
+          onClick={onOpenWhackAMole}
+          style={{ flex: '1 1 14rem' }}
+        >
+          🎯 挑戰成語打地鼠 (30秒)
+        </button>
+      </div>
 
       <p className="level-map-message" aria-live="polite">{message}</p>
 
-      <section className="level-grid" aria-label="第一章二十關">
+      <section className="level-grid" aria-label="第一章二十關與打地鼠獎勵關">
         {PUZZLE_LEVELS.map((level) => {
           const unlocked = isLevelUnlocked(progress, level.levelNumber);
           const record = progress.levelProgressById[level.id];
           const stars = record?.stars ?? 0;
           return (
-            <button
-              className={`level-card ${unlocked ? 'unlocked' : 'locked'} ${record === undefined ? '' : 'completed'}`}
-              type="button"
-              key={level.id}
-              aria-disabled={!unlocked}
-              aria-label={`第 ${level.levelNumber} 關，${level.title}，${unlocked ? `已解鎖，${stars} 星` : '尚未解鎖'}`}
-              onClick={() => openLevel(level.levelNumber)}
-            >
-              <span className="level-number">{unlocked ? level.levelNumber : '🔒'}</span>
-              <strong>{level.title}</strong>
-              <span className="level-difficulty">{difficultyLabels[level.difficulty]}</span>
-              <span className="level-stars" aria-hidden="true">{starText(stars)}</span>
-              {record === undefined ? null : (
-                <small>最高 {record.bestScore} 分</small>
-              )}
-            </button>
+            <div key={level.id} style={{ display: 'contents' }}>
+              <button
+                className={`level-card ${unlocked ? 'unlocked' : 'locked'} ${record === undefined ? '' : 'completed'}`}
+                type="button"
+                aria-disabled={!unlocked}
+                aria-label={`第 ${level.levelNumber} 關，${level.title}，${unlocked ? `已解鎖，${stars} 星` : '尚未解鎖'}`}
+                onClick={() => openLevel(level.levelNumber)}
+              >
+                <span className="level-number">{unlocked ? level.levelNumber : '🔒'}</span>
+                <strong>{level.title}</strong>
+                <span className="level-difficulty">{difficultyLabels[level.difficulty]}</span>
+                <span className="level-stars" aria-hidden="true">{starText(stars)}</span>
+                {record === undefined ? null : (
+                  <small>最高 {record.bestScore} 分</small>
+                )}
+              </button>
+
+              {level.levelNumber % 5 === 0 ? (
+                <button
+                  className="bonus-level-card"
+                  type="button"
+                  onClick={onOpenWhackAMole}
+                  aria-label={`第 ${level.levelNumber} 關後獎勵關，成語打地鼠`}
+                >
+                  <span className="bonus-level-icon" aria-hidden="true">🎯</span>
+                  <strong>打地鼠獎勵</strong>
+                  <span className="bonus-level-tag">30 秒補字</span>
+                </button>
+              ) : null}
+            </div>
           );
         })}
       </section>

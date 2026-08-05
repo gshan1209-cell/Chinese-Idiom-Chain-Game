@@ -39,8 +39,8 @@ body {
   font-size: var(--font-body);
   line-height: 1.6;
   background:
-    radial-gradient(circle at 20% 0%, rgba(251, 191, 36, 0.18), transparent 30rem),
-    linear-gradient(180deg, #fffaf3 0%, var(--paper) 100%);
+    radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.15), transparent 30rem),
+    linear-gradient(180deg, #fdf6ec 0%, var(--paper) 100%);
 }
 
 button,
@@ -55,7 +55,7 @@ a:focus-visible {
 }
 
 .app-shell {
-  width: min(100%, 72rem);
+  width: min(100%, 42rem);
   min-height: 100vh;
   margin: 0 auto;
   padding: max(1.25rem, env(safe-area-inset-top)) 1rem
@@ -67,10 +67,14 @@ a:focus-visible {
   justify-items: center;
   padding: clamp(1.5rem, 6vw, 4rem) clamp(1rem, 5vw, 3rem);
   text-align: center;
-  background: var(--card);
-  border: 2px solid var(--line);
+  background-image:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.9) 0%, rgba(255, 247, 237, 0.95) 100%),
+    url("/background.png");
+  background-size: cover;
+  background-position: center;
+  border: 2.5px solid var(--line);
   border-radius: 2rem;
-  box-shadow: 0 1.5rem 3rem rgba(124, 45, 18, 0.12);
+  box-shadow: 0 1.5rem 3rem rgba(124, 45, 18, 0.15);
 }
 
 .phase-badge {
@@ -253,6 +257,33 @@ h1 {
   border-radius: 1rem;
 }
 
+.sound-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--button-height);
+  padding: 0.5rem 1rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--brand-dark);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(124, 45, 18, 0.1);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.sound-toggle-btn:hover {
+  transform: scale(1.05);
+  background: #ffffff;
+}
+
+.sound-toggle-btn:active {
+  transform: scale(0.95);
+}
+
 .score-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -281,10 +312,14 @@ h1 {
 .game-card,
 .history-card {
   padding: clamp(1.2rem, 5vw, 2.4rem);
-  background: var(--card);
+  background-image:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.9) 0%, rgba(255, 247, 237, 0.95) 100%),
+    url("/background.png");
+  background-size: cover;
+  background-position: center;
   border: 2px solid var(--line);
   border-radius: 1.6rem;
-  box-shadow: 0 1rem 2rem rgba(124, 45, 18, 0.08);
+  box-shadow: 0 1rem 2rem rgba(124, 45, 18, 0.1);
 }
 
 .game-label,

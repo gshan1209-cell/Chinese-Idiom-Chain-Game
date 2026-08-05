@@ -13,7 +13,7 @@
     "build": "npm run build:data && tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
-    "test": "npm run test:data && npm run test:index && npm run test:game && npm run test:loader && npm run test:pwa && npm run test:puzzle && npm run test:progress && npm run test:bonus-energy && npm run test:game-bonus && npm run test:bonus-question && npm run test:bonus-round && npm run test:bonus-reward",
+    "test": "npm run test:data && npm run test:index && npm run test:game && npm run test:loader && npm run test:pwa && npm run test:puzzle && npm run test:progress && npm run test:bonus-energy && npm run test:game-bonus && npm run test:bonus-question && npm run test:bonus-round && npm run test:bonus-reward && npm run test:sound",
     "test:data": "node --test scripts/build-idioms.test.mjs",
     "test:index": "npm run compile:core && node --test tests/idiom-index.test.mjs",
     "compile:core": "tsc -p tsconfig.core.json",
@@ -27,7 +27,8 @@
     "test:game-bonus": "npm run compile:core && node --test tests/game-bonus-integration.test.mjs",
     "test:bonus-question": "npm run compile:core && node --test tests/bonus-question-generator.test.mjs",
     "test:bonus-round": "npm run compile:core && node --test tests/whack-a-mole-engine.test.mjs",
-    "test:bonus-reward": "npm run compile:core && node --test tests/bonus-reward.test.mjs"
+    "test:bonus-reward": "npm run compile:core && node --test tests/bonus-reward.test.mjs",
+    "test:sound": "npm run compile:core && node --test tests/sound-effects.test.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

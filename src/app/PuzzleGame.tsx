@@ -3,7 +3,9 @@ import { useEffect, useRef } from 'react';
 import type { LevelCompletionResult } from '../domain/progress';
 import { cellKey } from '../domain/puzzle';
 import { calculateStars } from '../progress/progress-engine';
+import { ConfettiCanvas } from './ConfettiCanvas';
 import { usePuzzleGame } from './use-puzzle-game';
+import { useSoundEffects } from './use-sound-effects';
 import './PuzzleGame.css';
 
 export interface PuzzleGameProps {
@@ -26,9 +28,12 @@ export function PuzzleGame({
   onOpenNextLevel
 }: PuzzleGameProps) {
   const game = usePuzzleGame(initialLevelNumber);
+  const sound = useSoundEffects();
   const { board } = game.session;
   const cells = [];
   const reportedLevelRef = useRef<string | null>(null);
+  const prevStatusRef = useRef(game.session.status);
+
   const completionResult: LevelCompletionResult = {
     levelId: game.level.id,
     levelNumber: game.level.levelNumber,
@@ -38,6 +43,13 @@ export function PuzzleGame({
   };
   const earnedStars = calculateStars(completionResult);
   const displayedBestStars = Math.max(bestStars, earnedStars);
+
+  useEffect(() => {
+    if (game.session.status === 'completed' && prevStatusRef.current !== 'completed') {
+      sound.playLevelComplete();
+    }
+    prevStatusRef.current = game.session.status;
+  }, [game.session.status, sound]);
 
   useEffect(() => {
     if (game.session.status === 'playing') {
@@ -63,6 +75,46 @@ export function PuzzleGame({
     onLevelCompleted
   ]);
 
+  const handleChooseTile = (tileId: string) => {
+    const tileKey = game.session.selectedCellKey;
+    if (tileKey === null) return;
+    const cell = board.cells.get(tileKey);
+    const tile = game.session.tiles.find((candidate) => candidate.id === tileId);
+    if (cell !== undefined && tile !== undefined && tile.usedBy === null) {
+      if (tile.character === cell.answer) {
+        sound.playCorrect();
+      } else {
+        sound.playWrong();
+      }
+    }
+    game.chooseTile(tileId);
+  };
+
+  const handleSelectCell = (key: string) => {
+    sound.playTileClick();
+    game.selectCell(key);
+  };
+
+  const handleHint = () => {
+    sound.playHint();
+    game.hint();
+  };
+
+  const handleRemove = () => {
+    sound.playButtonClick();
+    game.removeSelected();
+  };
+
+  const handleShuffle = () => {
+    sound.playButtonClick();
+    game.shuffleTiles();
+  };
+
+  const handleClear = () => {
+    sound.playButtonClick();
+    game.clear();
+  };
+
   for (let row = 0; row < game.level.height; row += 1) {
     for (let column = 0; column < game.level.width; column += 1) {
       const key = cellKey(row, column);
@@ -83,7 +135,7 @@ export function PuzzleGame({
           disabled={cell.fixed || game.session.status === 'completed'}
           aria-label={`第 ${row + 1} 列第 ${column + 1} 格${value ? `，目前是${value}` : '，尚未填字'}`}
           aria-pressed={selected}
-          onClick={() => game.selectCell(key)}
+          onClick={() => handleSelectCell(key)}
         >
           {value || '　'}
         </button>
@@ -101,7 +153,12 @@ export function PuzzleGame({
           <p className="eyebrow">第一章 · {game.level.title}</p>
           <h1 className="puzzle-title">第 {game.level.levelNumber} 關</h1>
         </div>
-        <button className="text-action" type="button" onClick={() => game.restartLevel()}>重玩</button>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button className="sound-toggle-btn" type="button" onClick={sound.toggleSound}>
+            {sound.isSoundEnabled ? '🔊' : '🔇'}
+          </button>
+          <button className="text-action" type="button" onClick={() => game.restartLevel()}>重玩</button>
+        </div>
       </header>
 
       <section className="puzzle-stats" aria-label="關卡狀態">
@@ -124,35 +181,39 @@ export function PuzzleGame({
       </section>
 
       {game.session.status === 'completed' ? (
-        <section className="puzzle-complete" aria-labelledby="complete-title">
-          <h2 id="complete-title">過關！本關成語</h2>
-          <div className="completion-stars" aria-label={`本次獲得 ${earnedStars} 星`}>
-            <strong aria-hidden="true">{starText(earnedStars)}</strong>
-            <span>本次 {earnedStars} 星 · 最佳 {displayedBestStars} 星</span>
-          </div>
-          <div className="completed-idioms">
-            {game.completedIdioms.map((idiom) => (
-              <article key={idiom.id}>
-                <strong>{idiom.text}</strong>
-                <p>{idiom.meaning}</p>
-              </article>
-            ))}
-          </div>
-          <div className="completion-actions">
-            <button className="secondary-action" type="button" onClick={() => onExitToMap()}>
-              返回地圖
-            </button>
-            <button
-              className="primary-action"
-              type="button"
-              onClick={() => finalLevel
-                ? onExitToMap()
-                : onOpenNextLevel(game.level.levelNumber + 1)}
-            >
-              {finalLevel ? '完成第一章' : '下一關'}
-            </button>
-          </div>
-        </section>
+        <>
+          <ConfettiCanvas />
+          <section className="puzzle-complete" aria-labelledby="complete-title">
+            <div className="victory-stamp">大吉</div>
+            <h2 id="complete-title">過關！本關成語</h2>
+            <div className="completion-stars" aria-label={`本次獲得 ${earnedStars} 星`}>
+              <strong aria-hidden="true">{starText(earnedStars)}</strong>
+              <span>本次 {earnedStars} 星 · 最佳 {displayedBestStars} 星</span>
+            </div>
+            <div className="completed-idioms">
+              {game.completedIdioms.map((idiom) => (
+                <article key={idiom.id}>
+                  <strong>{idiom.text}</strong>
+                  <p>{idiom.meaning}</p>
+                </article>
+              ))}
+            </div>
+            <div className="completion-actions">
+              <button className="secondary-action" type="button" onClick={() => onExitToMap()}>
+                返回地圖
+              </button>
+              <button
+                className="primary-action"
+                type="button"
+                onClick={() => finalLevel
+                  ? onExitToMap()
+                  : onOpenNextLevel(game.level.levelNumber + 1)}
+              >
+                {finalLevel ? '完成第一章' : '下一關'}
+              </button>
+            </div>
+          </section>
+        </>
       ) : (
         <section className="tile-panel" aria-labelledby="candidate-title">
           <h2 id="candidate-title">候選字</h2>
@@ -163,17 +224,17 @@ export function PuzzleGame({
                 type="button"
                 key={tile.id}
                 disabled={tile.usedBy !== null}
-                onClick={() => game.chooseTile(tile.id)}
+                onClick={() => handleChooseTile(tile.id)}
               >
                 {tile.character}
               </button>
             ))}
           </div>
           <div className="puzzle-actions">
-            <button className="secondary-action" type="button" onClick={() => game.removeSelected()}>移除</button>
-            <button className="secondary-action" type="button" onClick={() => game.hint()}>提示</button>
-            <button className="secondary-action" type="button" onClick={() => game.shuffleTiles()}>重排</button>
-            <button className="secondary-action" type="button" onClick={() => game.clear()}>清空</button>
+            <button className="secondary-action" type="button" onClick={handleRemove}>移除</button>
+            <button className="secondary-action" type="button" onClick={handleHint}>提示</button>
+            <button className="secondary-action" type="button" onClick={handleShuffle}>重排</button>
+            <button className="secondary-action" type="button" onClick={handleClear}>清空</button>
           </div>
         </section>
       )}

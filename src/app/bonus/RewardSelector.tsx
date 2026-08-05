@@ -46,7 +46,7 @@ export function RewardSelector({
         <h1 id="reward-title" className="bonus-title">
           選擇這次獎勵
         </h1>
-        <p>接著進入 15 秒補字打地鼠，命中越多，獎勵越高。</p>
+        <p>接著進入 30 秒補字打地鼠，命中越多，獎勵越高。</p>
         {unavailableReason !== null ? (
           <p className="bonus-unavailable" role="alert">
             {unavailableReason}

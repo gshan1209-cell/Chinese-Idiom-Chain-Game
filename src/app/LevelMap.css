@@ -177,13 +177,40 @@
     gap: 0.5rem;
   }
 
-  .level-card {
-    min-height: 8.6rem;
-  }
+  .bonus-map-action {
+  background: #fff7ed;
+  border-color: #f59e0b;
+  color: #92400e;
 }
 
-@media (max-width: 25rem) {
-  .level-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.bonus-level-card {
+  display: grid;
+  min-width: 0;
+  min-height: 9.8rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 0.7rem 0.35rem;
+  color: #7c2d12;
+  background-image: linear-gradient(180deg, #fffce8 0%, #fef3c7 100%);
+  border: 3px solid #f59e0b;
+  border-radius: 1.15rem;
+  box-shadow: 0 0.35rem 0 rgba(217, 119, 6, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.bonus-level-card:hover {
+  transform: scale(1.04);
+}
+
+.bonus-level-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.bonus-level-tag {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #d97706;
 }

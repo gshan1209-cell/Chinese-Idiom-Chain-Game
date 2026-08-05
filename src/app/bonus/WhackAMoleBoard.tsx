@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import type { BonusRewardType, BonusRound } from '../../domain/bonus';
+import { playMoleHit } from '../../sound/sound-effects';
 import { MoleHole } from './MoleHole';
 
 interface WhackAMoleBoardProps {
@@ -52,6 +53,7 @@ export function WhackAMoleBoard({ round, onHit }: WhackAMoleBoardProps) {
       const holeIndex = Number(event.key) - 1;
       if (!choices.has(holeIndex)) return;
       event.preventDefault();
+      playMoleHit();
       onHit(question.id, holeIndex);
     };
     window.addEventListener('keydown', handleKey);
@@ -61,7 +63,7 @@ export function WhackAMoleBoard({ round, onHit }: WhackAMoleBoardProps) {
   const seconds = (round.remainingMs / 1000).toFixed(1);
   const timerPercent = Math.max(
     0,
-    Math.min(100, (round.remainingMs / 15_000) * 100)
+    Math.min(100, (round.remainingMs / 30_000) * 100)
   );
 
   return (
@@ -91,7 +93,12 @@ export function WhackAMoleBoard({ round, onHit }: WhackAMoleBoardProps) {
               holeIndex={holeIndex}
               character={choices.get(holeIndex) ?? null}
               disabled={disabled}
-              onHit={(index) => question !== null && onHit(question.id, index)}
+              onHit={(index) => {
+                if (question !== null) {
+                  playMoleHit();
+                  onHit(question.id, index);
+                }
+              }}
             />
           ))}
         </div>

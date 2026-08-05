@@ -7,7 +7,7 @@ import type {
   BonusRoundPhase
 } from '../../domain/bonus.js';
 
-const ROUND_DURATION_MS = 15_000;
+const ROUND_DURATION_MS = 30_000;
 const FEEDBACK_DURATION_MS = 800;
 const COMBO_STEP = 20;
 const MAX_COMBO_BONUS = 200;
@@ -37,13 +37,13 @@ function remaining(deadlineMs: number, nowMs: number): number {
 function questionDurationMs(difficulty: BonusDifficulty): number {
   switch (difficulty) {
     case 'easy':
-      return 2_500;
+      return 5_000;
     case 'normal':
-      return 2_000;
+      return 4_000;
     case 'challenge':
-      return 1_700;
+      return 3_400;
     case 'extreme':
-      return 1_500;
+      return 3_000;
   }
 }
 
