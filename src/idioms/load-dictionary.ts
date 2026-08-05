@@ -37,8 +37,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function isInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value);
+}
+
 function parseManifest(value: unknown): DictionaryManifest {
-  if (!isRecord(value) || !Number.isInteger(value.dictionaryVersion) || !isRecord(value.files)) {
+  if (!isRecord(value) || !isInteger(value.dictionaryVersion) || !isRecord(value.files)) {
     throw new Error('字典資訊格式錯誤。');
   }
   const idioms = value.files.idioms;
@@ -46,7 +50,7 @@ function parseManifest(value: unknown): DictionaryManifest {
     throw new Error('字典資訊格式錯誤。');
   }
   return {
-    dictionaryVersion: value.dictionaryVersion as number,
+    dictionaryVersion: value.dictionaryVersion,
     files: { idioms }
   };
 }
@@ -77,8 +81,8 @@ function parseIdiom(value: unknown): Idiom | null {
     !DIFFICULTIES.has(value.difficulty) ||
     tags === null ||
     typeof value.enabled !== 'boolean' ||
-    !Number.isInteger(value.version) ||
-    (value.version as number) < 1
+    !isInteger(value.version) ||
+    value.version < 1
   ) {
     return null;
   }
@@ -96,16 +100,16 @@ function parseIdiom(value: unknown): Idiom | null {
     difficulty: value.difficulty as Idiom['difficulty'],
     tags,
     enabled: value.enabled,
-    version: value.version as number
+    version: value.version
   });
 }
 
 function parsePayload(value: unknown): IdiomDictionaryPayload {
   if (
     !isRecord(value) ||
-    !Number.isInteger(value.schemaVersion) ||
-    !Number.isInteger(value.dictionaryVersion) ||
-    !Number.isInteger(value.count) ||
+    !isInteger(value.schemaVersion) ||
+    !isInteger(value.dictionaryVersion) ||
+    !isInteger(value.count) ||
     !Array.isArray(value.idioms)
   ) {
     throw new Error('字典資料格式錯誤。');
