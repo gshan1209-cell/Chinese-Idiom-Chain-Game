@@ -17,7 +17,8 @@
     "src/domain/**/*.ts",
     "src/idioms/**/*.ts",
     "src/game/**/*.ts",
-    "src/pwa/**/*.ts"
+    "src/pwa/**/*.ts",
+    "src/puzzle/**/*.ts"
   ],
   "exclude": [
     "**/*.test.ts",
