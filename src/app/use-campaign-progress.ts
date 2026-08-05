@@ -9,6 +9,7 @@ import {
   recordLevelStarted
 } from '../progress/progress-engine';
 import type { CampaignProgressRepository } from '../progress/progress-repository';
+import { createProgressWriteQueue } from '../progress/progress-write-queue';
 
 const TOTAL_LEVELS = PUZZLE_LEVELS.length;
 const STORAGE_WARNING = '目前無法保存本機進度；本次仍可正常遊玩。';
@@ -22,6 +23,7 @@ export function useCampaignProgress() {
     const factory = globalThis.indexedDB;
     return factory === undefined ? null : createIndexedDbProgressRepository(factory);
   }, []);
+  const writeQueue = useMemo(() => createProgressWriteQueue(), []);
   const initialProgress = useMemo(
     () => createInitialCampaignProgress(TOTAL_LEVELS, now()),
     []
@@ -41,11 +43,11 @@ export function useCampaignProgress() {
       setStorageWarning(STORAGE_WARNING);
       return;
     }
-    void repository.save(next).then(
+    void writeQueue.enqueue(() => repository.save(next)).then(
       () => setStorageWarning(null),
       () => setStorageWarning(STORAGE_WARNING)
     );
-  }, [repository]);
+  }, [repository, writeQueue]);
 
   useEffect(() => {
     let active = true;
@@ -107,11 +109,11 @@ export function useCampaignProgress() {
       setStorageWarning(STORAGE_WARNING);
       return;
     }
-    void repository.clear().then(
+    void writeQueue.enqueue(() => repository.clear()).then(
       () => setStorageWarning(null),
       () => setStorageWarning(STORAGE_WARNING)
     );
-  }, [repository, setCurrentProgress]);
+  }, [repository, setCurrentProgress, writeQueue]);
 
   return {
     progress,
