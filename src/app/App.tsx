@@ -1,5 +1,11 @@
+import './bonus/bonus.css';
+
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 
+import { BonusResult } from './bonus/BonusResult';
+import { EnergyMeter } from './bonus/EnergyMeter';
+import { RewardSelector } from './bonus/RewardSelector';
+import { WhackAMoleBoard } from './bonus/WhackAMoleBoard';
 import { CampaignGame } from './CampaignGame';
 import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
@@ -7,7 +13,7 @@ import { useClassicGame } from './use-classic-game';
 const featureCards = [
   { icon: '關', title: '二十關闖關', description: '逐關解鎖縱橫成語填字，累積每關一到三星。' },
   { icon: '存', title: '本機保存', description: '解鎖、星級與最佳成績保存在目前裝置。' },
-  { icon: '學', title: '邊玩邊學', description: '過關後查看本關成語與解釋。' }
+  { icon: '樂', title: '趣味附加', description: '自由接龍累積能量，再挑戰十五秒成語打地鼠。' }
 ] as const;
 
 type AppMode = 'home' | 'campaign' | 'classic';
@@ -22,6 +28,42 @@ export function App() {
 
   if (mode === 'classic' && game.session !== null) {
     const session = game.session;
+    const bonus = game.bonus;
+
+    if (bonus.view === 'selecting') {
+      return (
+        <RewardSelector
+          rewards={bonus.availableRewards}
+          unavailableReason={bonus.unavailableReason}
+          onSelect={(reward) => bonus.startRound(reward)}
+          onCancel={() => bonus.cancelSelection()}
+        />
+      );
+    }
+
+    if (bonus.view === 'playing' && bonus.round !== null) {
+      return (
+        <WhackAMoleBoard
+          round={bonus.round}
+          onHit={(questionId, holeIndex) => bonus.hitHole(questionId, holeIndex)}
+        />
+      );
+    }
+
+    if (
+      bonus.view === 'result' &&
+      bonus.round !== null &&
+      bonus.settlement !== null
+    ) {
+      return (
+        <BonusResult
+          round={bonus.round}
+          settlement={bonus.settlement}
+          onClose={() => bonus.closeResult()}
+        />
+      );
+    }
+
     const recentHistory = session.history.slice(-6);
     const completed = session.result === 'completed';
 
@@ -34,7 +76,7 @@ export function App() {
       <main className="app-shell game-shell">
         <header className="game-header">
           <div>
-            <p className="eyebrow">其他玩法 · 自由接龍</p>
+            <p className="eyebrow">其他玩法 · 自由接龍＋打地鼠</p>
             <h1 className="game-title">中文成語接龍</h1>
           </div>
           <button className="text-action" type="button" onClick={() => setMode('home')}>
@@ -48,6 +90,12 @@ export function App() {
           <div><span>已接</span><strong>{session.correctCount}</strong></div>
         </section>
 
+        <EnergyMeter
+          resources={session.bonusResources}
+          disabled={session.result !== null}
+          onStart={() => bonus.openRewardSelector()}
+        />
+
         <section className="game-card" aria-labelledby="current-idiom-label">
           <p id="current-idiom-label" className="game-label">目前成語</p>
           <p className="current-idiom">{session.previousIdiom.text}</p>
@@ -59,7 +107,14 @@ export function App() {
             <div className="completion-panel" role="status">
               <h2>接龍完成！</h2>
               <p>這條路徑已沒有未使用的接續成語。</p>
-              <button className="primary-action" type="button" onClick={() => game.restartGame()}>再玩一局</button>
+              <div className="action-row completion-actions">
+                <button className="primary-action" type="button" onClick={() => game.continueGame()}>
+                  下一輪接龍
+                </button>
+                <button className="secondary-action" type="button" onClick={() => game.restartGame()}>
+                  全新開始
+                </button>
+              </div>
             </div>
           ) : (
             <form className="answer-form" onSubmit={handleSubmit}>
@@ -78,16 +133,25 @@ export function App() {
               />
               <div className="action-row">
                 <button className="primary-action" type="submit">送出答案</button>
-                <button className="secondary-action" type="button" onClick={() => game.requestHint()}>給我提示</button>
+                <button className="secondary-action" type="button" onClick={() => game.requestHint()}>
+                  給我提示
+                </button>
               </div>
             </form>
           )}
 
-          <div id="answer-feedback" className={`feedback ${game.feedback?.tone ?? 'info'}`} aria-live="polite">
+          <div
+            id="answer-feedback"
+            className={`feedback ${game.feedback?.tone ?? 'info'}`}
+            aria-live="polite"
+          >
             {game.feedback?.message ?? '請接出下一個四字成語。'}
           </div>
           {game.hintText !== null && !completed ? (
-            <div className="hint-card" role="status"><span>提示答案</span><strong>{game.hintText}</strong></div>
+            <div className="hint-card" role="status">
+              <span>提示答案</span>
+              <strong>{game.hintText}</strong>
+            </div>
           ) : null}
         </section>
 
@@ -127,10 +191,12 @@ export function App() {
           onClick={startClassic}
           style={{ marginTop: '1rem', width: 'min(100%, 22rem)' }}
         >
-          {game.loading ? '自由接龍載入中…' : '其他玩法：自由接龍'}
+          {game.loading ? '自由接龍載入中…' : '其他玩法：自由接龍＋打地鼠'}
         </button>
         {game.loadError !== null ? (
-          <button className="text-action" type="button" onClick={() => game.retryLoad()}>重新載入成語字典</button>
+          <button className="text-action" type="button" onClick={() => game.retryLoad()}>
+            重新載入成語字典
+          </button>
         ) : null}
         <p className="phase-note">不需登入，闖關進度只保存在目前裝置，不會上傳玩家操作</p>
       </section>

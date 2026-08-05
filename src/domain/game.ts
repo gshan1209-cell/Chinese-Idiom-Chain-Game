@@ -1,3 +1,4 @@
+import type { BonusResources } from './bonus.js';
 import type { Difficulty, Idiom } from './idiom.js';
 
 export type GameMode = 'classic' | 'timed' | 'choice';
@@ -26,6 +27,9 @@ export interface GameSession {
   readonly usedIdiomIds: ReadonlySet<string>;
   readonly history: readonly Idiom[];
   readonly result: GameSessionResult | null;
+  readonly bonusResources: BonusResources;
+  readonly hintUsedForCurrentTurn: boolean;
+  readonly appliedBonusSettlementIds: ReadonlySet<string>;
 }
 
 export interface TurnResult {

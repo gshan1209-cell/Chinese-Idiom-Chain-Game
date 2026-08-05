@@ -3,11 +3,16 @@ import { useCallback, useEffect, useState } from 'react';
 import type { GameSession, TurnErrorCode } from '../domain/game';
 import {
   createClassicSession,
+  createNextClassicSession,
   requestClassicHint,
   submitClassicTurn
 } from '../game/game-engine';
 import type { IdiomIndex } from '../idioms/idiom-index';
 import { loadDictionary } from '../idioms/load-dictionary';
+import {
+  useWhackAMole,
+  type WhackAMoleController
+} from './use-whack-a-mole';
 
 export type FeedbackTone = 'info' | 'success' | 'error';
 
@@ -24,11 +29,13 @@ export interface ClassicGameController {
   readonly feedback: GameFeedback | null;
   readonly hintText: string | null;
   readonly canStart: boolean;
+  readonly bonus: WhackAMoleController;
   setInput(value: string): void;
   startGame(): void;
   submitAnswer(): void;
   requestHint(): void;
   restartGame(): void;
+  continueGame(): void;
   retryLoad(): void;
 }
 
@@ -58,6 +65,7 @@ export function useClassicGame(): ClassicGameController {
   const [feedback, setFeedback] = useState<GameFeedback | null>(null);
   const [hintText, setHintText] = useState<string | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const bonus = useWhackAMole({ session, index, setSession });
 
   useEffect(() => {
     let active = true;
@@ -97,6 +105,18 @@ export function useClassicGame(): ClassicGameController {
     }
   }, [index]);
 
+  const continueGame = useCallback(() => {
+    if (index === null || session === null || session.result !== 'completed') return;
+    try {
+      setSession(createNextClassicSession(session, index));
+      setInputState('');
+      setHintText(null);
+      setFeedback({ tone: 'info', message: '保留部分能量，開始下一關！' });
+    } catch (error: unknown) {
+      setFeedback({ tone: 'error', message: errorMessage(error) });
+    }
+  }, [index, session]);
+
   const submitAnswer = useCallback(() => {
     if (index === null || session === null) return;
     const normalized = normalizeInput(input);
@@ -111,7 +131,15 @@ export function useClassicGame(): ClassicGameController {
 
     if (!outcome.result.correct) {
       const code = outcome.result.errorCode ?? 'IDIOM_NOT_FOUND';
-      setFeedback({ tone: 'error', message: ERROR_MESSAGES[code] });
+      const shieldUsed =
+        outcome.session.bonusResources.shieldLayers <
+        session.bonusResources.shieldLayers;
+      setFeedback({
+        tone: shieldUsed ? 'info' : 'error',
+        message: shieldUsed
+          ? '護盾生效，這次失誤不會中斷連擊。'
+          : ERROR_MESSAGES[code]
+      });
       return;
     }
 
@@ -128,6 +156,7 @@ export function useClassicGame(): ClassicGameController {
 
   const showHint = useCallback(() => {
     if (index === null || session === null) return;
+    const hadTicket = session.bonusResources.hintTickets > 0;
     const outcome = requestClassicHint(session, index);
     setSession(outcome.session);
     if (outcome.idiom === null) {
@@ -136,7 +165,12 @@ export function useClassicGame(): ClassicGameController {
       return;
     }
     setHintText(outcome.idiom.text);
-    setFeedback({ tone: 'info', message: '提示會扣 50 分，這次已套用。' });
+    setFeedback({
+      tone: 'info',
+      message: hadTicket
+        ? '已使用 1 張提示券，本次不扣分。'
+        : '提示會扣 50 分，這次已套用。'
+    });
   }, [index, session]);
 
   const setInput = useCallback((value: string) => {
@@ -155,11 +189,13 @@ export function useClassicGame(): ClassicGameController {
     feedback,
     hintText,
     canStart: index !== null && !loading,
+    bonus,
     setInput,
     startGame,
     submitAnswer,
     requestHint: showHint,
     restartGame: startGame,
+    continueGame,
     retryLoad
   };
 }

@@ -2,204 +2,154 @@
 
 **中文成語填填字（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語填字闖關 PWA。
 
-目前 Repository 已完成 **Phase 0–5：PWA 基礎、成語資料層、手機安裝、自由接龍附加模式、20 關縱橫成語填字，以及可持續保存的闖關地圖與星級進度**。
+目前完成 PWA 基礎、離線成語資料、第一章 20 關填字闖關、關卡地圖、星級與 IndexedDB 本機進度保存；自由接龍保留為附加模式，並加入可自行啟動的 15 秒成語打地鼠獎勵關卡。
 
 ## 目前完成範圍
 
-- React + TypeScript + Vite 專案骨架。
-- PWA Manifest、Service Worker 與字典快取設定。
-- 適合手機、兒童與中高齡使用者的大字體首頁。
-- 成語 CSV 來源格式與 JSON Schema。
-- CSV 驗證、重複偵測、首尾字索引及 SHA-256 校驗碼。
-- 37 筆可形成接龍關係的繁體中文示範資料。
-- 20 關縱橫成語填字關卡，從 2 個成語逐步增加到 4 個成語。
-- 純 TypeScript 填字盤面引擎：交叉字驗證、固定提示格、候選字池。
-- 填字 session 引擎：選格、填字、移除、重排、提示、計分與過關判定。
-- 第一章 20 關關卡地圖、逐關解鎖與繼續上次關卡。
-- 每關 1～3 星評價、最高分、最少錯誤與最少提示紀錄。
-- 原生 IndexedDB 本機進度保存；無法儲存時仍可遊玩並顯示警告。
-- 寫入佇列保證開始關卡、過關與重設操作依序保存，不讓舊進度覆蓋新進度。
-- 手機大字體闖關介面；原自由接龍保留為「其他玩法」。
-- 純 TypeScript 成語索引查詢服務。
-- 經典模式遊戲引擎：接龍判定、重複偵測、計分、連擊、提示與自然結束。
-- 大字體可玩介面：輸入、回饋、分數板、最近紀錄與重新開始。
-- 離線字典載入與資料格式防護。
-- Android／Chromium PWA 安裝按鈕與安裝結果回饋。
-- iPhone／iPad「分享 → 加入主畫面」三步驟教學。
-- 離線就緒標示與 Service Worker 新版本套用提示。
-- Node 內建測試、GitHub Actions 與一鍵執行腳本。
+- React + TypeScript + Vite PWA。
+- 成語 CSV、JSON Schema、資料驗證、首尾字索引與 SHA-256 校驗。
+- 37 筆可形成接龍關係的繁體中文開發示範資料。
+- 第一章 20 關縱橫成語填字，從 2 個成語逐步增加到 4 個成語。
+- 純 TypeScript 填字盤面與 session 引擎。
+- 關卡地圖、逐關解鎖、1～3 星評價、最高分與繼續上次關卡。
+- IndexedDB 本機進度保存與序列化寫入佇列。
+- 自由接龍：接龍判定、重複防護、計分、連擊、提示與自然結束。
+- 自由接龍趣味獎勵：能量槽、自選獎勵、15 秒補最後一字打地鼠。
+- 提示券、失誤護盾、雙倍分數，以及後續限時模式可使用的加時資源。
+- 打地鼠 6／9 洞位、數字鍵 1～9、四級難度、單題輪替與背景暫停防護。
+- Android／Chromium 安裝提示、iPhone／iPad 加入主畫面教學與離線更新提示。
 
 ## 尚未實作
 
-- 第二章與多章節內容。
-- 登入、雲端備份與跨裝置進度同步。
+- 第二章與更多關卡。
+- 登入、雲端備份與跨裝置同步。
 - 60 秒限時模式與選擇題模式。
-- 生命值、難度篩選與完整結算頁。
-- 設定頁、成語小冊與發音輔助。
-- Lighthouse、瀏覽器 E2E、Android 安裝及 iOS 加入主畫面實機驗證。
-
-## 執行環境
-
-- Node.js `>=22.13.0`
-- npm `>=10`
+- 成語小冊、發音輔助與完整設定頁。
+- Lighthouse、瀏覽器 E2E、Android／iOS 實機與完整離線 PWA 驗收。
 
 ## 快速啟動
+
+需求：Node.js `>=22.13.0`、npm `>=10`。
 
 ```bash
 ./start.sh
 ```
 
-預設服務位置：
-
-```text
-http://localhost:5173
-```
-
-可自訂 Host 與 Port：
+預設位置：`http://localhost:5173`
 
 ```bash
-HOST=127.0.0.1 PORT=4173 ./start.sh
-```
-
-## 常用指令
-
-```bash
-./start.sh             # 安裝依賴、建置字典並啟動開發伺服器
-./test.sh              # 建置字典並執行全部核心測試
+./test.sh              # 建置資料並執行全部核心測試
 ./build.sh             # 建立正式 PWA 產物
-./scripts/verify.sh    # test、typecheck、lint、build 全面驗證
+./scripts/verify.sh    # test、typecheck、lint、build
 ```
 
-也可直接使用 npm：
-
-```bash
-npm install
-npm run dev
-npm run test
-npm run build
-```
-
-## 安裝到手機
-
-- Android／Chromium：當瀏覽器確認符合 PWA 安裝條件後，首頁會顯示「安裝到手機」。
-- iPhone／iPad：首頁會顯示「查看安裝步驟」，依序使用 Safari「分享 → 加入主畫面 → 新增」。
-- 已安裝或以 standalone 模式啟動時，不再重複顯示安裝按鈕。
-- Service Worker 完成快取後會顯示「離線可用」。
-
-## 成語填字闖關規則
+## 成語填字闖關
 
 - 上方顯示由 2～4 個成語交叉組成的方格。
-- 先點選空格，再點擊下方候選中文字完成填入；不需叫出手機鍵盤。
-- 綠色格代表正確，紅色格代表錯誤，可移除後重新選字。
-- 「提示」會自動填入一格正確答案；「重排」只改變候選字順序。
-- 所有可填格正確後過關，並顯示本關成語與解釋。
-- 第一章目前提供 20 關，前 5 關為 2 個成語，後續增加至 3～4 個成語。
+- 先點選空格，再點擊候選中文字。
+- 綠色格代表正確，紅色格代表錯誤。
+- 提示會填入一格正確答案；重排只改變候選字順序。
+- 全部完成後顯示本關成語與解釋。
 
-## 闖關、星級與保存規則
+### 闖關與保存
 
 - 第 1 關永遠解鎖；完成第 N 關後解鎖第 N+1 關。
-- 三星：不使用提示且沒有填錯。
-- 二星：提示不超過 1 次，且錯誤不超過 2 次。
+- 三星：0 次提示、0 次錯誤。
+- 二星：提示不超過 1 次，錯誤不超過 2 次。
 - 一星：完成關卡但未達二星條件。
-- 重玩會保留較佳星級與最高分，並分別保存最少錯誤與最少提示紀錄。
-- 關卡地圖會顯示已解鎖數、總星數、每關最佳星級及上次遊玩關卡。
-- 進度保存在瀏覽器 IndexedDB：Database `cicg-progress`、version `1`、store `campaigns`、key `chapter-1`。
-- 進度只存在目前瀏覽器／裝置；清除網站資料、使用無痕模式或更換裝置不會自動同步。
-- 若瀏覽器封鎖 IndexedDB，遊戲仍可繼續，但會提示本次進度可能無法保存。
+- 重玩只更新更佳星級、最高分、最少錯誤與最少提示。
+- 進度保存在 IndexedDB：database `cicg-progress`、version `1`、store `campaigns`、key `chapter-1`。
+- IndexedDB 不可用時仍可遊玩，但會顯示本次可能無法保存的警告。
 
-## 自由接龍附加模式規則
+## 自由接龍＋成語打地鼠
+
+### 接龍規則
 
 - 下一個成語第一字必須等於目前成語最後一字。
-- 僅接受本機字典內啟用的四字成語。
+- 僅接受本機字典內已啟用的四字成語。
 - 同一局不能重複使用相同成語。
-- 正確答案基礎分為 100 分；連擊每次增加 20 分，上限加成 200 分。
-- 使用提示扣 50 分，分數最低維持 0 分。
-- 當目前成語已無未使用的接續候選，本局自然完成。
+- 基礎分 100；連擊每次增加 20，上限加成 200。
+- 沒有提示券時使用提示扣 50 分。
+- 護盾會在答錯時消耗一層並保留連擊。
+- 雙倍分數依剩餘題數套用，不重複相加。
 
-## 成語資料維護
+### 能量累積
 
-人工維護來源：
+| 條件 | 能量 |
+|---|---:|
+| 一般答對 | +15% |
+| 連擊達 3 題 | 額外 +5% |
+| 連擊達 5 題以上 | 再額外 +10% |
+| 困難成語 | 額外 +5% |
+| 使用提示後答對 | 僅取得基本 +15% |
 
-```text
-data/idioms.source.csv
-```
+- 能量最高 100%，滿格後由玩家自行啟動。
+- 離開獎勵選擇畫面不扣能量。
+- 可用安全題目少於 8 題時禁止啟動，能量保持不變。
+- 完成一輪自由接龍後，下一輪最多保留 50% 能量。
 
-欄位順序固定為：
+### 獎勵與操作
 
-```text
-id,text,bopomofo,pinyin,meaning,example,source,difficulty,tags,enabled,version
-```
+經典自由接龍可選：
 
-更新資料後執行：
+- **提示券**：下一次提示優先免費使用。
+- **雙倍分數**：下一批正確答案取得 2 倍分數。
+- **失誤護盾**：答錯時保留連擊。
+
+打地鼠規則：
+
+- 基礎時間 15 秒，題型固定為補最後一字。
+- 每題提供 4 個安全且唯一的候選字。
+- 手機顯示 6 洞；寬度至少 768px 時顯示 9 洞。
+- 支援觸控、滑鼠與鍵盤數字鍵 `1`～`9`。
+- 單題依難度每 1.5～2.5 秒自動輪替。
+- 第一次切到背景會暫停；第二次切到背景視為放棄該輪。
+
+| 難度 | 單題時間 | 打錯處罰 |
+|---|---:|---|
+| 輕鬆 | 2.5 秒 | 扣 20 分，保留連擊 |
+| 標準 | 2.0 秒 | 扣 50 分，連擊歸零 |
+| 挑戰 | 1.7 秒 | 扣 50 分並減少 1 秒 |
+| 極限 | 1.5 秒 | 減少 1 秒，連擊歸零 |
+
+## 成語資料
+
+人工來源：`data/idioms.source.csv`
 
 ```bash
 npm run build:data
 ```
 
-系統會驗證：
-
-- 成語必須是四個中文字。
-- `id` 與成語文字不得重複。
-- 解釋不得留空。
-- 難度只能是 `easy`、`normal`、`hard`。
-- `enabled` 必須為布林值。
-- `version` 必須為正整數。
-
-產物位置：
-
-```text
-public/generated/idioms.v1.json
-public/generated/idiom-index.v1.json
-public/generated/manifest.json
-```
-
-`manifest.json` 會記錄字典版本、資料筆數及 SHA-256 校驗碼。
-
 > [!WARNING]
-> 現有 37 筆內容是**開發用示範資料**。正式作為教育產品發布前，必須完成來源授權、文字校訂、注音／拼音補充及例句審核；不得將目前資料直接宣稱為正式辭典內容。
+> 現有 37 筆內容是開發用示範資料。正式教育產品發布前，必須完成來源授權、文字校訂、注音／拼音補充及例句審核。
 
-## 架構邊界
+## 架構
 
 ```text
 src/domain       領域型別與遊戲契約
-src/idioms       純 TypeScript 字典索引與載入服務
-src/game         自由接龍純 TypeScript 遊戲引擎
-src/puzzle       成語填字關卡、盤面與 session 引擎
-src/progress     闖關規則、資料解析、IndexedDB adapter 與寫入佇列
-src/pwa          PWA 裝置判斷與安裝純函式
-scripts          成語資料建置與驗證
-public/generated 離線字典與首尾字索引
-src/app          React PWA 使用者介面與瀏覽器事件 Hook
+src/idioms       字典索引與載入
+src/puzzle       填字關卡、盤面與 session 引擎
+src/progress     星級、解鎖、IndexedDB 與寫入佇列
+src/game         自由接龍引擎
+src/game/bonus   能量、出題、打地鼠回合與獎勵引擎
+src/app          React UI 與瀏覽器事件 Hook
+src/pwa          PWA 安裝與裝置判斷
 ```
 
-遊戲規則不直接寫在 React 元件內；`game-engine`、`puzzle-engine` 與 `progress-engine` 皆以 TDD 實作，再由 UI 透過公開介面呼叫。
+規則維持純 TypeScript；React 只呈現狀態並傳送玩家操作。
 
-## PWA 驗收方式
+## 驗證
 
-完成 `npm install` 後：
-
-```bash
-npm run build
-npx vite preview --host 0.0.0.0
-```
-
-正式驗收需確認：
-
-1. Chromium 顯示可安裝 PWA。
-2. 安裝後以 `standalone` 視窗啟動。
-3. 首次完整載入後，關閉網路仍可開啟首頁與字典資源。
-4. 360px 寬度無水平捲軸。
-5. 主要按鈕高度至少 56px，主要文字至少 24px。
-6. 完成第 1 關後第 2 關解鎖，重新整理後解鎖與星級仍保留。
-7. 重玩較差成績不會覆蓋較佳星級或最高分。
-8. IndexedDB 不可用時顯示警告，但關卡仍可操作。
+- 合併前最新主線的闖關／進度版本曾通過 66 項 Node 測試、TypeScript strict、ESLint 與 production build。
+- 打地鼠功能分支的五組新增與整合核心測試共 20 項通過、0 失敗。
+- 最終整合後仍須由 Pull Request CI 重新執行 `./scripts/verify.sh`，以整體結果作為合併依據。
 
 ## 文件
 
-- [開發規格書 v1.0](docs/specs/chinese-idiom-chain-game-v1.0-spec.md)
-- [Phase 0–1 Implementation Plan](docs/superpowers/plans/2026-08-05-phase-0-1-foundation.md)
-- [Phase 2 Classic Gameplay Plan](docs/superpowers/plans/2026-08-05-phase-2-classic-gameplay.md)
-- [Phase 3 PWA Installation Plan](docs/superpowers/plans/2026-08-05-phase-3-pwa-installation.md)
+- [開發規格書](docs/specs/chinese-idiom-chain-game-v1.0-spec.md)
 - [Phase 4 Idiom Crossword Plan](docs/superpowers/plans/2026-08-05-phase-4-idiom-crossword.md)
 - [Phase 5 Campaign Progress Design](docs/superpowers/specs/2026-08-05-phase-5-campaign-progress-design.md)
 - [Phase 5 Campaign Progress Plan](docs/superpowers/plans/2026-08-05-phase-5-campaign-progress.md)
+- [成語打地鼠設計規格](docs/superpowers/specs/2026-08-05-whack-a-mole-bonus-design.md)
+- [成語打地鼠實作計畫](docs/superpowers/plans/2026-08-05-whack-a-mole-bonus.md)
+- [成語打地鼠交付報告](docs/superpowers/reports/2026-08-05-whack-a-mole-bonus-delivery.md)
