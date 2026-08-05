@@ -5,11 +5,11 @@
 - Repository：`gshan1209-cell/Chinese-Idiom-Chain-Game`
 - Branch：`feat/chapter-one-unique-idioms`
 - 日期：2026-08-06
-- 狀態：規格已核准，待實作計畫
+- 狀態：規格已核准，實作中
 
 ## 1. 背景
 
-第一章目前共有 20 關，總計 61 個成語 placement。現行 `LEVEL_CHAINS` 只引用 37 筆成語種子，導致同一成語在不同關卡重複出現。
+第一章目前共有 20 關，總計 61 個成語 placement。原本 `LEVEL_CHAINS` 只引用 37 筆成語種子，導致同一成語在不同關卡重複出現。
 
 本次調整的目標是：
 
@@ -49,10 +49,10 @@
 
 ### 3.1 題庫容量
 
-第一章需要 61 個唯一成語。正式資料至少提供：
+第一章需要 61 個唯一成語。正式資料提供：
 
 - 61 個可用且互不重複的成語供第一章使用。
-- 建議題庫擴充至至少 70 筆，保留替換、校訂與後續調整空間。
+- 題庫擴充至 70 筆，保留 9 筆替換、校訂與後續調整空間。
 
 ### 3.2 資料來源
 
@@ -60,15 +60,16 @@
 
 - `data/idioms.source.csv`
 
-生成資料：
+由 `npm run build:data` 生成：
 
 - `public/generated/idioms.v1.json`
-- `public/generated/idioms.manifest.json`
+- `public/generated/idiom-index.v1.json`
+- `public/generated/manifest.json`
 
 所有新增內容必須：
 
 - 為四字繁體中文成語。
-- 有非空白解釋。
+- 有非空白解釋與例句。
 - 通過既有資料驗證。
 - 避免只為湊接龍而加入不可靠、罕見或未校訂詞條。
 - 不將生成式 AI 未經人工確認的內容直接視為正式題庫。
@@ -103,13 +104,14 @@
 
 ## 5. 永久驗證 Gate
 
-在 `tests/puzzle-levels.test.mjs` 新增第一章全域唯一性測試：
+在 `tests/puzzle-levels.test.mjs` 新增第一章全域唯一性與來源一致性測試：
 
 1. 收集第一章所有 placements。
 2. 斷言 placement 總數為 61。
 3. 斷言 `idiomId` Set 大小等於 placement 數。
 4. 斷言 `text` Set 大小等於 placement 數。
-5. 斷言每個 placement 的成語存在於正式生成字典。
+5. 解析 `data/idioms.source.csv`，斷言每個 placement 都對應到已啟用且文字一致的來源條目。
+6. `npm run build:data` 必須成功生成 70 筆版本化 JSON 與 checksum manifest。
 
 既有測試仍須全部保留：
 
@@ -127,6 +129,7 @@
 
 - 資料建置應失敗，不生成不一致版本。
 - Puzzle 測試應明確指出重複的 `idiomId` 或成語文字。
+- 來源字典測試應指出缺少或文字不一致的成語 ID。
 - 不允許以放寬唯一性、減少關卡或移除測試來通過 Gate。
 
 ## 7. 預計修改範圍
@@ -137,8 +140,9 @@
 - `src/puzzle/levels.ts`
 - `tests/puzzle-levels.test.mjs`
 - `README.md`
-- 必要的生成資料檔
 - 本功能的設計、計畫與交付文件
+
+生成資料由標準 `build:data` 流程重建，不手動維護 checksum。
 
 除非驗證證明必要，否則不得修改：
 
@@ -155,7 +159,8 @@
 - 第一章維持 20 關與 61 個 placement。
 - 61 個 `idiomId` 全部唯一。
 - 61 個成語文字全部唯一。
-- 所有成語都存在於正式字典且通過資料驗證。
+- 所有成語都存在於已啟用來源字典且通過資料驗證。
+- `build:data` 產出 70 筆生成字典。
 - 全部 20 關盤面可建立並可完成。
 - 既有玩家進度格式不變。
 - `npm run test:puzzle` 通過。
