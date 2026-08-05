@@ -19,7 +19,8 @@
     "src/game/**/*.ts",
     "src/pwa/**/*.ts",
     "src/puzzle/**/*.ts",
-    "src/progress/**/*.ts"
+    "src/progress/**/*.ts",
+    "src/media/**/*.ts"
   ],
   "exclude": [
     "**/*.test.ts",
