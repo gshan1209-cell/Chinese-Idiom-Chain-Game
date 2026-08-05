@@ -59,7 +59,7 @@ export function App() {
             <div className="completion-panel" role="status">
               <h2>接龍完成！</h2>
               <p>這條路徑已沒有未使用的接續成語。</p>
-              <button className="primary-action" type="button" onClick={game.restartGame}>再玩一局</button>
+              <button className="primary-action" type="button" onClick={() => game.restartGame()}>再玩一局</button>
             </div>
           ) : (
             <form className="answer-form" onSubmit={handleSubmit}>
@@ -78,7 +78,7 @@ export function App() {
               />
               <div className="action-row">
                 <button className="primary-action" type="submit">送出答案</button>
-                <button className="secondary-action" type="button" onClick={game.requestHint}>給我提示</button>
+                <button className="secondary-action" type="button" onClick={() => game.requestHint()}>給我提示</button>
               </div>
             </form>
           )}
@@ -130,7 +130,7 @@ export function App() {
           {game.loading ? '自由接龍載入中…' : '其他玩法：自由接龍'}
         </button>
         {game.loadError !== null ? (
-          <button className="text-action" type="button" onClick={game.retryLoad}>重新載入成語字典</button>
+          <button className="text-action" type="button" onClick={() => game.retryLoad()}>重新載入成語字典</button>
         ) : null}
         <p className="phase-note">不需登入、沒有強制廣告，首次載入後可離線遊玩</p>
       </section>
