@@ -1,8 +1,8 @@
 # Chinese-Idiom-Chain-Game
 
-**中文成語接龍遊戲（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語接龍 PWA。
+**中文成語填填字（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語填字闖關 PWA。
 
-目前 Repository 已完成 **Phase 0–3：PWA 基礎、成語資料層、可玩的經典模式與手機安裝引導**。
+目前 Repository 已完成 **Phase 0–4：PWA 基礎、成語資料層、手機安裝、自由接龍附加模式，以及 20 關縱橫成語填字主玩法**。
 
 ## 目前完成範圍
 
@@ -12,6 +12,10 @@
 - 成語 CSV 來源格式與 JSON Schema。
 - CSV 驗證、重複偵測、首尾字索引及 SHA-256 校驗碼。
 - 37 筆可形成接龍關係的繁體中文示範資料。
+- 20 關縱橫成語填字關卡，從 2 個成語逐步增加到 4 個成語。
+- 純 TypeScript 填字盤面引擎：交叉字驗證、固定提示格、候選字池。
+- 填字 session 引擎：選格、填字、移除、重排、提示、計分與過關判定。
+- 手機大字體闖關介面；原自由接龍保留為「其他玩法」。
 - 純 TypeScript 成語索引查詢服務。
 - 經典模式遊戲引擎：接龍判定、重複偵測、計分、連擊、提示與自然結束。
 - 大字體可玩介面：輸入、回饋、分數板、最近紀錄與重新開始。
@@ -23,10 +27,10 @@
 
 ## 尚未實作
 
+- 關卡地圖、章節解鎖與 IndexedDB 闖關進度保存。
 - 60 秒限時模式與選擇題模式。
 - 生命值、難度篩選與完整結算頁。
 - 設定頁、成語小冊與發音輔助。
-- IndexedDB 歷史成績與最佳紀錄。
 - Lighthouse、瀏覽器 E2E、Android 安裝及 iOS 加入主畫面實機驗證。
 
 ## 執行環境
@@ -77,7 +81,16 @@ npm run build
 - 已安裝或以 standalone 模式啟動時，不再重複顯示安裝按鈕。
 - Service Worker 完成快取後會顯示「離線可用」。
 
-## 經典模式規則
+## 成語填字闖關規則
+
+- 上方顯示由 2～4 個成語交叉組成的方格。
+- 先點選空格，再點擊下方候選中文字完成填入；不需叫出手機鍵盤。
+- 綠色格代表正確，紅色格代表錯誤，可移除後重新選字。
+- 「提示」會自動填入一格正確答案；「重排」只改變候選字順序。
+- 所有可填格正確後過關，並顯示本關成語與解釋。
+- 第一章目前提供 20 關，前 5 關為 2 個成語，後續增加至 3～4 個成語。
+
+## 自由接龍附加模式規則
 
 - 下一個成語第一字必須等於目前成語最後一字。
 - 僅接受本機字典內啟用的四字成語。
@@ -133,14 +146,15 @@ public/generated/manifest.json
 ```text
 src/domain       領域型別與遊戲契約
 src/idioms       純 TypeScript 字典索引與載入服務
-src/game         純 TypeScript 遊戲引擎
+src/game         自由接龍純 TypeScript 遊戲引擎
+src/puzzle       成語填字關卡、盤面與 session 引擎
 src/pwa          PWA 裝置判斷與安裝純函式
 scripts          成語資料建置與驗證
 public/generated 離線字典與首尾字索引
 src/app          React PWA 使用者介面與瀏覽器事件 Hook
 ```
 
-遊戲規則不直接寫在 React 元件內；`game-engine` 以 TDD 實作，再由 UI 透過公開介面呼叫。
+遊戲規則不直接寫在 React 元件內；`game-engine` 與 `puzzle-engine` 皆以 TDD 實作，再由 UI 透過公開介面呼叫。
 
 ## PWA 驗收方式
 
@@ -165,3 +179,4 @@ npx vite preview --host 0.0.0.0
 - [Phase 0–1 Implementation Plan](docs/superpowers/plans/2026-08-05-phase-0-1-foundation.md)
 - [Phase 2 Classic Gameplay Plan](docs/superpowers/plans/2026-08-05-phase-2-classic-gameplay.md)
 - [Phase 3 PWA Installation Plan](docs/superpowers/plans/2026-08-05-phase-3-pwa-installation.md)
+- [Phase 4 Idiom Crossword Plan](docs/superpowers/plans/2026-08-05-phase-4-idiom-crossword.md)
