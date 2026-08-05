@@ -11,6 +11,16 @@ test('provides exactly twenty sequential levels', () => {
   assert.equal(new Set(PUZZLE_LEVELS.map((level) => level.id)).size, 20);
 });
 
+test('uses sixty-one unique idioms across chapter one', () => {
+  const placements = PUZZLE_LEVELS.flatMap((level) => level.placements);
+  const ids = placements.map((placement) => placement.idiomId);
+  const texts = placements.map((placement) => placement.text);
+
+  assert.equal(placements.length, 61);
+  assert.equal(new Set(ids).size, 61, 'chapter one repeats an idiomId');
+  assert.equal(new Set(texts).size, 61, 'chapter one repeats an idiom text');
+});
+
 test('every level builds a valid connected crossword board', () => {
   for (const level of PUZZLE_LEVELS) {
     const board = buildPuzzleBoard(level);
