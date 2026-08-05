@@ -70,7 +70,7 @@ npm run test:puzzle
 1. **目前偏好 placement 正向的下一個空格**
    - 橫向向右。
    - 直向向下。
-   - 略過固定格、已有文字的格與已填正確格。
+   - 略過固定格與所有已有文字的格子。
 
 2. **目前格的相交 placement**
    - 偏好 placement 已無空格時，切換至目前交叉格的另一個 placement。
@@ -116,7 +116,7 @@ preferredPlacementId === null
 
 - 覆蓋錯字：先釋放原字牌，再寫入新字牌，然後繼續自動跳格。
 - `removePuzzleCell`：選取被移除格並重新推導方向。
-- `usePuzzleHint`：提示格維持選取並重新推導方向；若提示後完成關卡則 `null/null`。
+- `usePuzzleHint`：提示格維持選取並重新推導方向；若提示後完成關卡則 `null/null`。提示操作本身不套用一般自動跳格流程。
 - `clearPuzzleEntries`：回到第一個可填格，重新推導方向。
 
 ## 5. 領域模型與介面
@@ -197,7 +197,7 @@ export function findNextPuzzleCell(
 - 填對後跳到同成語下一空格。
 - 填錯後保留錯字但仍跳格。
 - 略過固定格。
-- 略過已有文字與已正確格。
+- 略過已有文字格。
 - 無效字牌不跳格。
 
 ### Task 3：交叉與直接相連 placement
@@ -225,7 +225,7 @@ export function findNextPuzzleCell(
 
 - 覆蓋錯字會釋放舊字牌並繼續跳格。
 - 移除格後重新選取該格與方向。
-- 提示後選取狀態一致。
+- 提示後選取狀態一致，但不自動跳到下一格。
 - 清空後回到第一個可填格與初始方向。
 
 ## 8. 測試要求
