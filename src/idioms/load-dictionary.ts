@@ -123,7 +123,7 @@ function parsePayload(value: unknown): IdiomDictionaryPayload {
     schemaVersion: value.schemaVersion as number,
     dictionaryVersion: value.dictionaryVersion as number,
     count: value.count as number,
-    idioms: Object.freeze(idioms as Idiom[])
+    idioms: Object.freeze(idioms)
   });
 }
 
