@@ -3,6 +3,8 @@ export type MediaItemType =
   | 'youtube-video'
   | 'youtube-playlist';
 
+export type MediaItemOrigin = 'built-in' | 'custom';
+
 export type ParsedMediaSource =
   | Readonly<{
       type: 'radio';
@@ -18,6 +20,30 @@ export type ParsedMediaSource =
       canonicalUrl: string;
       youtubePlaylistId: string;
     }>;
+
+export interface MediaLibraryItem {
+  readonly id: string;
+  readonly type: MediaItemType;
+  readonly title: string;
+  readonly sourceUrl: string;
+  readonly canonicalUrl: string;
+  readonly category: string;
+  readonly origin: MediaItemOrigin;
+  readonly enabled: boolean;
+  readonly createdAt?: string;
+  readonly homepageUrl?: string;
+  readonly youtubeVideoId?: string;
+  readonly youtubePlaylistId?: string;
+}
+
+export interface CreateCustomMediaItemInput {
+  readonly id: string;
+  readonly type: MediaItemType;
+  readonly title: string;
+  readonly category: string;
+  readonly sourceUrl: string;
+  readonly homepageUrl?: string;
+}
 
 export class MediaValidationError extends Error {
   constructor(message: string) {
