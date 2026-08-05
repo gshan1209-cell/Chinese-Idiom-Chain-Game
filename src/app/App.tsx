@@ -1,12 +1,18 @@
+import './bonus/bonus.css';
+
 import type { ChangeEvent, FormEvent } from 'react';
 
+import { BonusResult } from './bonus/BonusResult';
+import { EnergyMeter } from './bonus/EnergyMeter';
+import { RewardSelector } from './bonus/RewardSelector';
+import { WhackAMoleBoard } from './bonus/WhackAMoleBoard';
 import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
 
 const featureCards = [
   { icon: '字', title: '超大字體', description: '手機直式畫面也能清楚閱讀與操作。' },
   { icon: '離', title: '離線遊玩', description: '首次完整載入後，不連網也能繼續練習。' },
-  { icon: '學', title: '邊玩邊學', description: '答題同時累積成語接龍能力。' }
+  { icon: '樂', title: '趣味闖關', description: '累積能量，挑戰 15 秒成語打地鼠。' }
 ] as const;
 
 export function App() {
@@ -14,6 +20,36 @@ export function App() {
 
   if (game.session !== null) {
     const session = game.session;
+    const bonus = game.bonus;
+
+    if (bonus.view === 'selecting') {
+      return (
+        <RewardSelector
+          rewards={bonus.availableRewards}
+          onSelect={bonus.startRound}
+          onCancel={bonus.cancelSelection}
+        />
+      );
+    }
+
+    if (bonus.view === 'playing' && bonus.round !== null) {
+      return <WhackAMoleBoard round={bonus.round} onHit={bonus.hitHole} />;
+    }
+
+    if (
+      bonus.view === 'result' &&
+      bonus.round !== null &&
+      bonus.settlement !== null
+    ) {
+      return (
+        <BonusResult
+          round={bonus.round}
+          settlement={bonus.settlement}
+          onClose={bonus.closeResult}
+        />
+      );
+    }
+
     const recentHistory = session.history.slice(-6);
     const completed = session.result === 'completed';
 
@@ -40,6 +76,12 @@ export function App() {
           <div><span>已接</span><strong>{session.correctCount}</strong></div>
         </section>
 
+        <EnergyMeter
+          resources={session.bonusResources}
+          disabled={session.result !== null}
+          onStart={bonus.openRewardSelector}
+        />
+
         <section className="game-card" aria-labelledby="current-idiom-label">
           <p id="current-idiom-label" className="game-label">目前成語</p>
           <p className="current-idiom">{session.previousIdiom.text}</p>
@@ -51,9 +93,14 @@ export function App() {
             <div className="completion-panel" role="status">
               <h2>接龍完成！</h2>
               <p>這條路徑已沒有未使用的接續成語。</p>
-              <button className="primary-action" type="button" onClick={game.restartGame}>
-                再玩一局
-              </button>
+              <div className="action-row completion-actions">
+                <button className="primary-action" type="button" onClick={game.continueGame}>
+                  下一關
+                </button>
+                <button className="secondary-action" type="button" onClick={game.restartGame}>
+                  全新開始
+                </button>
+              </div>
             </div>
           ) : (
             <form className="answer-form" onSubmit={handleSubmit}>
@@ -112,11 +159,11 @@ export function App() {
   return (
     <main className="app-shell">
       <section className="hero" aria-labelledby="page-title">
-        <span className="phase-badge">離線 PWA · 經典模式</span>
+        <span className="phase-badge">離線 PWA · 成語趣味闖關</span>
         <div className="seal" aria-hidden="true">成</div>
         <p className="eyebrow">看得清楚，離線也能玩</p>
         <h1 id="page-title">中文成語接龍</h1>
-        <p className="hero-copy">依照上一個成語的最後一字，接出下一個四字成語。</p>
+        <p className="hero-copy">接成語、集能量，再挑戰 15 秒成語打地鼠。</p>
 
         {game.loadError !== null ? (
           <div className="load-error" role="alert">
