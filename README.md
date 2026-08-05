@@ -8,8 +8,9 @@
 
 - React + TypeScript + Vite PWA。
 - 成語 CSV、JSON Schema、資料驗證、首尾字索引與 SHA-256 校驗。
-- 37 筆可形成接龍關係的繁體中文開發示範資料。
+- 70 筆可形成接龍關係的繁體中文開發示範資料。
 - 第一章 20 關縱橫成語填字，從 2 個成語逐步增加到 4 個成語。
+- 第一章共使用 61 個不同成語，同一成語不會跨關重複。
 - 純 TypeScript 填字盤面與 session 引擎。
 - 關卡地圖、逐關解鎖、1～3 星評價、最高分與繼續上次關卡。
 - IndexedDB 本機進度保存與序列化寫入佇列。
@@ -51,6 +52,7 @@
 - 盤面仍有空格時優先填滿空格，全盤填滿後自動巡回錯誤格。
 - 提示會填入一格正確答案；重排只改變候選字順序。
 - 全部完成後顯示本關成語與解釋。
+- 第一章每個成語只會出現在一個關卡；`idiomId` 與成語文字皆有自動唯一性 Gate。
 
 ### 闖關與保存
 
@@ -122,7 +124,7 @@ npm run build:data
 ```
 
 > [!WARNING]
-> 現有 37 筆內容是開發用示範資料。正式教育產品發布前，必須完成來源授權、文字校訂、注音／拼音補充及例句審核。
+> 現有 70 筆內容是開發用示範資料。正式教育產品發布前，必須完成來源授權、文字校訂、注音／拼音補充及例句審核。
 
 ## 架構
 
@@ -141,9 +143,8 @@ src/pwa          PWA 安裝與裝置判斷
 
 ## 驗證
 
-- 合併前最新主線的闖關／進度版本曾通過 66 項 Node 測試、TypeScript strict、ESLint 與 production build。
-- 打地鼠功能分支的五組新增與整合核心測試共 20 項通過、0 失敗。
-- 最終整合後仍須由 Pull Request CI 重新執行 `./scripts/verify.sh`，以整體結果作為合併依據。
+- Pull Request CI 會執行 `./scripts/verify.sh`，包含資料建置、全部 Node 測試、TypeScript strict、ESLint 與 production PWA build。
+- 第一章永久 Gate 驗證 20 關、61 個 placement、61 個唯一 `idiomId`、61 個唯一成語文字、來源字典一致性、交叉鏈與逐關可完成性。
 
 ## 文件
 
@@ -154,3 +155,5 @@ src/pwa          PWA 安裝與裝置判斷
 - [成語打地鼠設計規格](docs/superpowers/specs/2026-08-05-whack-a-mole-bonus-design.md)
 - [成語打地鼠實作計畫](docs/superpowers/plans/2026-08-05-whack-a-mole-bonus.md)
 - [成語打地鼠交付報告](docs/superpowers/reports/2026-08-05-whack-a-mole-bonus-delivery.md)
+- [第一章成語不重複設計規格](docs/superpowers/specs/2026-08-06-chapter-one-unique-idioms-design.md)
+- [第一章成語不重複實作計畫](docs/superpowers/plans/2026-08-06-chapter-one-unique-idioms.md)
