@@ -1,9 +1,9 @@
 {
   "name": "chinese-idiom-chain-game",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "大字體、離線優先、可安裝至手機的繁體中文成語接龍 PWA。",
+  "description": "大字體、離線優先、可安裝至手機的繁體中文成語填字闖關 PWA。",
   "engines": {
     "node": ">=22.13.0"
   },
@@ -13,14 +13,15 @@
     "build": "npm run build:data && tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
-    "test": "npm run test:data && npm run test:index && npm run test:game && npm run test:loader && npm run test:pwa",
+    "test": "npm run test:data && npm run test:index && npm run test:game && npm run test:loader && npm run test:pwa && npm run test:puzzle",
     "test:data": "node --test scripts/build-idioms.test.mjs",
     "test:index": "npm run compile:core && node --test tests/idiom-index.test.mjs",
     "compile:core": "tsc -p tsconfig.core.json",
     "verify": "./scripts/verify.sh",
     "test:game": "npm run compile:core && node --test tests/game-engine.test.mjs",
     "test:loader": "npm run compile:core && node --test tests/load-dictionary.test.mjs",
-    "test:pwa": "npm run compile:core && node --test tests/pwa-install.test.mjs"
+    "test:pwa": "npm run compile:core && node --test tests/pwa-install.test.mjs",
+    "test:puzzle": "npm run compile:core && node --test tests/puzzle-board.test.mjs tests/puzzle-engine.test.mjs tests/puzzle-levels.test.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
