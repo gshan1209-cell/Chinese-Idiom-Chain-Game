@@ -1,0 +1,189 @@
+.level-map-shell {
+  display: grid;
+  gap: 1rem;
+  max-width: 66rem;
+}
+
+.level-map-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.level-map-header .eyebrow,
+.level-map-title {
+  margin: 0;
+}
+
+.level-map-title {
+  font-size: clamp(2.4rem, 9vw, 4.5rem);
+}
+
+.storage-warning,
+.level-map-message {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-supporting);
+  font-weight: 800;
+  text-align: center;
+  border-radius: 0.9rem;
+}
+
+.storage-warning {
+  color: #92400e;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+}
+
+.level-map-message {
+  color: var(--muted);
+  background: #fff;
+  border: 2px solid var(--line);
+}
+
+.chapter-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.chapter-summary div {
+  display: grid;
+  justify-items: center;
+  padding: 0.8rem 0.4rem;
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 1rem;
+}
+
+.chapter-summary span {
+  font-size: var(--font-supporting);
+  color: var(--muted);
+}
+
+.chapter-summary strong {
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+}
+
+.continue-action {
+  justify-self: center;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.level-card {
+  display: grid;
+  min-width: 0;
+  min-height: 9.8rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 0.7rem 0.35rem;
+  color: var(--ink);
+  background: #fff;
+  border: 3px solid var(--line);
+  border-radius: 1.15rem;
+  box-shadow: 0 0.35rem 0 rgba(124, 45, 18, 0.18);
+}
+
+.level-card.unlocked {
+  border-color: #d97706;
+}
+
+.level-card.completed {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.level-card.locked {
+  color: #78716c;
+  background: #e7e5e4;
+  border-color: #a8a29e;
+  box-shadow: none;
+}
+
+.level-number {
+  display: grid;
+  width: 3.25rem;
+  min-height: 3.25rem;
+  place-items: center;
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #fff;
+  background: var(--brand-dark);
+  border-radius: 999px;
+}
+
+.level-card.locked .level-number {
+  color: inherit;
+  background: transparent;
+}
+
+.level-card strong {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  line-height: 1.25;
+}
+
+.level-difficulty,
+.level-card small {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.level-stars {
+  font-size: 1.15rem;
+  color: #d97706;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 50rem) {
+  .level-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 36rem) {
+  .level-map-header {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .level-map-header > div {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .level-map-header > button:first-child {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .level-map-header > button:last-child {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .chapter-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .level-card {
+    min-height: 8.6rem;
+  }
+}
+
+@media (max-width: 25rem) {
+  .level-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
