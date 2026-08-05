@@ -2,7 +2,7 @@
 
 **中文成語接龍遊戲（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語接龍 PWA。
 
-目前 Repository 已完成 **Phase 0–2：PWA 基礎、成語資料層與可玩的經典模式**。
+目前 Repository 已完成 **Phase 0–3：PWA 基礎、成語資料層、可玩的經典模式與手機安裝引導**。
 
 ## 目前完成範圍
 
@@ -16,6 +16,9 @@
 - 經典模式遊戲引擎：接龍判定、重複偵測、計分、連擊、提示與自然結束。
 - 大字體可玩介面：輸入、回饋、分數板、最近紀錄與重新開始。
 - 離線字典載入與資料格式防護。
+- Android／Chromium PWA 安裝按鈕與安裝結果回饋。
+- iPhone／iPad「分享 → 加入主畫面」三步驟教學。
+- 離線就緒標示與 Service Worker 新版本套用提示。
 - Node 內建測試、GitHub Actions 與一鍵執行腳本。
 
 ## 尚未實作
@@ -23,7 +26,7 @@
 - 60 秒限時模式與選擇題模式。
 - 生命值、難度篩選與完整結算頁。
 - 設定頁、成語小冊與發音輔助。
-- IndexedDB 歷史成績、最佳紀錄與 PWA 安裝引導介面。
+- IndexedDB 歷史成績與最佳紀錄。
 - Lighthouse、瀏覽器 E2E、Android 安裝及 iOS 加入主畫面實機驗證。
 
 ## 執行環境
@@ -66,6 +69,13 @@ npm run dev
 npm run test
 npm run build
 ```
+
+## 安裝到手機
+
+- Android／Chromium：當瀏覽器確認符合 PWA 安裝條件後，首頁會顯示「安裝到手機」。
+- iPhone／iPad：首頁會顯示「查看安裝步驟」，依序使用 Safari「分享 → 加入主畫面 → 新增」。
+- 已安裝或以 standalone 模式啟動時，不再重複顯示安裝按鈕。
+- Service Worker 完成快取後會顯示「離線可用」。
 
 ## 經典模式規則
 
@@ -124,9 +134,10 @@ public/generated/manifest.json
 src/domain       領域型別與遊戲契約
 src/idioms       純 TypeScript 字典索引與載入服務
 src/game         純 TypeScript 遊戲引擎
+src/pwa          PWA 裝置判斷與安裝純函式
 scripts          成語資料建置與驗證
 public/generated 離線字典與首尾字索引
-src/app          React PWA 使用者介面
+src/app          React PWA 使用者介面與瀏覽器事件 Hook
 ```
 
 遊戲規則不直接寫在 React 元件內；`game-engine` 以 TDD 實作，再由 UI 透過公開介面呼叫。
@@ -153,3 +164,4 @@ npx vite preview --host 0.0.0.0
 - [開發規格書 v1.0](docs/specs/chinese-idiom-chain-game-v1.0-spec.md)
 - [Phase 0–1 Implementation Plan](docs/superpowers/plans/2026-08-05-phase-0-1-foundation.md)
 - [Phase 2 Classic Gameplay Plan](docs/superpowers/plans/2026-08-05-phase-2-classic-gameplay.md)
+- [Phase 3 PWA Installation Plan](docs/superpowers/plans/2026-08-05-phase-3-pwa-installation.md)

@@ -1,5 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 
+import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
 
 const featureCards = [
@@ -136,6 +137,8 @@ export function App() {
         )}
         <p className="phase-note">不需登入，遊戲資料只在目前裝置執行</p>
       </section>
+
+      <PwaInstallCard />
 
       <section className="feature-grid" aria-label="產品特色">
         {featureCards.map((feature) => (

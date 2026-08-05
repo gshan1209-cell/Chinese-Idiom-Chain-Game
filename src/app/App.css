@@ -444,3 +444,130 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+.install-card {
+  margin-top: 1.25rem;
+  padding: clamp(1.2rem, 5vw, 2rem);
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 1.4rem;
+}
+
+.install-card-heading,
+.ios-dialog-heading,
+.install-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.install-kicker {
+  margin: 0;
+  font-size: var(--font-supporting);
+  font-weight: 900;
+  color: var(--muted);
+}
+
+.install-card h2,
+.ios-instructions h3 {
+  margin: 0.15rem 0 0;
+  line-height: 1.25;
+}
+
+.offline-badge {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.7rem;
+  font-size: var(--font-supporting);
+  font-weight: 900;
+  color: #78350f;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 999px;
+}
+
+.offline-badge.ready {
+  color: #065f46;
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.install-status,
+.browser-install-note {
+  margin: 1rem 0;
+  font-size: var(--font-supporting);
+}
+
+.install-status.success {
+  color: #065f46;
+}
+
+.install-status.error {
+  color: #9f1239;
+}
+
+.install-action {
+  flex: 1 1 16rem;
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+}
+
+.update-action {
+  flex: 0 1 auto;
+}
+
+.installed-label {
+  display: inline-flex;
+  min-height: var(--button-height);
+  align-items: center;
+  padding: 0.65rem 1rem;
+  font-weight: 900;
+  color: #065f46;
+  background: #d1fae5;
+  border: 2px solid #34d399;
+  border-radius: 1rem;
+}
+
+.ios-instructions {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #eff6ff;
+  border: 3px solid #60a5fa;
+  border-radius: 1rem;
+}
+
+.ios-instructions ol {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1rem 0 0;
+  padding-left: 1.8rem;
+}
+
+.close-instructions {
+  min-height: var(--button-height);
+  padding: 0.55rem 0.9rem;
+  font-weight: 900;
+  color: var(--brand-dark);
+  background: #fff;
+  border: 2px solid var(--brand-dark);
+  border-radius: 0.8rem;
+}
+
+@media (max-width: 38rem) {
+  .install-card-heading,
+  .install-actions,
+  .ios-dialog-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .offline-badge,
+  .installed-label {
+    align-self: flex-start;
+  }
+
+  .install-action,
+  .update-action,
+  .close-instructions {
+    width: 100%;
+  }
+}
