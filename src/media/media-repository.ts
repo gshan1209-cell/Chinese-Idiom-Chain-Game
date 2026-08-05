@@ -31,11 +31,14 @@ export function createMemoryMediaRepository(
   let stored = initial === null ? null : cloneMediaState(initial);
 
   return Object.freeze({
-    async load(): Promise<MediaState | null> {
-      return stored === null ? null : cloneMediaState(stored);
+    load(): Promise<MediaState | null> {
+      return Promise.resolve(
+        stored === null ? null : cloneMediaState(stored)
+      );
     },
-    async save(state: MediaState): Promise<void> {
+    save(state: MediaState): Promise<void> {
       stored = cloneMediaState(state);
+      return Promise.resolve();
     }
   });
 }
