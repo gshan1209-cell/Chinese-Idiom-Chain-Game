@@ -86,8 +86,6 @@
 
 人工來源：`data/idioms.source.csv`
 
-更新後執行：
-
 ```bash
 npm run build:data
 ```
@@ -113,7 +111,7 @@ src/pwa          PWA 安裝與裝置判斷
 本分支在隔離環境已完成：
 
 - 核心 TypeScript 編譯通過。
-- 新增與整合核心測試 **19 項通過、0 失敗**。
+- PR 內五組新增與整合核心測試 **20 項通過、0 失敗**。
 - React 控制器與介面最小靜態型別檢查通過。
 
 目前環境無法安裝 npm 依賴，因此正式 React／Vite typecheck、ESLint、production build、瀏覽器尺寸與 PWA 實機驗收仍需由 GitHub Actions 或完整網路環境接續執行。
