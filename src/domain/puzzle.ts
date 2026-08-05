@@ -57,6 +57,7 @@ export interface PuzzleSession {
   readonly tileByCell: Readonly<Record<string, string>>;
   readonly tiles: readonly PuzzleTile[];
   readonly selectedCellKey: string | null;
+  readonly preferredPlacementId: string | null;
   readonly status: PuzzleSessionStatus;
   readonly score: number;
   readonly mistakes: number;
