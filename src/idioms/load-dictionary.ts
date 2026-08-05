@@ -111,10 +111,13 @@ function parsePayload(value: unknown): IdiomDictionaryPayload {
     throw new Error('字典資料格式錯誤。');
   }
 
-  const idioms = value.idioms.map(parseIdiom);
-  if (idioms.some((item) => item === null)) {
-    throw new Error('字典資料格式錯誤。');
-  }
+  const idioms = value.idioms.map((item) => {
+    const idiom = parseIdiom(item);
+    if (idiom === null) {
+      throw new Error('字典資料格式錯誤。');
+    }
+    return idiom;
+  });
   if (value.count !== idioms.length) {
     throw new Error(`字典筆數不一致：標示 ${String(value.count)} 筆，實際 ${idioms.length} 筆。`);
   }
