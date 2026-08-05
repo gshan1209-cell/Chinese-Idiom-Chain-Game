@@ -35,14 +35,19 @@ export function App() {
         <RewardSelector
           rewards={bonus.availableRewards}
           unavailableReason={bonus.unavailableReason}
-          onSelect={bonus.startRound}
-          onCancel={bonus.cancelSelection}
+          onSelect={(reward) => bonus.startRound(reward)}
+          onCancel={() => bonus.cancelSelection()}
         />
       );
     }
 
     if (bonus.view === 'playing' && bonus.round !== null) {
-      return <WhackAMoleBoard round={bonus.round} onHit={bonus.hitHole} />;
+      return (
+        <WhackAMoleBoard
+          round={bonus.round}
+          onHit={(questionId, holeIndex) => bonus.hitHole(questionId, holeIndex)}
+        />
+      );
     }
 
     if (
@@ -54,7 +59,7 @@ export function App() {
         <BonusResult
           round={bonus.round}
           settlement={bonus.settlement}
-          onClose={bonus.closeResult}
+          onClose={() => bonus.closeResult()}
         />
       );
     }
@@ -88,7 +93,7 @@ export function App() {
         <EnergyMeter
           resources={session.bonusResources}
           disabled={session.result !== null}
-          onStart={bonus.openRewardSelector}
+          onStart={() => bonus.openRewardSelector()}
         />
 
         <section className="game-card" aria-labelledby="current-idiom-label">
