@@ -1,23 +1,23 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 
-import { PuzzleGame } from './PuzzleGame';
+import { CampaignGame } from './CampaignGame';
 import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
 
 const featureCards = [
-  { icon: '填', title: '縱橫填字', description: '把候選文字填入交叉成語方格，完成整個關卡。' },
-  { icon: '離', title: '離線遊玩', description: '首次完整載入後，不連網也能繼續闖關。' },
+  { icon: '關', title: '二十關闖關', description: '逐關解鎖縱橫成語填字，累積每關一到三星。' },
+  { icon: '存', title: '本機保存', description: '解鎖、星級與最佳成績保存在目前裝置。' },
   { icon: '學', title: '邊玩邊學', description: '過關後查看本關成語與解釋。' }
 ] as const;
 
-type AppMode = 'home' | 'puzzle' | 'classic';
+type AppMode = 'home' | 'campaign' | 'classic';
 
 export function App() {
   const [mode, setMode] = useState<AppMode>('home');
   const game = useClassicGame();
 
-  if (mode === 'puzzle') {
-    return <PuzzleGame onExit={() => setMode('home')} />;
+  if (mode === 'campaign') {
+    return <CampaignGame onExit={() => setMode('home')} />;
   }
 
   if (mode === 'classic' && game.session !== null) {
@@ -111,14 +111,14 @@ export function App() {
   return (
     <main className="app-shell">
       <section className="hero" aria-labelledby="page-title">
-        <span className="phase-badge">20 關 · 離線 PWA</span>
+        <span className="phase-badge">20 關 · 星級解鎖 · 離線 PWA</span>
         <div className="seal" aria-hidden="true">填</div>
         <p className="eyebrow">大字體成語填字闖關</p>
         <h1 id="page-title">中文成語填填字</h1>
-        <p className="hero-copy">點選下方候選字，完成上方縱橫交錯的成語方格。</p>
+        <p className="hero-copy">完成縱橫交錯的成語方格，解鎖下一關並累積三星紀錄。</p>
 
-        <button className="primary-action" type="button" onClick={() => setMode('puzzle')}>
-          開始闖關
+        <button className="primary-action" type="button" onClick={() => setMode('campaign')}>
+          進入闖關地圖
         </button>
         <button
           className="secondary-action"
@@ -132,7 +132,7 @@ export function App() {
         {game.loadError !== null ? (
           <button className="text-action" type="button" onClick={() => game.retryLoad()}>重新載入成語字典</button>
         ) : null}
-        <p className="phase-note">不需登入、沒有強制廣告，首次載入後可離線遊玩</p>
+        <p className="phase-note">不需登入，闖關進度只保存在目前裝置，不會上傳玩家操作</p>
       </section>
 
       <PwaInstallCard />
