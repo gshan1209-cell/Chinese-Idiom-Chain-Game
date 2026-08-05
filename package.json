@@ -22,7 +22,7 @@
     "test:loader": "npm run compile:core && node --test tests/load-dictionary.test.mjs",
     "test:pwa": "npm run compile:core && node --test tests/pwa-install.test.mjs",
     "test:puzzle": "npm run compile:core && node --test tests/puzzle-board.test.mjs tests/puzzle-engine.test.mjs tests/puzzle-levels.test.mjs",
-    "test:progress": "npm run compile:core && node --test tests/progress-engine.test.mjs tests/progress-serialization.test.mjs"
+    "test:progress": "npm run compile:core && node --test tests/progress-engine.test.mjs tests/progress-serialization.test.mjs tests/progress-write-queue.test.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
