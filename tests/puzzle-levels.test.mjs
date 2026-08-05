@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath, URL } from 'node:url';
 
 import { parseCsv } from '../scripts/build-idioms.mjs';
 import { PUZZLE_LEVELS } from '../.test-dist/src/puzzle/levels.js';
 import { buildPuzzleBoard } from '../.test-dist/src/puzzle/puzzle-board.js';
 import { createPuzzleSession, placePuzzleTile, selectPuzzleCell } from '../.test-dist/src/puzzle/puzzle-engine.js';
 
-const sourceIdioms = parseCsv(
-  readFileSync(new URL('../data/idioms.source.csv', import.meta.url), 'utf8')
+const sourcePath = fileURLToPath(
+  new URL('../data/idioms.source.csv', import.meta.url)
 );
+const sourceIdioms = parseCsv(readFileSync(sourcePath, 'utf8'));
 
 test('provides exactly twenty sequential levels', () => {
   assert.equal(PUZZLE_LEVELS.length, 20);
