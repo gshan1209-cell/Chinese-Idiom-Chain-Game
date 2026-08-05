@@ -2,7 +2,7 @@
 
 **中文成語填填字（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語填字闖關 PWA。
 
-目前 Repository 已完成 **Phase 0–4：PWA 基礎、成語資料層、手機安裝、自由接龍附加模式，以及 20 關縱橫成語填字主玩法**。
+目前 Repository 已完成 **Phase 0–5：PWA 基礎、成語資料層、手機安裝、自由接龍附加模式、20 關縱橫成語填字，以及可持續保存的闖關地圖與星級進度**。
 
 ## 目前完成範圍
 
@@ -15,6 +15,10 @@
 - 20 關縱橫成語填字關卡，從 2 個成語逐步增加到 4 個成語。
 - 純 TypeScript 填字盤面引擎：交叉字驗證、固定提示格、候選字池。
 - 填字 session 引擎：選格、填字、移除、重排、提示、計分與過關判定。
+- 第一章 20 關關卡地圖、逐關解鎖與繼續上次關卡。
+- 每關 1～3 星評價、最高分、最少錯誤與最少提示紀錄。
+- 原生 IndexedDB 本機進度保存；無法儲存時仍可遊玩並顯示警告。
+- 寫入佇列保證開始關卡、過關與重設操作依序保存，不讓舊進度覆蓋新進度。
 - 手機大字體闖關介面；原自由接龍保留為「其他玩法」。
 - 純 TypeScript 成語索引查詢服務。
 - 經典模式遊戲引擎：接龍判定、重複偵測、計分、連擊、提示與自然結束。
@@ -27,7 +31,8 @@
 
 ## 尚未實作
 
-- 關卡地圖、章節解鎖與 IndexedDB 闖關進度保存。
+- 第二章與多章節內容。
+- 登入、雲端備份與跨裝置進度同步。
 - 60 秒限時模式與選擇題模式。
 - 生命值、難度篩選與完整結算頁。
 - 設定頁、成語小冊與發音輔助。
@@ -90,6 +95,18 @@ npm run build
 - 所有可填格正確後過關，並顯示本關成語與解釋。
 - 第一章目前提供 20 關，前 5 關為 2 個成語，後續增加至 3～4 個成語。
 
+## 闖關、星級與保存規則
+
+- 第 1 關永遠解鎖；完成第 N 關後解鎖第 N+1 關。
+- 三星：不使用提示且沒有填錯。
+- 二星：提示不超過 1 次，且錯誤不超過 2 次。
+- 一星：完成關卡但未達二星條件。
+- 重玩會保留較佳星級與最高分，並分別保存最少錯誤與最少提示紀錄。
+- 關卡地圖會顯示已解鎖數、總星數、每關最佳星級及上次遊玩關卡。
+- 進度保存在瀏覽器 IndexedDB：Database `cicg-progress`、version `1`、store `campaigns`、key `chapter-1`。
+- 進度只存在目前瀏覽器／裝置；清除網站資料、使用無痕模式或更換裝置不會自動同步。
+- 若瀏覽器封鎖 IndexedDB，遊戲仍可繼續，但會提示本次進度可能無法保存。
+
 ## 自由接龍附加模式規則
 
 - 下一個成語第一字必須等於目前成語最後一字。
@@ -148,13 +165,14 @@ src/domain       領域型別與遊戲契約
 src/idioms       純 TypeScript 字典索引與載入服務
 src/game         自由接龍純 TypeScript 遊戲引擎
 src/puzzle       成語填字關卡、盤面與 session 引擎
+src/progress     闖關規則、資料解析、IndexedDB adapter 與寫入佇列
 src/pwa          PWA 裝置判斷與安裝純函式
 scripts          成語資料建置與驗證
 public/generated 離線字典與首尾字索引
 src/app          React PWA 使用者介面與瀏覽器事件 Hook
 ```
 
-遊戲規則不直接寫在 React 元件內；`game-engine` 與 `puzzle-engine` 皆以 TDD 實作，再由 UI 透過公開介面呼叫。
+遊戲規則不直接寫在 React 元件內；`game-engine`、`puzzle-engine` 與 `progress-engine` 皆以 TDD 實作，再由 UI 透過公開介面呼叫。
 
 ## PWA 驗收方式
 
@@ -172,6 +190,9 @@ npx vite preview --host 0.0.0.0
 3. 首次完整載入後，關閉網路仍可開啟首頁與字典資源。
 4. 360px 寬度無水平捲軸。
 5. 主要按鈕高度至少 56px，主要文字至少 24px。
+6. 完成第 1 關後第 2 關解鎖，重新整理後解鎖與星級仍保留。
+7. 重玩較差成績不會覆蓋較佳星級或最高分。
+8. IndexedDB 不可用時顯示警告，但關卡仍可操作。
 
 ## 文件
 
@@ -180,3 +201,5 @@ npx vite preview --host 0.0.0.0
 - [Phase 2 Classic Gameplay Plan](docs/superpowers/plans/2026-08-05-phase-2-classic-gameplay.md)
 - [Phase 3 PWA Installation Plan](docs/superpowers/plans/2026-08-05-phase-3-pwa-installation.md)
 - [Phase 4 Idiom Crossword Plan](docs/superpowers/plans/2026-08-05-phase-4-idiom-crossword.md)
+- [Phase 5 Campaign Progress Design](docs/superpowers/specs/2026-08-05-phase-5-campaign-progress-design.md)
+- [Phase 5 Campaign Progress Plan](docs/superpowers/plans/2026-08-05-phase-5-campaign-progress.md)
