@@ -45,6 +45,35 @@ export interface CreateCustomMediaItemInput {
   readonly homepageUrl?: string;
 }
 
+export interface MediaPreferences {
+  readonly volume: number;
+  readonly muted: boolean;
+  readonly dockCollapsed: boolean;
+  readonly lastSelectedItemId: string | null;
+}
+
+export interface MediaState {
+  readonly library: readonly MediaLibraryItem[];
+  readonly favoriteIds: readonly string[];
+  readonly preferences: MediaPreferences;
+}
+
+export interface MediaBackupInput {
+  readonly state: MediaState;
+  readonly exportedAt: string;
+}
+
+export interface MediaImportSummary {
+  readonly added: number;
+  readonly skipped: number;
+  readonly failed: number;
+}
+
+export interface MediaImportResult {
+  readonly state: MediaState;
+  readonly summary: MediaImportSummary;
+}
+
 export class MediaValidationError extends Error {
   constructor(message: string) {
     super(message);
