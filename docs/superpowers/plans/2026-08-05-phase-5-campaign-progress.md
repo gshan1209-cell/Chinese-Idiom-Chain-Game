@@ -115,7 +115,17 @@
 - [x] Include progress engine, serialization and write-queue tests in `npm test`.
 - [x] Update README completed scope, progress rules, IndexedDB storage, architecture and remaining work.
 - [x] Record implementation and review evidence in this plan.
-- [ ] Run the final latest-head `./scripts/verify.sh` through GitHub Actions and confirm 66 tests, typecheck, lint, shell checks and PWA build.
-- [ ] Compare the final branch to `main` and require `behind_by: 0`.
-- [ ] Update PR #3 with exact scope, verification evidence and limitations; mark ready for review.
-- [ ] Confirm the final GitHub Actions `verify` succeeds before squash merge.
+- [x] Run the final latest-head `./scripts/verify.sh` through GitHub Actions and confirm 66 tests, typecheck, lint, shell checks and PWA build.
+- [x] Compare the final branch to `main` and confirm `behind_by: 0`.
+- [x] Update PR #3 with exact scope, verification evidence and limitations; mark ready for review.
+- [x] Confirm the final GitHub Actions `verify` succeeds before squash merge.
+
+## Closure Record
+
+- Pull Request: `#3 feat: add persistent campaign progress and level map`
+- PR head verified: `4df03845afa76a0716bdf75a96e4e70046966b7a`
+- Verification: 66/66 Node tests, TypeScript strict, ESLint, data build, shell checks, npm audit and PWA production build passed.
+- Drift check before merge: `ahead 25 / behind 0`.
+- Merge method: squash.
+- Main merge commit: `a85301563e858a702443b738e74b4d36e71aa9fe`.
+- Merged at: `2026-08-05T12:30:41Z`.
