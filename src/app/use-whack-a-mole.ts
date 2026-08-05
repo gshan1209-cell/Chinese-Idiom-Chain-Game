@@ -16,7 +16,10 @@ import type {
 } from '../domain/bonus';
 import type { GameSession } from '../domain/game';
 import { spendFullEnergy } from '../game/bonus/bonus-energy';
-import { createBonusQuestion } from '../game/bonus/question-generator';
+import {
+  createBonusQuestion,
+  hasMinimumBonusQuestions
+} from '../game/bonus/question-generator';
 import {
   answerWhackRound,
   pauseWhackRound,
@@ -38,6 +41,7 @@ export interface WhackAMoleController {
   readonly round: BonusRound | null;
   readonly settlement: BonusSettlement | null;
   readonly availableRewards: readonly BonusRewardType[];
+  readonly unavailableReason: string | null;
   openRewardSelector(): void;
   startRound(rewardType: BonusRewardType): void;
   hitHole(questionId: string, holeIndex: number): void;
@@ -52,6 +56,9 @@ interface UseWhackAMoleInput {
   readonly difficulty?: BonusDifficulty;
 }
 
+const MINIMUM_QUESTION_COUNT = 8;
+const INSUFFICIENT_QUESTIONS_MESSAGE =
+  '目前可用的安全題目不足 8 題，能量不會扣除。請先補充成語題庫。';
 const CLASSIC_REWARDS = Object.freeze([
   'hint-ticket',
   'score-multiplier',
@@ -72,6 +79,7 @@ export function useWhackAMole({
   const [view, setView] = useState<BonusView>('closed');
   const [round, setRound] = useState<BonusRound | null>(null);
   const [settlement, setSettlement] = useState<BonusSettlement | null>(null);
+  const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
   const [holeCount, setHoleCount] = useState<6 | 9>(readHoleCount);
   const previousSessionId = useRef<string | null>(session?.id ?? null);
 
@@ -82,6 +90,7 @@ export function useWhackAMole({
       setView('closed');
       setRound(null);
       setSettlement(null);
+      setUnavailableReason(null);
     }
   }, [session?.id]);
 
@@ -147,10 +156,12 @@ export function useWhackAMole({
   }, [round, setSession, settlement]);
 
   const openRewardSelector = useCallback(() => {
-    if (session?.result === null && session.bonusResources.energy === 100) {
-      setView('selecting');
-    }
-  }, [session]);
+    if (session?.result !== null || session.bonusResources.energy !== 100) return;
+    const enoughQuestions =
+      index !== null && hasMinimumBonusQuestions(index, MINIMUM_QUESTION_COUNT);
+    setUnavailableReason(enoughQuestions ? null : INSUFFICIENT_QUESTIONS_MESSAGE);
+    setView('selecting');
+  }, [index, session]);
 
   const startRound = useCallback(
     (rewardType: BonusRewardType) => {
@@ -164,10 +175,20 @@ export function useWhackAMole({
       ) {
         return;
       }
+      if (
+        index === null ||
+        !hasMinimumBonusQuestions(index, MINIMUM_QUESTION_COUNT)
+      ) {
+        setUnavailableReason(INSUFFICIENT_QUESTIONS_MESSAGE);
+        return;
+      }
       const dependencies = createDependencies();
       if (dependencies === null) return;
       const nextRound = startWhackRound(rewardType, difficulty, dependencies);
-      if (nextRound.phase === 'settled' || nextRound.question === null) return;
+      if (nextRound.phase === 'settled' || nextRound.question === null) {
+        setUnavailableReason(INSUFFICIENT_QUESTIONS_MESSAGE);
+        return;
+      }
       setSession((current) => {
         if (current === null || current.bonusResources.energy !== 100) return current;
         return Object.freeze({
@@ -175,11 +196,12 @@ export function useWhackAMole({
           bonusResources: spendFullEnergy(current.bonusResources)
         });
       });
+      setUnavailableReason(null);
       setSettlement(null);
       setRound(nextRound);
       setView('playing');
     },
-    [createDependencies, difficulty, session, setSession]
+    [createDependencies, difficulty, index, session, setSession]
   );
 
   const hitHole = useCallback(
@@ -198,10 +220,12 @@ export function useWhackAMole({
   const closeResult = useCallback(() => {
     setRound(null);
     setSettlement(null);
+    setUnavailableReason(null);
     setView('closed');
   }, []);
 
   const cancelSelection = useCallback(() => {
+    setUnavailableReason(null);
     setView('closed');
   }, []);
 
@@ -211,6 +235,7 @@ export function useWhackAMole({
       round,
       settlement,
       availableRewards: CLASSIC_REWARDS,
+      unavailableReason,
       openRewardSelector,
       startRound,
       hitHole,
@@ -225,6 +250,7 @@ export function useWhackAMole({
       round,
       settlement,
       startRound,
+      unavailableReason,
       view
     ]
   );
