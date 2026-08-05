@@ -26,6 +26,7 @@ export function App() {
       return (
         <RewardSelector
           rewards={bonus.availableRewards}
+          unavailableReason={bonus.unavailableReason}
           onSelect={bonus.startRound}
           onCancel={bonus.cancelSelection}
         />
