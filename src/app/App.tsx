@@ -1,18 +1,26 @@
-import type { ChangeEvent, FormEvent } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 
+import { PuzzleGame } from './PuzzleGame';
 import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
 
 const featureCards = [
-  { icon: '字', title: '超大字體', description: '手機直式畫面也能清楚閱讀與操作。' },
-  { icon: '離', title: '離線遊玩', description: '首次完整載入後，不連網也能繼續練習。' },
-  { icon: '學', title: '邊玩邊學', description: '答題同時累積成語接龍能力。' }
+  { icon: '填', title: '縱橫填字', description: '把候選文字填入交叉成語方格，完成整個關卡。' },
+  { icon: '離', title: '離線遊玩', description: '首次完整載入後，不連網也能繼續闖關。' },
+  { icon: '學', title: '邊玩邊學', description: '過關後查看本關成語與解釋。' }
 ] as const;
 
+type AppMode = 'home' | 'puzzle' | 'classic';
+
 export function App() {
+  const [mode, setMode] = useState<AppMode>('home');
   const game = useClassicGame();
 
-  if (game.session !== null) {
+  if (mode === 'puzzle') {
+    return <PuzzleGame onExit={() => setMode('home')} />;
+  }
+
+  if (mode === 'classic' && game.session !== null) {
     const session = game.session;
     const recentHistory = session.history.slice(-6);
     const completed = session.result === 'completed';
@@ -26,11 +34,11 @@ export function App() {
       <main className="app-shell game-shell">
         <header className="game-header">
           <div>
-            <p className="eyebrow">經典模式</p>
+            <p className="eyebrow">其他玩法 · 自由接龍</p>
             <h1 className="game-title">中文成語接龍</h1>
           </div>
-          <button className="text-action" type="button" onClick={game.restartGame}>
-            重新開始
+          <button className="text-action" type="button" onClick={() => setMode('home')}>
+            返回首頁
           </button>
         </header>
 
@@ -51,9 +59,7 @@ export function App() {
             <div className="completion-panel" role="status">
               <h2>接龍完成！</h2>
               <p>這條路徑已沒有未使用的接續成語。</p>
-              <button className="primary-action" type="button" onClick={game.restartGame}>
-                再玩一局
-              </button>
+              <button className="primary-action" type="button" onClick={game.restartGame}>再玩一局</button>
             </div>
           ) : (
             <form className="answer-form" onSubmit={handleSubmit}>
@@ -72,36 +78,24 @@ export function App() {
               />
               <div className="action-row">
                 <button className="primary-action" type="submit">送出答案</button>
-                <button className="secondary-action" type="button" onClick={game.requestHint}>
-                  給我提示
-                </button>
+                <button className="secondary-action" type="button" onClick={game.requestHint}>給我提示</button>
               </div>
             </form>
           )}
 
-          <div
-            id="answer-feedback"
-            className={`feedback ${game.feedback?.tone ?? 'info'}`}
-            aria-live="polite"
-          >
+          <div id="answer-feedback" className={`feedback ${game.feedback?.tone ?? 'info'}`} aria-live="polite">
             {game.feedback?.message ?? '請接出下一個四字成語。'}
           </div>
-
           {game.hintText !== null && !completed ? (
-            <div className="hint-card" role="status">
-              <span>提示答案</span>
-              <strong>{game.hintText}</strong>
-            </div>
+            <div className="hint-card" role="status"><span>提示答案</span><strong>{game.hintText}</strong></div>
           ) : null}
         </section>
 
         <section className="history-card" aria-labelledby="history-title">
           <h2 id="history-title">本局足跡</h2>
           <div className="history-list">
-            {recentHistory.map((idiom, index) => (
-              <span className="history-chip" key={`${idiom.id}-${index}`}>
-                {idiom.text}
-              </span>
+            {recentHistory.map((idiom: { id: string; text: string }, index: number) => (
+              <span className="history-chip" key={`${idiom.id}-${index}`}>{idiom.text}</span>
             ))}
           </div>
         </section>
@@ -109,33 +103,36 @@ export function App() {
     );
   }
 
+  const startClassic = () => {
+    game.startGame();
+    setMode('classic');
+  };
+
   return (
     <main className="app-shell">
       <section className="hero" aria-labelledby="page-title">
-        <span className="phase-badge">離線 PWA · 經典模式</span>
-        <div className="seal" aria-hidden="true">成</div>
-        <p className="eyebrow">看得清楚，離線也能玩</p>
-        <h1 id="page-title">中文成語接龍</h1>
-        <p className="hero-copy">依照上一個成語的最後一字，接出下一個四字成語。</p>
+        <span className="phase-badge">20 關 · 離線 PWA</span>
+        <div className="seal" aria-hidden="true">填</div>
+        <p className="eyebrow">大字體成語填字闖關</p>
+        <h1 id="page-title">中文成語填填字</h1>
+        <p className="hero-copy">點選下方候選字，完成上方縱橫交錯的成語方格。</p>
 
+        <button className="primary-action" type="button" onClick={() => setMode('puzzle')}>
+          開始闖關
+        </button>
+        <button
+          className="secondary-action"
+          type="button"
+          disabled={!game.canStart}
+          onClick={startClassic}
+          style={{ marginTop: '1rem', width: 'min(100%, 22rem)' }}
+        >
+          {game.loading ? '自由接龍載入中…' : '其他玩法：自由接龍'}
+        </button>
         {game.loadError !== null ? (
-          <div className="load-error" role="alert">
-            <p>{game.loadError}</p>
-            <button className="secondary-action" type="button" onClick={game.retryLoad}>
-              重新載入字典
-            </button>
-          </div>
-        ) : (
-          <button
-            className="primary-action"
-            type="button"
-            disabled={!game.canStart}
-            onClick={game.startGame}
-          >
-            {game.loading ? '字典載入中…' : '開始遊戲'}
-          </button>
-        )}
-        <p className="phase-note">不需登入，遊戲資料只在目前裝置執行</p>
+          <button className="text-action" type="button" onClick={game.retryLoad}>重新載入成語字典</button>
+        ) : null}
+        <p className="phase-note">不需登入、沒有強制廣告，首次載入後可離線遊玩</p>
       </section>
 
       <PwaInstallCard />
@@ -151,7 +148,7 @@ export function App() {
       </section>
 
       <footer className="site-footer">
-        <p>目前不使用 AI Token，也不會上傳玩家輸入。</p>
+        <p>目前使用本機成語資料，不使用 AI Token，也不會上傳玩家操作。</p>
       </footer>
     </main>
   );
