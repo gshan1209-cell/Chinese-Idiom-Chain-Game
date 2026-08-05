@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cicg.example/schemas/idiom.schema.json",
+  "title": "Chinese Idiom Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "text",
+    "firstChar",
+    "lastChar",
+    "meaning",
+    "difficulty",
+    "enabled",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^idiom-[0-9]{4,}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4
+    },
+    "firstChar": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "lastChar": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "bopomofo": { "type": "string" },
+    "pinyin": { "type": "string" },
+    "meaning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "example": { "type": "string" },
+    "source": { "type": "string" },
+    "difficulty": {
+      "enum": ["easy", "normal", "hard"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "enabled": { "type": "boolean" },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

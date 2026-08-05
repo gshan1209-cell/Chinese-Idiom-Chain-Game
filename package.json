@@ -1,0 +1,37 @@
+{
+  "name": "chinese-idiom-chain-game",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "大字體、離線優先、可安裝至手機的繁體中文成語接龍 PWA。",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build:data": "node scripts/build-idioms.mjs",
+    "build": "npm run build:data && tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint .",
+    "test": "npm run test:data && npm run test:index",
+    "test:data": "node --test scripts/build-idioms.test.mjs",
+    "test:index": "npm run compile:core && node --test tests/idiom-index.test.mjs",
+    "compile:core": "tsc -p tsconfig.core.json",
+    "verify": "./scripts/verify.sh"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.4",
+    "eslint": "10.8.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0",
+    "vite": "8.1.5",
+    "vite-plugin-pwa": "1.3.0"
+  }
+}
