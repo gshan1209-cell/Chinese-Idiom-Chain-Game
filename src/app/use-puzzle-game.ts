@@ -29,6 +29,13 @@ function shuffled<T>(items: readonly T[]): readonly T[] {
   return result;
 }
 
+function indexForLevelNumber(levelNumber: number): number {
+  if (!Number.isInteger(levelNumber) || levelNumber < 1 || levelNumber > PUZZLE_LEVELS.length) {
+    throw new Error(`關卡範圍必須介於 1 到 ${PUZZLE_LEVELS.length}。`);
+  }
+  return levelNumber - 1;
+}
+
 function makeSession(levelIndex: number): PuzzleSession {
   const level = PUZZLE_LEVELS[levelIndex];
   if (level === undefined) throw new Error('找不到指定關卡。');
@@ -40,9 +47,10 @@ export interface PuzzleFeedback {
   readonly message: string;
 }
 
-export function usePuzzleGame() {
-  const [levelIndex, setLevelIndex] = useState(0);
-  const [session, setSession] = useState<PuzzleSession>(() => makeSession(0));
+export function usePuzzleGame(initialLevelNumber = 1) {
+  const initialLevelIndex = indexForLevelNumber(initialLevelNumber);
+  const [levelIndex, setLevelIndex] = useState(initialLevelIndex);
+  const [session, setSession] = useState<PuzzleSession>(() => makeSession(initialLevelIndex));
   const [feedback, setFeedback] = useState<PuzzleFeedback>({
     tone: 'info',
     message: '先點選空格，再從下方選一個字。'
@@ -123,16 +131,12 @@ export function usePuzzleGame() {
     setFeedback({ tone: 'info', message: '候選字已重新排列。' });
   }, []);
 
-  const openLevel = useCallback((nextIndex: number) => {
-    const safeIndex = Math.max(0, Math.min(PUZZLE_LEVELS.length - 1, nextIndex));
-    setLevelIndex(safeIndex);
-    setSession(makeSession(safeIndex));
+  const openLevelNumber = useCallback((levelNumber: number) => {
+    const nextIndex = indexForLevelNumber(levelNumber);
+    setLevelIndex(nextIndex);
+    setSession(makeSession(nextIndex));
     setFeedback({ tone: 'info', message: '先點選空格，再從下方選一個字。' });
   }, []);
-
-  const nextLevel = useCallback(() => {
-    openLevel(levelIndex === PUZZLE_LEVELS.length - 1 ? 0 : levelIndex + 1);
-  }, [levelIndex, openLevel]);
 
   return {
     level,
@@ -147,7 +151,7 @@ export function usePuzzleGame() {
     hint,
     clear,
     shuffleTiles,
-    nextLevel,
-    restartLevel: () => openLevel(levelIndex)
+    openLevelNumber,
+    restartLevel: () => openLevelNumber(level.levelNumber)
   };
 }
