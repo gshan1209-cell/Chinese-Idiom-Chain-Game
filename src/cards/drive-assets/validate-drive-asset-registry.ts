@@ -11,6 +11,7 @@ export type DriveRegistryIssueCode =
   | 'invalid-sha256'
   | 'approved-missing-evidence'
   | 'published-not-approved'
+  | 'current-approved-status-mismatch'
   | 'ur-missing-license'
   | 'broken-supersession';
 
@@ -104,6 +105,18 @@ export function validateDriveAssetRegistry(
         'published-not-approved',
         asset.assetId,
         'Published 資產必須仍是 current Approved master。',
+      ));
+    }
+
+    if (
+      asset.currentApproved &&
+      asset.status !== 'approved' &&
+      asset.status !== 'published'
+    ) {
+      issues.push(issue(
+        'current-approved-status-mismatch',
+        asset.assetId,
+        '只有 approved 或 published 資產可以標記 current Approved。',
       ));
     }
 
