@@ -75,7 +75,11 @@ export function MediaLibraryPanel() {
             <p className="media-kicker">邊玩邊聽 · 可見影音</p>
             <h2 id="media-panel-title">成語電台與影音中心</h2>
           </div>
-          <button className="media-close-button" type="button" onClick={media.closePanel}>
+          <button
+            className="media-close-button"
+            type="button"
+            onClick={() => media.closePanel()}
+          >
             關閉
           </button>
         </header>
@@ -88,12 +92,17 @@ export function MediaLibraryPanel() {
         {media.notice === null ? null : (
           <div className="media-notice" role="status">
             <span>{media.notice}</span>
-            <button type="button" onClick={media.clearNotice}>知道了</button>
+            <button type="button" onClick={() => media.clearNotice()}>
+              知道了
+            </button>
           </div>
         )}
 
         {media.activeItem !== null && media.activeItem.type !== 'radio' ? (
-          <YouTubePlayer item={media.activeItem} onClose={media.pauseAll} />
+          <YouTubePlayer
+            item={media.activeItem}
+            onClose={() => media.pauseAll()}
+          />
         ) : null}
 
         <nav className="media-tabs" aria-label="媒體分類">
@@ -187,12 +196,20 @@ export function MediaLibraryPanel() {
             備份只包含自訂媒體、收藏與播放器偏好，不包含帳號、Cookie 或闖關進度。
           </p>
           <div className="media-backup-actions">
-            <button className="media-secondary-button" type="button" onClick={media.exportBackup}>
+            <button
+              className="media-secondary-button"
+              type="button"
+              onClick={() => media.exportBackup()}
+            >
               匯出 JSON
             </button>
             <label className="media-secondary-button media-file-label">
               匯入 JSON
-              <input type="file" accept="application/json,.json" onChange={(event) => void handleImport(event)} />
+              <input
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => void handleImport(event)}
+              />
             </label>
           </div>
           {importError === null ? null : (
