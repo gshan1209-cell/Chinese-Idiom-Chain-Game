@@ -17,9 +17,24 @@ A card cannot become Approved while any Blocking item fails.
 - [ ] Allusion type, summary, and source are accurate
 - [ ] Original motto is not presented as a classical quotation
 
+## Modular source separation
+
+Apply to `renderMode === 'modular'`.
+
+- [ ] Artwork is an independent source asset, not only a flat card crop
+- [ ] Artwork source is `1024 × 1200 px` or verified safe for the v2.6 artwork slot
+- [ ] Artwork contains no frame, rarity badge, difficulty badge, title, Zhuyin, Pinyin, subtitle, theme badge, allusion, motto, or source line
+- [ ] Artwork has its own asset ID, version, Drive File ID, SHA-256, dimensions, and review status
+- [ ] Frame, rarity, difficulty, theme, pronunciation, allusion, motto, and source are separate components or live data layers
+- [ ] Composite PNG is recorded as a derived output, not the only canonical source
+- [ ] Changing difficulty leaves artwork asset ID and artwork SHA-256 unchanged
+- [ ] Changing rarity badge leaves artwork asset ID and artwork SHA-256 unchanged
+- [ ] Component set, layout, rarity badge, and artwork versions are recorded independently
+- [ ] Unapproved artwork or component master is not included in formal PWA runtime assets
+
 ## Dimensions and layout
 
-- [ ] Exact canvas is `1024 × 2000 px`
+- [ ] Exact composite canvas is `1024 × 2000 px`
 - [ ] Header is `y = 0–359`, height `360 px`
 - [ ] Main artwork is `y = 360–1559`, height `1200 px`
 - [ ] Footer is `y = 1560–1999`, height `440 px`
@@ -46,6 +61,7 @@ Apply this section only when `rarity === 'SSR'`.
 - [ ] Badge does not cover the title, Zhuyin, Pinyin, or subtitle
 - [ ] Iridescent treatment does not recolor the outer frame, difficulty panel, main artwork, story panel, theme badge, or motto plaque
 - [ ] N／R／SR cards do not use the SSR v2.7 badge
+- [ ] Badge component version is independently traceable from the artwork version
 
 ## Quality and rights
 
@@ -57,15 +73,20 @@ Apply this section only when `rarity === 'SSR'`.
 
 ## Workflow evidence
 
-- [ ] Filename follows the latest standard: SSR uses `v2.7`; N／R／SR use their latest approved version
-- [ ] Actual PNG dimensions were verified after generation
-- [ ] `current-batch.json` matches the actual card status
-- [ ] Drive File ID is present only after confirmed upload
-- [ ] Manifest is updated when Drive or publication status changes
+- [ ] Filename follows the latest standard: SSR composite uses `v2.7`; N／R／SR use their latest approved version
+- [ ] Artwork and composite filenames are recorded separately
+- [ ] Actual artwork and composite PNG dimensions were verified after generation
+- [ ] `current-batch.json` matches artwork, composition, approval, and upload status
+- [ ] Artwork Drive File ID is present only after confirmed artwork upload
+- [ ] Composite Drive File ID is present only after confirmed composite upload
+- [ ] Manifest is updated when artwork, component, composite, Drive, checksum, or publication status changes
 - [ ] Producer and final approver are not represented as the same unverified action
+- [ ] `flat-legacy` cards are explicitly marked and are not described as modular
 
 ## Decision
 
 - All Blocking checks pass: eligible for independent final approval.
-- Repairable failure: set `changes-requested` and record findings.
+- Repairable artwork failure: set artwork to `changes-requested`.
+- Repairable composition failure: set composition to `changes-requested`.
+- Renderer unavailable: keep composition `pending` or `blocked`; do not bake UI into canonical artwork.
 - Unverifiable source or rights: keep blocked or reject; do not publish.

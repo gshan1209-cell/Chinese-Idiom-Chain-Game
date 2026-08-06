@@ -63,19 +63,22 @@ GitHub main
 ## 3. 架構與開發原則
 
 ```text
-src/domain    領域模型
-src/idioms    成語資料
-src/game      自由接龍
-src/puzzle    填字盤面與導航
-src/progress  闖關進度與 IndexedDB
-src/bonus     打地鼠
-src/pwa       PWA
-src/app       React UI
+src/domain       共用領域模型
+src/idioms       成語資料
+src/game         自由接龍
+src/puzzle       填字盤面與導航
+src/progress     闖關進度與 IndexedDB
+src/bonus        打地鼠
+src/pwa          PWA
+src/cards        圖卡資料、版面、元件解析與 render plan
+src/app          React UI 與瀏覽器事件
+src/app/cards    圖卡 React／SVG 顯示與 PNG 輸出 adapter
 ```
 
 - 領域規則使用純 TypeScript。
 - React 只負責畫面與瀏覽器事件。
 - 不得把核心規則寫進 DOM、動畫 callback 或不可測試的亂數流程。
+- 圖卡 React 元件不得重新判定稀有度、難易度、來源、授權或卡池資格。
 - 不得直接修改既有 `cicg-progress` Schema，除非任務明確核准 Schema migration。
 
 所有功能與 Bug 修正使用 TDD：
@@ -104,6 +107,7 @@ npm install
 - 圖卡企劃、Prompt 或素材產製
 - 產生成語圖卡、繼續產圖或下一批
 - 修正上一批、審核或上傳圖卡
+- 圖卡元件、模板、renderer 或 PNG 輸出
 - 稀有度或難易度
 - 每十關免費贈卡
 - 收藏頁或卡池
@@ -136,10 +140,11 @@ docs/card-prompts/state/current-batch.json
 5. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
 6. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
 7. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-8. docs/card-prompts/PROJECT_PROMPT.md
+8. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
+9. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準。
+v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工。
 
 發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、來源、授權或核准證據。
 
@@ -159,8 +164,14 @@ v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與�
 - SSR 徽章必須與 SR 在輪廓、材質、光效與主寶石上明顯區隔；只改文字、亮度或飽和度視為 Blocking failure。
 - SSR 虹彩只限左上徽章，不得全面染色外框、難易度框、主圖、典故區、主題徽章或箴言牌匾。
 - N／R／SR 不得套用 v2.7 SSR 徽章。
+- 新建圖卡預設 `renderMode = modular`；舊整張 PNG 使用 `flat-legacy`。
+- 中央主插圖必須保存為獨立 artwork，不得烙入稀有度、難易度、主標、注音、拼音、典故、箴言或來源。
+- 難易度、稀有度、主題徽章、文字、箴言牌匾與來源必須能獨立替換。
+- Review／Approved PNG 是 derived output，不得成為唯一 canonical source。
+- 修改難易度或徽章時，`artworkAssetId` 與 artwork checksum 必須維持不變。
 - 圖卡必須使用繁體中文、人物情境與最下方單行典故來源。
-- 使用者要求正式產圖時，應使用可用的圖片生成工具，不得只回傳 Prompt 代替成品。
+- 使用者要求正式產圖時，應使用可用的圖片生成工具；在 modular workflow 中優先產生 illustration-only artwork，再由 renderer 組卡。
+- Renderer 尚未完成時可先產 artwork，但不得退回把所有 UI 永久烙入 canonical artwork。
 - 產製 Agent 不得自行把自己的輸出直接標記為最終 Approved。
 - 產圖、審核、上傳或批次狀態改變後，必須更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 Manifest。
 
@@ -173,14 +184,16 @@ GitHub 存放：
 - 程式碼、測試與 CI
 - CSV、JSON、Schema
 - 技術規格與 Implementation Plan
-- 圖卡技能、批次狀態、定義、稀有度理由與審核紀錄
+- 圖卡技能、批次狀態、定義、元件註冊表與 render plan
+- 稀有度理由與審核紀錄
 - Drive File ID、SHA-256 與版本參照
+- Approved master 產生的 PWA runtime derivative 與追溯 manifest
 
 Drive 存放：
 
 - UI／UX 圖
 - Logo、Icon、背景
-- 成語圖卡圖片
+- 成語圖卡 artwork、component master 與 composite PNG
 - 音效與影片
 - 校訂與授權文件
 - 實機測試證據
@@ -189,9 +202,12 @@ Drive 存放：
 圖卡素材路徑：
 
 ```text
-80_Inbox/Idiom_Cards
-02_UI_UX_And_Visuals/Idiom_Cards/Approved
-80_Inbox/Idiom_Cards/Changes_Requested
+80_Inbox/Idiom_Cards/Artworks
+80_Inbox/Idiom_Cards/Components
+80_Inbox/Idiom_Cards/Composites
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Artworks
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Components
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Composites
 90_Archive/Idiom_Cards
 ```
 

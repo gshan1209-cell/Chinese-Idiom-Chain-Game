@@ -1,9 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "project": "Chinese-Idiom-Chain-Game",
+  "defaultRenderMode": "modular",
+  "layoutVersion": "2.6",
+  "componentSetVersion": "1.0",
   "activeBatchId": null,
   "workflowStatus": "ready",
-  "nextAction": "Select or confirm the next batch of idiom cards.",
-  "lastUpdatedAt": "2026-08-06T08:00:00+08:00",
+  "nextAction": "Select or confirm the next modular idiom-card batch, then prepare illustration-only artwork before composition.",
+  "lastUpdatedAt": "2026-08-06T20:27:21+08:00",
   "cards": []
 }

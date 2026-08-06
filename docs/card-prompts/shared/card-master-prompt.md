@@ -1,72 +1,147 @@
-# CICG 成語卡牌共用母提示語 v2.6
+# CICG 成語卡牌共用母提示語 v2.7／Modular v1.0
 
 ## 使用前置 Gate
 
-本母提示語不得單獨使用。每次產圖前必須先讀取：
+本母提示語不得單獨使用。產製前依序讀取：
 
 ```text
-1. docs/card-prompts/PROJECT_PROMPT.md
-2. docs/card-prompts/README.md
-3. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
-4. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-5. docs/card-prompts/shared/negative-constraints.md
-6. 對應稀有度模板
-7. 對應成語單卡提示語
-8. docs/card-prompts/manifest.md
+1. AGENTS.md
+2. .agents/skills/generating-cicg-idiom-cards/SKILL.md
+3. docs/card-prompts/state/current-batch.json
+4. docs/card-prompts/PROJECT_PROMPT.md
+5. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
+6. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
+7. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
+8. docs/card-prompts/shared/negative-constraints.md
+9. 對應稀有度模板
+10. 對應成語單卡提示語
+11. docs/card-prompts/manifest.md
 ```
 
-若 Repository 已有 `AGENTS.md`、`docs/superpowers/specs/README.md`、圖卡稀有度標準或圖卡審核治理規格，也必須先讀取。
+較新的 Approved 規格優先。`NeedsReview` 內容只能產 Review 資產。
 
-規範衝突時，以 GitHub 最新 `main` 中較新的 Approved 規格為準。v2.6 覆寫 v2.1 的尺寸、比例、注音位置與禁止羅馬拼音條款。
+---
 
-產圖前必須確認成語、逐字注音、漢語拼音、副標、難易度、稀有度理由、主題類別、典故、來源、箴言、人物動作與場景均已整理。仍為 `NeedsReview` 的內容只能產製 Review 圖，不得宣稱 Approved。
+## 產製目標
 
-## 產圖目標
+每張新卡建立兩類不同資產：
 
-建立一張固定 `1024 × 2000 px` 的繁體中文成語收藏卡。整體採高質感韓日動漫遊戲卡牌風格，兼具敘事性、清楚資訊層級、大字體與手機閱讀性。不得複製其他遊戲的角色、卡面、美術、文案、關卡或商店素材。
-
-固定區塊：
+### A. Canonical Artwork
 
 ```text
-上方資訊區：y = 0–359，高度 360 px
-中央主插圖：y = 360–1559，高度 1200 px
-下方內容區：y = 1560–1999，高度 440 px
+1024 × 1200 px
+人物＋背景＋情境＋道具＋光影
 ```
 
-中央主插圖必須是卡面最大視覺區域，且實際高度必須經影像尺寸驗證，不得只依生成提示語判定。
+Artwork 必須完全排除：
 
-## 固定版型與輸出順序
+- 卡框
+- 稀有度徽章
+- 難易度標籤
+- 成語主標
+- 注音
+- 漢語拼音
+- 白話副標
+- 主題徽章
+- 典故區
+- 箴言與牌匾
+- 典故來源
+- Logo、浮水印、未授權 IP
 
-1. **左上稀有度徽章**：顯示 `N / R / SR / SSR`。稀有度只影響左上徽章內的文字、底色、材質與局部光效。
-2. **上方中央標題**：四字成語，大字體繁體中文。
-3. **注音橫列**：主標正下方，四組注音依四字順序排列，每組與對應國字欄位水平對齊。
-4. **漢語拼音橫列**：位於注音正下方，使用小寫、帶聲調符號的漢語拼音，例如 `yú gōng yí shān`。不得使用數字聲調。
-5. **標題下方副標**：拼音下方顯示一句精簡白話解釋。
-6. **右上難易度**：只顯示「難易度」與 `E / D / C / B / A / S` 字母，不得出現「人氣」。
-7. **中央主插圖**：固定高度 `1200 px`，至少一名人物，以動作、表情、道具與環境直接表達成語。
-8. **左下主題徽章**：固定類別圖示、固定底色與完整類別名稱，不受稀有度影響。
-9. **下方典故區**：標題只使用「典故」，不得顯示「典故說明」；以短段落交代人物、事件、轉折與寓意。
-10. **右下卡牌箴言**：獨立窄版深色金框牌匾，繁體中文直式排版，由右至左閱讀，原則上三句。牌匾高度須貼合文字，不得向上侵占中央主圖區。
-11. **最下方來源**：單行小字，格式為 `典故來源：朝代・作者《典籍名稱・卷次》`。
+Artwork 是可重用 canonical visual source。
 
-## 系列固定規則
+### B. Derived Composite
 
-- 外框使用同一系列深色金框，不隨稀有度改色。
-- 主插圖、難易度框、典故區、箴言牌匾與主題徽章不因稀有度改色。
-- 稀有度徽章：`N 灰鐵`、`R 藍色`、`SR 紫金`、`SSR 虹彩金`。
-- 稀有度必須依成語的正面意義、激勵強度、人格力量、精神象徵與收藏定位判定；不得依難易度、人氣、典故年代或畫面華麗程度判定。
-- 強烈展現堅持、勇氣、突破、成就、責任或正向人格力量的成語，才可優先評估為 `SSR`；警世、負面行為、恐懼、欺瞞或侷限型成語不得只因知名度高就升為 SSR。
-- `UR` 僅保留給經正式授權的 IP 聯名隱藏版本；目前一般成語卡、模板與自動產圖流程不得自行使用 UR。
-- 未取得正式 IP 授權時，不得使用聯名角色、品牌名稱、Logo、可識別服裝、武器或官方視覺元素。
-- SSR 徽章字樣可使用較強的手寫或筆觸感，但不可改變成語標題字體規則。
-- 主題徽章必須採「中央圖示＋固定底色＋類別名稱」三重辨識。
-- 人物必須有明確動作與情緒，不得只是正面站立肖像。
-- 角色性別依典故與構圖需求安排；無明確限制的題材不得長期全部使用男性主角、同一臉型或同一姿勢。
-- 場景、服裝、建築與道具不得明顯違反典故時代。
-- 原創箴言不得冒充古籍原文。
-- 傳說、寓言、後世記載與史實必須清楚區分。
-- 未校訂來源一律標記 `NeedsReview`。
-- 未依正面意義標準完成人工複核的稀有度必須標記 `NeedsReview`。
+由 renderer 使用 artwork、Approved components 與 structured data 組成：
+
+```text
+1024 × 2000 px
+Header：360 px
+Artwork：1200 px
+Footer：440 px
+```
+
+Composite 是 Review／Approved 交付圖，不是唯一來源。
+
+---
+
+## Artwork 生成提示語骨架
+
+建立一張高質感韓日動漫遊戲插畫風格的繁體中文成語情境主圖素材，但畫面本身不得包含任何卡牌 UI 或正式文字。
+
+必要要求：
+
+- 畫布 `1024 × 1200 px`。
+- 至少一名人物實際參與成語事件。
+- 人物以動作、表情、道具與環境直接表達成語。
+- 不得只畫正面站立肖像。
+- 重要人物、手部、道具與事件轉折不得被裁切。
+- 歷史題材的服飾、建築與道具符合典故時代。
+- 人物性別、年齡、構圖與動作依單卡企劃安排。
+- 系列批次不得長期重複同一臉型、性別、姿勢或構圖。
+- 不得出現卡框、徽章、標籤、文字欄、Logo、浮水印或第三方角色。
+
+---
+
+## Composite 固定版型
+
+Renderer 必須按以下順序組合：
+
+1. `frame-skin`
+2. `artwork`：`x = 0–1023`、`y = 360–1559`
+3. `effect-overlay`（可選）
+4. 左上 `rarity-badge`
+5. 右上 `difficulty-badge`
+6. 四字繁體中文主標
+7. 四組逐字對齊注音橫列
+8. 四個小寫帶聲調漢語拼音音節
+9. 精簡白話副標
+10. 左下 `theme-badge`
+11. 中下 `allusion-panel`，標題只使用「典故」
+12. 右下低高度窄版直式 `motto-plaque`
+13. 最下方單行 `source-line`
+
+### SSR v2.7
+
+SSR 使用：
+
+- 傳奇級虹彩金龍輪廓
+- 大型立體金色 `SSR`
+- 紫藍洋紅星雲核心
+- 紫色菱形主寶石
+
+不得用 SR 類似輪廓只改字母、亮度或飽和度。虹彩只限左上徽章。
+
+---
+
+## Structured Data 必填
+
+```text
+成語
+四組注音
+四個帶聲調漢語拼音音節
+白話副標
+難易度
+稀有度與判定理由
+主題類別
+典故摘要與來源
+三句箴言
+renderMode
+layoutVersion
+componentSetVersion
+artworkAssetId
+rarityBadgeId
+difficultyBadgeId
+themeBadgeId
+mottoPlaqueId
+```
+
+- 難易度依普及度與理解門檻。
+- 稀有度依正面意義、激勵強度、精神象徵與收藏定位。
+- 視覺華麗度不能決定語義稀有度。
+- UR 只限正式授權聯名。
+
+---
 
 ## 九類主題徽章
 
@@ -82,25 +157,37 @@
 | 警世 | 警鐘與眼睛 | 靛紫色 `#3F2B78` |
 | 見識 | 眼睛與遠山窗口 | 寶石藍 `#1D5F9E` |
 
-## 產圖後 Blocking Gate
+---
 
-生成後必須逐項檢查：
+## Blocking Gate
 
-- 圖片尺寸恰為 `1024 × 2000 px`。
-- 上方資訊區恰為 `360 px`。
-- 中央主圖區恰為 `1200 px`。
-- 下方內容區恰為 `440 px`。
-- 四字成語完全正確且為繁體中文。
-- 主標下方第一列為四組正確、可辨識、逐字對齊注音。
-- 注音下方第二列為正確的小寫、帶聲調漢語拼音。
-- 沒有數字聲調或省略正式拼音聲調符號。
-- 右上只顯示難易度，不得出現人氣。
-- 左下主題徽章圖示、底色與完整名稱正確。
+### Artwork
+
+- 實際尺寸為 `1024 × 1200 px` 或已驗證可安全裁切。
+- 沒有任何正式 UI、文字欄或卡框。
+- 人物動作與成語一致。
+- 沒有重大人體錯誤、時代矛盾、第三方 Logo、浮水印或未授權 IP。
+
+### Composite
+
+- 實際尺寸恰為 `1024 × 2000 px`。
+- 三區高度為 `360 / 1200 / 440 px`。
+- 注音與拼音正確，無數字聲調。
+- 右上只顯示難易度。
+- 左下主題徽章完整。
 - 下方標題只使用「典故」。
-- 右下箴言為低高度直式窄牌匾，沒有大面積空白。
-- 典故來源位於最下方單行。
-- 人物動作與成語情境一致。
-- 沒有明顯人體變形、AI 假文字、第三方 Logo 或未授權 IP 元素。
-- 稀有度已依正面意義標準複核。
+- 箴言為低高度直式窄牌匾。
+- 典故來源為最下方單行。
+- SSR 徽章符合 v2.7。
+- 修改 difficulty／rarity badge 後 artwork asset ID 與 checksum 不變。
 
-未通過任一項時，圖片只能標記 `Changes Requested` 或 `Review`，不得命名為 Approved。
+未通過任一項時，只能標記 `Review` 或 `Changes Requested`。
+
+---
+
+## Renderer 未完成時
+
+- 先產生 illustration-only artwork。
+- 在 `current-batch.json` 將 composition 標記 `pending` 或 `blocked`。
+- 不得把 UI 烙入 canonical artwork 作為替代。
+- 臨時 flat preview 只能作為 Review derivative，並保留獨立 artwork source。

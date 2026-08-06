@@ -22,7 +22,7 @@ GitHub main
 
 ### 跨聊天產製入口
 
-凡涉及產生、接續、修正、審核或上傳成語圖卡，必須先使用：
+凡涉及產生、接續、修正、審核、上傳、元件化或輸出成語圖卡，必須先使用：
 
 ```text
 .agents/skills/generating-cicg-idiom-cards/SKILL.md
@@ -47,7 +47,8 @@ docs/card-prompts/state/current-batch.json
 5. 2026-08-06-card-template-v2.1-layout-amendment.md
 6. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
 7. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-8. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+8. 2026-08-06-idiom-card-modularization-design.md
+9. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 ### 規格用途
@@ -62,6 +63,7 @@ docs/card-prompts/state/current-batch.json
 | `2026-08-06-card-template-v2.1-layout-amendment.md` | 歷史版型基礎：典故區、主題徽章與低高度直式箴言 |
 | `2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` | 鎖定 `1024 × 2000`、中央主圖 `1200 px`、注音橫列與帶聲調漢語拼音橫列 |
 | `2026-08-06-card-template-v2.7-ssr-badge-amendment.md` | 鎖定 SSR 傳奇級虹彩金龍徽章，使 SSR 與 SR 在輪廓、材質、星雲核心及主寶石上明顯區隔 |
+| `2026-08-06-idiom-card-modularization-design.md` | 定義 artwork、template、component、data、render plan、PNG 輸出與 flat-legacy 遷移架構 |
 
 ### 規範優先序
 
@@ -75,6 +77,7 @@ GitHub main 與最新 Approved 規格
 → 收藏與里程碑贈卡
 → v2.7 SSR 徽章增補
 → v2.6 尺寸與發音版面增補
+→ 元件化架構
 → v2.1 歷史版面增補
 → Repository-local skill 與批次狀態
 → 個別卡片企劃與 Prompt
@@ -82,7 +85,7 @@ GitHub main 與最新 Approved 規格
 
 技能與 `current-batch.json` 用於接續工作，不能取代 Drive File ID、Manifest、來源、授權或最終核准證據。
 
-目前明確覆寫：
+目前明確覆寫與新增：
 
 - 收藏規格第 3.1 節的舊句「稀有度描述卡牌收藏價值與視覺規格」已被稀有度標準取代。
 - 正確規則：N～SSR 主要依成語正面意義、勵志程度、精神象徵、共鳴力與代表性判定。
@@ -92,11 +95,29 @@ GitHub main 與最新 Approved 規格
 - v2.6 主標下方第一列為逐字對齊注音，第二列為小寫、帶聲調符號的漢語拼音。
 - v2.7 只覆寫 SSR 左上徽章：使用傳奇級虹彩金龍、立體金色 SSR、紫藍洋紅星雲核心與紫色菱形主寶石。
 - SSR v2.7 必須一眼明顯高於 SR，不能只把 SR 徽章文字改成 SSR 或單純提高亮度。
+- 新建圖卡預設使用 `modular`；舊整張 PNG 使用 `flat-legacy`。
+- canonical artwork 只保存人物、背景、情境與道具，不得烙入卡框、標籤或正式文字欄位。
+- 難易度、稀有度、主題徽章、主標、注音、拼音、典故、箴言與來源必須由元件及資料層組合。
+- Review／Approved PNG 是可重新輸出的 derived artifact，不得成為唯一來源。
 - 里程碑圖卡必須先固定並持久化 rewardId、resolvedCardId 與 acquisitionId，確認成功後才播放揭示動畫。
 
 ---
 
-## 圖卡永久 Gate 摘要
+## 圖卡元件化永久 Gate
+
+- 新 artwork 建議固定為 `1024 × 1200 px`，對應中央主圖區。
+- artwork 不得包含卡框、稀有度、難易度、成語主標、注音、拼音、副標、典故、箴言或來源。
+- `rarity-badge`、`difficulty-badge`、`theme-badge`、`pronunciation-block`、`motto-plaque` 與 `source-line` 必須可獨立替換。
+- 修改 difficulty 或 rarity badge 時，`artworkAssetId` 與 artwork SHA-256 必須不變。
+- Canonical render surface 使用 `1024 × 2000` SVG 座標，React 與 PNG 輸出共用同一 render plan。
+- Drive 保存 artwork／component／composite master；GitHub 保存資料、註冊表、版本、Drive File ID、SHA-256 與 runtime derivative。
+- 未核准 Drive master 不得進入正式 PWA runtime assets。
+- Renderer 尚未完成時，可以先產 illustration-only artwork；不得因暫時缺少 renderer 而重新把 UI 烙進 canonical artwork。
+- flat legacy 舊卡可繼續顯示，但不宣稱支援獨立元件替換。
+
+---
+
+## 圖卡既有永久 Gate 摘要
 
 - 稀有度與難易度是兩套不同系統。
 - `SSR` 不代表 `A` 或 `S`。
@@ -129,9 +150,12 @@ Google Drive 專案：
 圖卡素材治理：
 
 ```text
-80_Inbox/Idiom_Cards
-02_UI_UX_And_Visuals/Idiom_Cards/Approved
-80_Inbox/Idiom_Cards/Changes_Requested
+80_Inbox/Idiom_Cards/Artworks
+80_Inbox/Idiom_Cards/Components
+80_Inbox/Idiom_Cards/Composites
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Artworks
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Components
+02_UI_UX_And_Visuals/Idiom_Cards/Approved/Composites
 90_Archive/Idiom_Cards
 ```
 
@@ -156,7 +180,7 @@ GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素�
 
 ## Agent 禁止事項
 
-- 未讀規格與技能就自行定義稀有度、卡池或產圖流程。
+- 未讀規格與技能就自行定義稀有度、卡池、產圖或組卡流程。
 - 只依聊天紀錄判定卡片 Approved 或上一批進度。
 - 狀態檔與 Drive／Manifest 不一致時猜測完成。
 - 把稀有度與難易度混為同一欄位。
@@ -166,6 +190,9 @@ GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素�
 - 將正式圖卡輸出為 `1024 × 1536` 或 `2:3`。
 - 新產 SSR 圖卡沿用 SR 徽章輪廓，或只以亮度／飽和度差異冒充 v2.7。
 - 將 SSR 虹彩色系套用到整張卡面。
+- 把卡框、標籤與正式文字欄位永久烙入 modular artwork。
+- 修改難易度或徽章時重畫或偷偷替換 artwork。
+- 把 Review／Approved composite PNG 當成唯一 canonical source。
 - 先播放圖卡獎勵動畫，再保存抽取與收藏結果。
 - 直接覆蓋已發布圖卡。
 - 將 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。
