@@ -13,10 +13,13 @@
 - semanticRule: high-positive-meaning-and-spiritual-symbolism
 - assetStatus: Approved
 - dimensions: 1024 × 2000 px
+- headerHeight: 360 px
 - mainArtworkHeight: 1200 px
+- footerHeight: 440 px
 - driveFileId: 1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV
 - driveImageUrl: https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view
-- sha256: 8e21a8b84aa21ad5ff457cfe31e1cd5adbca941fd1c2fbcaed830502a6294c59
+- fileSizeBytes: 3427910
+- sha256: cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
 
 ## SSR 唯一視覺差異
 
@@ -61,7 +64,9 @@ Footer：y = 1560–1999，440 px
 ## 驗收清單
 
 - [ ] 圖片尺寸恰為 1024 × 2000 px。
+- [ ] 上方資訊區實際高度為 360 px。
 - [ ] 中央主圖實際高度為 1200 px。
+- [ ] 下方內容區實際高度為 440 px。
 - [ ] 左上為傳奇級虹彩金龍 SSR 徽章。
 - [ ] SSR 與 SR 在輪廓、材質、星雲核心與紫色主寶石上明顯不同。
 - [ ] 徽章未遮擋主標、注音、拼音或副標。
