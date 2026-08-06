@@ -15,6 +15,8 @@ import { loadDictionary } from '../idioms/load-dictionary';
 
 export const COLLECTION_STORAGE_WARNING = '目前無法保存圖卡收藏；闖關進度不受影響。';
 
+const EMPTY_ACTIVE_IDIOMS: readonly ActiveIdiomReference[] = Object.freeze([]);
+
 function currentTimestamp(): string {
   return new Date().toISOString();
 }
@@ -52,8 +54,17 @@ export function useCardCollection(
   const [storageWarning, setStorageWarning] = useState<string | null>(null);
 
   const getActiveIdioms = useCallback(() => {
-    dictionaryPromiseRef.current ??= loadActiveIdiomReferences();
-    return dictionaryPromiseRef.current;
+    if (dictionaryPromiseRef.current !== null) {
+      return dictionaryPromiseRef.current;
+    }
+    const promise = loadActiveIdiomReferences();
+    dictionaryPromiseRef.current = promise;
+    void promise.catch(() => {
+      if (dictionaryPromiseRef.current === promise) {
+        dictionaryPromiseRef.current = null;
+      }
+    });
+    return promise;
   }, []);
 
   const syncAfterProgressSaved = useCallback((savedProgress: CampaignProgress): Promise<void> => {
@@ -64,7 +75,9 @@ export function useCardCollection(
 
     return writeQueue.enqueue(async () => {
       try {
-        const activeIdioms = await getActiveIdioms();
+        const activeIdioms = IDIOM_CARD_DEFINITIONS.length === 0
+          ? EMPTY_ACTIVE_IDIOMS
+          : await getActiveIdioms();
         const result = await syncCardCollectionMilestones({
           repository,
           completedUniqueMainLevels: countCompletedUniqueMainLevels(savedProgress),
