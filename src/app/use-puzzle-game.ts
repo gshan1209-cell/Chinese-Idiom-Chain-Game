@@ -8,6 +8,7 @@ import { buildPuzzleBoard } from '../puzzle/puzzle-board';
 import {
   clearPuzzleEntries,
   createPuzzleSession,
+  findNextPuzzleCell,
   placePuzzleTile,
   removePuzzleCell,
   reorderPuzzleTiles,
@@ -17,6 +18,7 @@ import {
 import { PUZZLE_LEVELS } from '../puzzle/levels';
 import { useBoardIntruders } from './use-board-intruders';
 import { useCandidateDecoys } from './use-candidate-decoys';
+import { useStubbornIntruders } from './use-stubborn-intruders';
 
 function shuffled<T>(items: readonly T[]): readonly T[] {
   const result = [...items];
@@ -43,6 +45,16 @@ function makeSession(levelIndex: number): PuzzleSession {
   const level = PUZZLE_LEVELS[levelIndex];
   if (level === undefined) throw new Error('找不到指定關卡。');
   return createPuzzleSession(buildPuzzleBoard(level), shuffled);
+}
+
+function nextAutoCellKeyFor(session: PuzzleSession): string | null {
+  const selectedCellKey = session.selectedCellKey;
+  if (selectedCellKey === null || session.status === 'completed') return null;
+  return findNextPuzzleCell(
+    session,
+    selectedCellKey,
+    session.preferredPlacementId
+  ).cellKey;
 }
 
 export interface PuzzleFeedback {
@@ -93,6 +105,7 @@ export function usePuzzleGame(
     idioms
   });
   const {
+    session: boardIntruderSession,
     visibleIntruders: boardIntruders,
     recordValidPlacement: recordValidBoardPlacement,
     recordPuzzleAction: recordBoardPuzzleAction,
@@ -105,6 +118,47 @@ export function usePuzzleGame(
     mode: playMode,
     idioms,
     excludedCharacters: reservedCharacters
+  });
+  const boardReservedCharacters = useMemo(
+    () => Object.freeze(
+      boardIntruderSession.intruders
+        .filter((intruder) => intruder.status !== 'removed')
+        .map((intruder) => intruder.character)
+    ),
+    [boardIntruderSession]
+  );
+  const boardReservedTargetCellKeys = useMemo(
+    () => Object.freeze(
+      boardIntruderSession.intruders
+        .filter((intruder) => intruder.status !== 'removed')
+        .map((intruder) => intruder.targetCellKey)
+    ),
+    [boardIntruderSession]
+  );
+  const stubbornExcludedCharacters = useMemo(
+    () => Object.freeze([...reservedCharacters, ...boardReservedCharacters]),
+    [boardReservedCharacters, reservedCharacters]
+  );
+  const nextAutoCellKey = useMemo(
+    () => nextAutoCellKeyFor(session),
+    [session]
+  );
+  const {
+    visibleIntruders: stubbornIntruders,
+    recordValidPlacement: recordValidStubbornPlacement,
+    recordPuzzleAction: recordStubbornPuzzleAction,
+    hitIntruder: hitStubbornIntruder,
+    completeEjection: completeStubbornEjection,
+    prepareHint: prepareStubbornHint,
+    isCellBlocked: isStubbornCellBlocked
+  } = useStubbornIntruders({
+    board: session.board,
+    puzzleSession: session,
+    mode: playMode,
+    idioms,
+    excludedCharacters: stubbornExcludedCharacters,
+    excludedTargetCellKeys: boardReservedTargetCellKeys,
+    nextAutoCellKey
   });
 
   const level = PUZZLE_LEVELS[levelIndex];
@@ -121,16 +175,32 @@ export function usePuzzleGame(
   );
 
   const selectCell = useCallback((key: string) => {
-    setSession((current) => selectPuzzleCell(current, key));
+    const current = session;
+    const next = selectPuzzleCell(current, key);
+    if (next !== current) recordStubbornPuzzleAction(next, nextAutoCellKeyFor(next));
+    setSession(next);
     setFeedback({ tone: 'info', message: '已選取空格，請從下方選字。' });
-  }, []);
+  }, [recordStubbornPuzzleAction, session]);
 
   const chooseTile = useCallback((tileId: string) => {
     const current = session;
+    if (
+      current.selectedCellKey !== null &&
+      isStubbornCellBlocked(current.selectedCellKey)
+    ) {
+      setFeedback({
+        tone: 'error',
+        message: '頑固伏字要連點三次才能拔除。'
+      });
+      return;
+    }
+
     const result = placePuzzleTile(current, tileId);
     if (result.session !== current) {
+      const nextNavigationCellKey = nextAutoCellKeyFor(result.session);
       recordValidPlacement();
       recordValidBoardPlacement(result.session);
+      recordValidStubbornPlacement(result.session, nextNavigationCellKey);
     }
     setSession(result.session);
 
@@ -141,7 +211,13 @@ export function usePuzzleGame(
     } else {
       setFeedback({ tone: 'error', message: '這個字不對，可以再選一次或使用提示。' });
     }
-  }, [recordValidBoardPlacement, recordValidPlacement, session]);
+  }, [
+    isStubbornCellBlocked,
+    recordValidBoardPlacement,
+    recordValidPlacement,
+    recordValidStubbornPlacement,
+    session
+  ]);
 
   const chooseCandidateDecoy = useCallback((id: string) => {
     beginEjection(id);
@@ -165,45 +241,71 @@ export function usePuzzleGame(
     completeBoardReveal(id);
   }, [completeBoardReveal]);
 
+  const hitStubborn = useCallback((id: string, nowMs: number) => {
+    hitStubbornIntruder(id, nowMs);
+    setFeedback({ tone: 'info', message: '持續連點，把頑固伏字拔出來！' });
+  }, [hitStubbornIntruder]);
+
+  const finishStubbornEjection = useCallback((id: string) => {
+    completeStubbornEjection(id);
+    setFeedback({ tone: 'success', message: '頑固伏字已經拔除了！' });
+  }, [completeStubbornEjection]);
+
   const removeSelected = useCallback(() => {
     const current = session;
     if (current.selectedCellKey === null) return;
     const hadValue = current.values[current.selectedCellKey] !== undefined;
     const next = removePuzzleCell(current, current.selectedCellKey);
-    if (hadValue) recordBoardPuzzleAction(next);
+    if (hadValue) {
+      recordBoardPuzzleAction(next);
+      recordStubbornPuzzleAction(next, nextAutoCellKeyFor(next));
+    }
     setSession(next);
     setFeedback(hadValue
       ? { tone: 'info', message: '已移除目前格子的文字。' }
       : { tone: 'info', message: '目前格子沒有可移除的文字。' });
-  }, [recordBoardPuzzleAction, session]);
+  }, [recordBoardPuzzleAction, recordStubbornPuzzleAction, session]);
 
   const hint = useCallback(() => {
     const current = session;
     const result = usePuzzleHint(current);
     if (result.hintedCellKey !== null) {
+      prepareStubbornHint(result.hintedCellKey);
       recordBoardPuzzleAction(result.session);
+      recordStubbornPuzzleAction(result.session, nextAutoCellKeyFor(result.session));
     }
     setSession(result.session);
     setFeedback(result.hintedCellKey === null
       ? { tone: 'info', message: '本關提示已用完，或盤面已經完成。' }
       : { tone: 'success', message: '已替你填入一個正確的字。' });
-  }, [recordBoardPuzzleAction, session]);
+  }, [
+    prepareStubbornHint,
+    recordBoardPuzzleAction,
+    recordStubbornPuzzleAction,
+    session
+  ]);
 
   const clear = useCallback(() => {
     const current = session;
     const hadValues = Object.keys(current.values).length > 0;
     const next = clearPuzzleEntries(current);
-    if (hadValues) recordBoardPuzzleAction(next);
+    if (hadValues) {
+      recordBoardPuzzleAction(next);
+      recordStubbornPuzzleAction(next, nextAutoCellKeyFor(next));
+    }
     setSession(next);
     setFeedback(hadValues
       ? { tone: 'info', message: '已清除本關自行填入的文字。' }
       : { tone: 'info', message: '盤面目前沒有可清除的文字。' });
-  }, [recordBoardPuzzleAction, session]);
+  }, [recordBoardPuzzleAction, recordStubbornPuzzleAction, session]);
 
   const shuffleTiles = useCallback(() => {
-    setSession((current) => reorderPuzzleTiles(current, shuffled));
+    const current = session;
+    const next = reorderPuzzleTiles(current, shuffled);
+    if (next !== current) recordStubbornPuzzleAction(next, nextAutoCellKeyFor(next));
+    setSession(next);
     setFeedback({ tone: 'info', message: '候選字已重新排列。' });
-  }, []);
+  }, [recordStubbornPuzzleAction, session]);
 
   const openLevelNumber = useCallback((levelNumber: number) => {
     const nextIndex = indexForLevelNumber(levelNumber);
@@ -222,6 +324,7 @@ export function usePuzzleGame(
     playMode,
     candidateDecoys,
     boardIntruders,
+    stubbornIntruders,
     selectCell,
     chooseTile,
     chooseCandidateDecoy,
@@ -229,6 +332,8 @@ export function usePuzzleGame(
     chooseBoardIntruder,
     finishBoardIntruderEjection,
     finishBoardIntruderReveal,
+    hitStubborn,
+    finishStubbornEjection,
     removeSelected,
     hint,
     clear,
