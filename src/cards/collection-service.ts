@@ -52,6 +52,17 @@ function sortGrants(
   ));
 }
 
+function inventoryHasAcquisition(
+  inventory: readonly PlayerCardInventoryItem[],
+  acquisitionId: string
+): boolean {
+  return inventory.some((item) =>
+    item.acquisitionHistory.some((record) =>
+      record.acquisitionId === acquisitionId
+    )
+  );
+}
+
 export function syncCardCollectionMilestones(
   input: SyncCardCollectionInput
 ): Promise<CardCollectionSyncResult> {
@@ -77,6 +88,24 @@ export function syncCardCollectionMilestones(
     for (const grant of combined) {
       if (grant.status !== 'pending') {
         nextGrants.push(grant);
+        if (
+          grant.resolvedCardId !== null &&
+          grant.acquisitionId !== null &&
+          grant.resolvedAt !== null &&
+          !inventoryHasAcquisition(nextInventory, grant.acquisitionId)
+        ) {
+          nextInventory = applyCardAcquisition(
+            nextInventory,
+            grant.resolvedCardId,
+            Object.freeze({
+              acquisitionId: grant.acquisitionId,
+              method: 'milestone-reward',
+              acquiredAt: grant.resolvedAt,
+              sourceReference: grant.rewardId
+            })
+          );
+          changed = true;
+        }
         continue;
       }
 
