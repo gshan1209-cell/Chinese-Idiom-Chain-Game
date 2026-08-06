@@ -101,9 +101,9 @@ export interface DriveMigrationEntry {
   readonly assetId: string | null;
   readonly driveResourceId: string;
   readonly operation: DriveMigrationOperation;
-  readonly before: DriveResourceSnapshot;
-  readonly after: DriveResourceSnapshot;
-  readonly rollback: DriveResourceSnapshot;
+  readonly before: DriveResourceSnapshot | null;
+  readonly after: DriveResourceSnapshot | null;
+  readonly rollback: DriveResourceSnapshot | null;
   readonly status: DriveMigrationEntryStatus;
   readonly blockingReason: string | null;
 }
