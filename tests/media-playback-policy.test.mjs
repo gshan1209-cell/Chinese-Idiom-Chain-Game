@@ -20,6 +20,18 @@ test('radio and YouTube playback are mutually exclusive', () => {
   assert.equal(state.activeItemId, 'y1');
 });
 
+test('restores a selected item without starting playback', () => {
+  const state = reducePlaybackState(
+    createInitialPlaybackState({ volume: 0.5, muted: false }),
+    { type: 'SET_SELECTED_ITEM', itemId: 'r1' }
+  );
+
+  assert.equal(state.activeItemId, 'r1');
+  assert.equal(state.activeSource, null);
+  assert.equal(state.radioPlaying, false);
+  assert.equal(state.youtubePlaying, false);
+});
+
 test('bonus rounds duck the latest base volume and restore it afterward', () => {
   let state = createInitialPlaybackState({ volume: 0.8, muted: false });
   state = reducePlaybackState(state, { type: 'PLAY_RADIO', itemId: 'r1' });
