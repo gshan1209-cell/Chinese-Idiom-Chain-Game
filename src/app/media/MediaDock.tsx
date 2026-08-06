@@ -26,7 +26,7 @@ export function MediaDock() {
         <button
           className="media-current-title"
           type="button"
-          onClick={media.openPanel}
+          onClick={() => media.openPanel()}
         >
           <span>{item.type === 'radio' ? '收音機' : 'YouTube'}</span>
           <strong>{item.title}</strong>
