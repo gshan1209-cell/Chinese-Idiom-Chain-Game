@@ -2,66 +2,66 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 建立資料驅動、可替換元件、同時支援 PWA 顯示與固定 PNG 輸出的成語圖卡渲染架構，使難易度、稀有度徽章與文字改版不需要重畫中央主插圖。
+**Goal:** 建立資料驅動、可替換元件、同時支援 PWA 顯示與固定 PNG 輸出的成語圖卡渲染基礎，使難易度、稀有度徽章與文字改版不需要重畫中央主插圖。
 
-**Architecture:** 使用純 TypeScript 建立卡片資料、元件註冊表、v2.6 固定座標與 immutable render plan；React 只負責把 render plan 畫成 SVG。PNG 輸出由同一 SVG 轉成 1024 × 2000 Canvas，舊卡透過 `flat-legacy` fallback 顯示。
+**Architecture:** 純 TypeScript 建立資料模型、v2.6 固定座標、元件解析與 immutable render plan；React 只將 render plan 畫成 SVG。PNG 由同一 SVG 轉成 1024 × 2000 Canvas；舊圖使用 `flat-legacy` fallback。
 
-**Tech Stack:** TypeScript 6、React 19、SVG、Canvas、Node.js built-in test runner、Vite PWA；第一階段不新增第三方 runtime dependency。
+**Tech Stack:** TypeScript 6、React 19、SVG、Canvas、Node.js built-in test runner、Vite PWA；本計畫不新增第三方 runtime dependency。
 
 ## Global Constraints
 
-- 正式畫布固定 `1024 × 2000 px`。
-- Header `360 px`、Artwork `1200 px`、Footer `440 px`。
-- 主標下方第一列為四組注音，第二列為小寫帶聲調漢語拼音。
-- SSR 新卡使用 v2.7 傳奇級虹彩金龍徽章；N／R／SR 不得使用。
-- 稀有度與難易度分離；徽章視覺不能反向決定語義稀有度。
-- 新卡預設 `renderMode: 'modular'`；舊平面圖使用 `flat-legacy`。
+- Composite 固定 `1024 × 2000 px`。
+- Header／Artwork／Footer 固定 `360 / 1200 / 440 px`。
+- Artwork canonical source 固定 `1024 × 1200 px` 或經驗證可安全裁切。
+- 主標下方第一列為注音，第二列為小寫帶聲調漢語拼音。
+- SSR 使用 v2.7 傳奇級虹彩金龍徽章；N／R／SR 不得使用。
+- 稀有度與難易度分離。
+- 新卡預設 `modular`；舊平面圖使用 `flat-legacy`。
 - React 不得承載稀有度、授權、來源或卡池規則。
 - Drive master 是視覺核准來源；Repository runtime derivative 必須可追溯。
-- 所有功能與 Bug 修正依 TDD：RED → 最小 GREEN → 完整回歸。
-- 不修改既有 `cicg-progress` IndexedDB Schema。
+- TDD：先 RED，再最小 GREEN，最後完整回歸。
+- 不修改 `cicg-progress` IndexedDB Schema。
 
----
-
-## File Structure
+## Planned File Structure
 
 ```text
 src/cards/
 ├─ domain/
 │  ├─ card-types.ts
-│  ├─ card-definition.ts
 │  ├─ card-assets.ts
+│  ├─ card-definition.ts
 │  └─ component-registry.ts
 ├─ layout/
 │  ├─ card-layout-v2_6.ts
 │  └─ resolve-card-components.ts
 ├─ render/
 │  ├─ card-render-plan.ts
-│  └─ build-card-render-plan.ts
+│  ├─ build-card-render-plan.ts
+│  └─ select-card-render-mode.ts
 └─ validation/
    └─ validate-card-definition.ts
 
 src/app/cards/
 ├─ IdiomCardCanvas.tsx
 ├─ IdiomCardView.tsx
-├─ components/
-│  ├─ RarityBadge.tsx
-│  ├─ DifficultyBadge.tsx
-│  ├─ ThemeBadge.tsx
-│  ├─ TitleAndPronunciation.tsx
-│  ├─ AllusionPanel.tsx
-│  ├─ MottoPlaque.tsx
-│  └─ SourceLine.tsx
-└─ exportCardPng.ts
-
-public/cards/
-├─ artworks/
+├─ exportCardPng.ts
 └─ components/
+   ├─ RarityBadge.tsx
+   ├─ DifficultyBadge.tsx
+   ├─ ThemeBadge.tsx
+   ├─ TitleAndPronunciation.tsx
+   ├─ AllusionPanel.tsx
+   ├─ MottoPlaque.tsx
+   └─ SourceLine.tsx
 
 data/cards/
 ├─ idiom-card-catalog.json
 ├─ card-component-registry.json
 └─ card-assets.schema.json
+
+public/cards/
+├─ artworks/
+└─ components/
 
 scripts/
 ├─ validate-card-assets.mjs
@@ -77,7 +77,7 @@ tests/
 
 ---
 
-### Task 1: 建立純 TypeScript 卡片資料模型
+### Task 1: 建立純 TypeScript 資料模型
 
 **Files:**
 - Create: `src/cards/domain/card-types.ts`
@@ -88,13 +88,9 @@ tests/
 - Modify: `package.json`
 - Test: `tests/card-definition.test.mjs`
 
-**Interfaces:**
-- Produces: `CardRarity`, `IdiomDifficulty`, `CardRenderMode`, `CardAssetReference`, `IdiomCardDefinition`, `CardComponentRegistry`
-- Consumed by: Tasks 2–7
+**Produces:** `CardRarity`, `IdiomDifficulty`, `CardRenderMode`, `CardAssetReference`, `IdiomCardDefinition`, `CardComponentRegistry`, `createCardDefinition()`
 
-- [ ] **Step 1: Write failing model tests**
-
-Create `tests/card-definition.test.mjs` that imports compiled modules from `.test-dist/src/cards/domain/` and asserts:
+- [ ] **Step 1: Write the failing test**
 
 ```js
 import assert from 'node:assert/strict';
@@ -143,26 +139,18 @@ test('keeps artwork and component versions independent', () => {
 });
 ```
 
-- [ ] **Step 2: Run test and verify RED**
-
-Run:
+- [ ] **Step 2: Verify RED**
 
 ```bash
 npm run compile:core
 node --test tests/card-definition.test.mjs
 ```
 
-Expected: FAIL because `src/cards/domain/card-definition.ts` does not exist.
+Expected: FAIL because the card domain modules do not exist.
 
-- [ ] **Step 3: Add `src/cards` to core compilation**
+- [ ] **Step 3: Wire compilation and test script**
 
-Update `tsconfig.core.json` include list:
-
-```json
-"src/cards/**/*.ts"
-```
-
-Add to `package.json`:
+Add `"src/cards/**/*.ts"` to `tsconfig.core.json` and add:
 
 ```json
 "test:cards": "npm run compile:core && node --test tests/card-*.test.mjs"
@@ -170,24 +158,17 @@ Add to `package.json`:
 
 Append `npm run test:cards` to the aggregate `test` script.
 
-- [ ] **Step 4: Implement minimal strict types and factory**
+- [ ] **Step 4: Implement minimal readonly types and factory**
 
-Implement readonly types exactly as defined in the modularization spec. `createCardDefinition()` returns a frozen shallow copy and does not infer rarity or difficulty.
+`createCardDefinition()` returns a frozen copy and does not infer rarity, difficulty, approval or license.
 
-- [ ] **Step 5: Run focused and full verification**
+- [ ] **Step 5: Verify GREEN and commit**
 
 ```bash
 npm run test:cards
 npm run typecheck
 npm run lint
-```
-
-Expected: all pass.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add src/cards tests/card-definition.test.mjs tsconfig.core.json package.json
+git add src/cards/domain tests/card-definition.test.mjs tsconfig.core.json package.json
 git commit -m "feat: add modular idiom card domain model"
 ```
 
@@ -200,13 +181,9 @@ git commit -m "feat: add modular idiom card domain model"
 - Create: `src/cards/layout/resolve-card-components.ts`
 - Test: `tests/card-layout.test.mjs`
 
-**Interfaces:**
-- Consumes: `IdiomCardDefinition`, `CardComponentRegistry`
-- Produces: `CARD_LAYOUT_V2_6`, `resolveCardComponents(card, registry)`
+**Produces:** `CARD_LAYOUT_V2_6`, `resolveCardComponents(card, registry)`
 
 - [ ] **Step 1: Write failing geometry tests**
-
-Assert exact constants:
 
 ```js
 assert.deepEqual(CARD_LAYOUT_V2_6.canvas, { width: 1024, height: 2000 });
@@ -215,40 +192,21 @@ assert.deepEqual(CARD_LAYOUT_V2_6.artwork, { x: 0, y: 360, width: 1024, height: 
 assert.deepEqual(CARD_LAYOUT_V2_6.footer, { x: 0, y: 1560, width: 1024, height: 440 });
 ```
 
-Add a resolver test proving `rarity === 'SSR'` requires `rarity-ssr-v2.7` and rejects an SR-like badge ID.
+Add tests proving SSR requires `rarity-ssr-v2.7`, and N／R／SR reject that badge.
 
-- [ ] **Step 2: Run test and verify RED**
+- [ ] **Step 2: Verify RED**
 
 ```bash
 npm run test:cards
 ```
 
-Expected: FAIL because layout modules are missing.
+- [ ] **Step 3: Implement immutable slot constants**
 
-- [ ] **Step 3: Implement immutable layout constants**
-
-Use `as const` and export slot rectangles for:
-
-- rarity
-- title
-- bopomofo
-- pinyin
-- subtitle
-- difficulty
-- artwork
-- theme
-- allusion
-- motto
-- source
+Export slots for rarity, title, bopomofo, pinyin, subtitle, difficulty, artwork, theme, allusion, motto and source.
 
 - [ ] **Step 4: Implement component resolver**
 
-Rules:
-
-- Resolve IDs from the registry without changing `artworkRef`.
-- Reject missing or non-approved component assets.
-- Require `rarity-ssr-v2.7` or a later explicitly approved SSR badge.
-- Reject v2.7 SSR badge on N／R／SR.
+Reject missing, deprecated or non-approved component assets. Never alter `artworkRef` while resolving components.
 
 - [ ] **Step 5: Verify and commit**
 
@@ -267,56 +225,51 @@ git commit -m "feat: add card layout and component resolver"
 **Files:**
 - Create: `src/cards/render/card-render-plan.ts`
 - Create: `src/cards/render/build-card-render-plan.ts`
+- Create: `src/cards/render/select-card-render-mode.ts`
 - Test: `tests/card-render-plan.test.mjs`
+- Test: `tests/card-legacy-fallback.test.mjs`
 
-**Interfaces:**
-- Consumes: validated card, resolved components, `CARD_LAYOUT_V2_6`
-- Produces: `IdiomCardRenderPlan`
+**Produces:** `IdiomCardRenderPlan`, `buildCardRenderPlan()`, `selectCardRenderMode()`
 
-- [ ] **Step 1: Write failing layer-order test**
+- [ ] **Step 1: Write failing layer-order and invariant tests**
 
 Expected layer order:
 
 ```js
 [
-  'background',
-  'artwork',
-  'frame-skin',
-  'effect-overlay',
-  'rarity-badge',
-  'difficulty-badge',
-  'title-block',
-  'pronunciation-block',
-  'subtitle-block',
-  'theme-badge',
-  'allusion-panel',
-  'motto-plaque',
-  'source-line'
+  'background', 'artwork', 'frame-skin', 'effect-overlay',
+  'rarity-badge', 'difficulty-badge', 'title-block',
+  'pronunciation-block', 'subtitle-block', 'theme-badge',
+  'allusion-panel', 'motto-plaque', 'source-line'
 ]
 ```
 
-Also test replacing difficulty from B to A:
+Replacement invariant:
 
 ```js
 assert.equal(after.sourceArtworkAssetId, before.sourceArtworkAssetId);
+assert.equal(after.sourceArtworkSha256, before.sourceArtworkSha256);
 assert.notEqual(after.componentVersions.difficulty, before.componentVersions.difficulty);
 ```
 
-- [ ] **Step 2: Run RED**
+Mode selection:
+
+```js
+assert.equal(selectCardRenderMode(modularCard), 'modular');
+assert.equal(selectCardRenderMode(legacyCard), 'flat-legacy');
+```
+
+Malformed modular cards must not silently fall back to legacy.
+
+- [ ] **Step 2: Verify RED**
 
 ```bash
 npm run test:cards
 ```
 
-- [ ] **Step 3: Implement render-plan builder**
+- [ ] **Step 3: Implement pure render-plan builder**
 
-Requirements:
-
-- Pure function, no DOM, no React, no random values.
-- Preserve source artwork asset ID and version.
-- Include exact slot rectangle and z-order for every layer.
-- Exclude optional `effect-overlay` when null without changing other z-order semantics.
-- Freeze returned arrays and top-level object.
+No DOM, React, random values or browser state. Freeze the returned plan and layer array.
 
 - [ ] **Step 4: Verify and commit**
 
@@ -324,13 +277,13 @@ Requirements:
 npm run test:cards
 npm run typecheck
 npm run lint
-git add src/cards/render tests/card-render-plan.test.mjs
+git add src/cards/render tests/card-render-plan.test.mjs tests/card-legacy-fallback.test.mjs
 git commit -m "feat: build deterministic idiom card render plans"
 ```
 
 ---
 
-### Task 4: 建立卡片定義與資產驗證 Gate
+### Task 4: 建立資料與資產驗證 Gate
 
 **Files:**
 - Create: `src/cards/validation/validate-card-definition.ts`
@@ -340,33 +293,30 @@ git commit -m "feat: build deterministic idiom card render plans"
 - Create: `scripts/verify-card-assets.test.mjs`
 - Test: `tests/card-validation.test.mjs`
 - Modify: `package.json`
+- Modify: `scripts/verify.sh`
 
-**Interfaces:**
-- Produces: `validateCardDefinition(card, registry)`, CLI asset validator
+**Produces:** `validateCardDefinition(card, registry)`, `npm run validate:card-assets`
 
 - [ ] **Step 1: Write failing validation tests**
 
-Test Blocking failures for:
+Blocking cases:
 
 - title is not exactly four Traditional Chinese characters
-- bopomofo length is not four
-- pinyin length is not four
-- numbered tone is used
+- bopomofo or pinyin does not contain four items
+- numbered Pinyin tone is used
 - modular artwork is not 1024 × 1200
-- approved asset has missing Drive ID or invalid SHA-256
-- SSR uses non-v2.7 badge
-- flat legacy card has no legacy asset
+- approved asset lacks Drive ID or valid SHA-256
+- SSR does not use v2.7 badge
+- flat legacy card lacks `flatLegacyRef`
 
-- [ ] **Step 2: Run RED**
+- [ ] **Step 2: Verify RED**
 
 ```bash
 npm run test:cards
 node --test scripts/verify-card-assets.test.mjs
 ```
 
-- [ ] **Step 3: Implement pure validator and CLI**
-
-Return structured findings:
+- [ ] **Step 3: Implement structured findings**
 
 ```ts
 export interface CardValidationFinding {
@@ -376,9 +326,9 @@ export interface CardValidationFinding {
 }
 ```
 
-The CLI exits non-zero when any blocking finding exists.
+The CLI exits non-zero when a blocking finding exists.
 
-- [ ] **Step 4: Wire scripts**
+- [ ] **Step 4: Wire verification**
 
 Add:
 
@@ -386,7 +336,7 @@ Add:
 "validate:card-assets": "node scripts/validate-card-assets.mjs"
 ```
 
-Call it from `scripts/verify.sh` after data validation and before TypeScript/build.
+Call it from `scripts/verify.sh` before TypeScript and build gates.
 
 - [ ] **Step 5: Verify and commit**
 
@@ -400,7 +350,7 @@ git commit -m "feat: validate modular card definitions and assets"
 
 ---
 
-### Task 5: 建立 React SVG 元件與 modular／legacy 顯示
+### Task 5: 建立 React SVG renderer 與 legacy fallback
 
 **Files:**
 - Create: `src/app/cards/IdiomCardCanvas.tsx`
@@ -412,52 +362,37 @@ git commit -m "feat: validate modular card definitions and assets"
 - Create: `src/app/cards/components/AllusionPanel.tsx`
 - Create: `src/app/cards/components/MottoPlaque.tsx`
 - Create: `src/app/cards/components/SourceLine.tsx`
-- Test: `tests/card-legacy-fallback.test.mjs`
 
-**Interfaces:**
-- Consumes: `IdiomCardDefinition`, `IdiomCardRenderPlan`
-- Produces: `<IdiomCardView />`, `<IdiomCardCanvas />`
+**Consumes:** validated `IdiomCardDefinition` and `IdiomCardRenderPlan`
 
-- [ ] **Step 1: Write failing mode-selection test**
+- [ ] **Step 1: Implement SVG canvas from render plan**
 
-Extract a pure helper in `src/cards/render/select-card-render-mode.ts` and test:
+Required root:
 
-```js
-assert.equal(selectCardRenderMode(modularCard), 'modular');
-assert.equal(selectCardRenderMode(legacyCard), 'flat-legacy');
+```tsx
+<svg viewBox="0 0 1024 2000" role="img" aria-label={ariaLabel}>
 ```
 
-A malformed modular card must not silently fall back to legacy.
+Artwork uses `{ x: 0, y: 360, width: 1024, height: 1200 }`. All formal text remains live SVG text.
 
-- [ ] **Step 2: Run RED**
+- [ ] **Step 2: Implement components without domain decisions**
 
-```bash
-npm run test:cards
-```
+Components receive already-resolved props. They must not infer rarity, approval, license, source status or card eligibility.
 
-- [ ] **Step 3: Implement SVG canvas**
+- [ ] **Step 3: Implement `IdiomCardView` mode switch**
 
-Requirements:
+- `modular`: render `IdiomCardCanvas`.
+- `flat-legacy`: render approved legacy image.
+- malformed modular input: render an explicit error state, not legacy fallback.
 
-- `<svg viewBox="0 0 1024 2000">`
-- Artwork rendered into `{x: 0, y: 360, width: 1024, height: 1200}`.
-- Text remains live SVG text, not embedded in artwork.
-- Component props come from render plan only.
-- Use `aria-label` with idiom title and meaning.
-- Preserve large mobile-readable typography.
-
-- [ ] **Step 4: Implement legacy fallback**
-
-`flat-legacy` renders its approved flat image directly. It must not pretend to support component replacement.
-
-- [ ] **Step 5: Run verification and commit**
+- [ ] **Step 4: Verify and commit**
 
 ```bash
 npm run test:cards
 npm run typecheck
 npm run lint
 npm run build
-git add src/app/cards src/cards/render/select-card-render-mode.ts tests/card-legacy-fallback.test.mjs
+git add src/app/cards
 git commit -m "feat: render modular and legacy idiom cards"
 ```
 
@@ -468,30 +403,24 @@ git commit -m "feat: render modular and legacy idiom cards"
 **Files:**
 - Create: `src/app/cards/exportCardPng.ts`
 - Modify: `src/app/cards/IdiomCardCanvas.tsx`
-- Test: `tests/card-render-plan.test.mjs`
+- Modify: `tests/card-render-plan.test.mjs`
 
-**Interfaces:**
-- Produces: `exportCardPng(svgElement, filename): Promise<Blob>`
+**Produces:** `getCardExportDimensions()`, `normalizeCardExportFilename()`, `exportCardPng()`
 
-- [ ] **Step 1: Add failing export-contract tests**
+- [ ] **Step 1: Write failing pure contract tests**
 
-Keep the test pure by extracting:
-
-```ts
-export function getCardExportDimensions(): { readonly width: 1024; readonly height: 2000 }
+```js
+assert.deepEqual(getCardExportDimensions(), { width: 1024, height: 2000 });
+assert.equal(normalizeCardExportFilename('愚公移山'), 'CICG_IdiomCard_愚公移山.png');
 ```
 
-Test exact dimensions and filename normalization.
-
-- [ ] **Step 2: Run RED**
+- [ ] **Step 2: Verify RED**
 
 ```bash
 npm run test:cards
 ```
 
 - [ ] **Step 3: Implement SVG-to-Canvas export**
-
-Workflow:
 
 ```text
 XMLSerializer
@@ -501,14 +430,7 @@ XMLSerializer
 → canvas.toBlob('image/png')
 ```
 
-Reject when:
-
-- SVG is missing
-- image decoding fails
-- canvas context is unavailable
-- output Blob is null
-
-Do not introduce a new runtime dependency.
+Reject missing SVG, decode failure, unavailable context or null Blob. Do not add a runtime dependency.
 
 - [ ] **Step 4: Verify and commit**
 
@@ -523,35 +445,24 @@ git commit -m "feat: export modular idiom cards as png"
 
 ---
 
-### Task 7: 建立第一組元件與示範卡驗證
+### Task 7: 建立真實示範卡與替換證據
 
 **Files:**
 - Create: `data/cards/idiom-card-catalog.json`
-- Add: Approved runtime derivatives under `public/cards/`
+- Add: approved runtime derivatives under `public/cards/artworks/` and `public/cards/components/`
 - Modify: `data/cards/card-component-registry.json`
 - Modify: `docs/card-prompts/manifest.md`
 - Modify: `docs/card-prompts/state/current-batch.json`
 
-**Interfaces:**
-- Produces: one modular demonstration card and one flat-legacy fixture
+**Produces:** one modular reference card and one flat-legacy fixture
 
-- [ ] **Step 1: Prepare Drive evidence**
+- [ ] **Step 1: Obtain real Drive evidence**
 
-For every artwork/component master, record:
+For every master record actual Drive File ID, SHA-256, dimensions, version and review status. Stop if evidence is unavailable.
 
-- Drive File ID
-- SHA-256
-- width and height
-- review status
-- version
+- [ ] **Step 2: Create the modular reference card**
 
-Do not proceed with invented placeholders.
-
-- [ ] **Step 2: Create one modular example**
-
-Recommended example: `愚公移山`.
-
-Required versions:
+Use `愚公移山` only after content review. Required values:
 
 ```text
 layoutVersion: 2.6
@@ -561,18 +472,13 @@ artwork: 1024 × 1200
 composite: 1024 × 2000
 ```
 
-- [ ] **Step 3: Prove component replacement invariant**
+- [ ] **Step 3: Prove replacement invariant**
 
-Render the same card twice with difficulty B and A. Verify:
-
-- artwork SHA-256 unchanged
-- artwork asset ID unchanged
-- only difficulty data/component differs
-- final PNGs are 1024 × 2000
+Render B and A difficulty variants. Verify artwork ID and SHA-256 are identical; only difficulty data/component and final composite checksum differ.
 
 - [ ] **Step 4: Update Manifest and state**
 
-Record artwork and composite Drive references separately. Do not merge their status fields.
+Record artwork and composite Drive references, checksums and statuses separately.
 
 - [ ] **Step 5: Run full gate and commit**
 
@@ -584,63 +490,25 @@ git commit -m "test: add modular idiom card reference assets"
 
 ---
 
-### Task 8: Integrate with collection and reward surfaces
+## Explicitly Out of Scope
 
-**Files:**
-- Modify the actual collection/reward files created by the card-collection implementation
-- Reuse: `src/app/cards/IdiomCardView.tsx`
-- Test: add focused tests beside the collection implementation
+Collection grid, detail page and milestone reward integration are not part of this renderer-foundation plan because their production files may not yet exist. After those features land, create a separate plan using their actual paths and reuse `src/app/cards/IdiomCardView.tsx`.
 
-**Interfaces:**
-- Consumes: card ownership and approved catalog entries
-- Produces: shared card rendering in collection grid, detail view, and reward reveal
-
-- [ ] **Step 1: Confirm collection implementation exists**
-
-If the collection feature is not yet implemented, stop this task and create a separate dependent plan. Do not invent file paths or mix collection implementation into renderer foundation.
-
-- [ ] **Step 2: Replace flat-card-only display with `IdiomCardView`**
-
-Rules:
-
-- `modular` uses SVG renderer.
-- `flat-legacy` uses approved legacy asset.
-- Review or blocked cards remain excluded from player-facing pools.
-
-- [ ] **Step 3: Verify no domain rule moved into React**
-
-Card eligibility, rarity, milestone selection and approval remain in pure TypeScript/domain services.
-
-- [ ] **Step 4: Run full verification and commit**
-
-```bash
-./scripts/verify.sh
-git add src tests
-git commit -m "feat: use modular cards in collection surfaces"
-```
-
----
+A headless batch exporter requiring Playwright or another new dependency also requires a separate dependency-reviewed plan.
 
 ## Final Verification
 
-- [ ] Run full repository verification:
+- [ ] Run:
 
 ```bash
 ./scripts/verify.sh
 ```
 
-- [ ] Confirm `npm audit` reports zero vulnerabilities.
-- [ ] Confirm exact Node test totals from the current run; do not reuse old counts.
+- [ ] Record current Node test totals and zero failures.
 - [ ] Confirm TypeScript strict, ESLint, Vite build and PWA generation pass.
-- [ ] Confirm `behind_by = 0` before merge.
+- [ ] Confirm `npm audit` reports zero vulnerabilities.
+- [ ] Confirm `behind_by = 0`.
 - [ ] Confirm unresolved review threads = 0.
-- [ ] Confirm Drive artwork/component/composite evidence is recorded.
+- [ ] Confirm real Drive artwork／component／composite evidence.
 - [ ] Perform ChatGPT Audit against the modularization spec.
-- [ ] Squash Merge only after all gates pass.
-
-## Implementation Notes
-
-- Tasks 1–6 form the renderer foundation and can be delivered before the collection feature.
-- Task 7 requires real approved Drive assets and must not use invented evidence.
-- Task 8 is dependency-gated and should remain separate if the collection implementation is not present.
-- A future headless batch exporter may add Playwright or another approved tool in a separate dependency-reviewed plan; it is not required for the first browser-side implementation.
+- [ ] Squash Merge only after every gate passes.
