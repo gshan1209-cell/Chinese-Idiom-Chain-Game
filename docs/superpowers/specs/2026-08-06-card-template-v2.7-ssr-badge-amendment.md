@@ -76,9 +76,11 @@ URL：https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view
 
 ```text
 尺寸：1024 × 2000 px
-檔案大小：3,387,862 bytes
-SHA-256：8e21a8b84aa21ad5ff457cfe31e1cd5adbca941fd1c2fbcaed830502a6294c59
+檔案大小：3,427,910 bytes
+SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
 ```
+
+版面座標已以實體像素重組並驗證：Header `360 px`、Main artwork `1200 px`、Footer `440 px`。
 
 v2.6 SSR 模板保留為歷史核准版本，不得原地覆蓋；新產 SSR 圖卡自本增補起使用 v2.7 徽章標準。
 
@@ -108,7 +110,9 @@ N／R／SR 仍使用其各自最新核准模板；不得套用 SSR 傳奇金龍�
 
 ```text
 [ ] 實際圖片尺寸為 1024 × 2000 px
+[ ] 上方資訊區實際高度為 360 px
 [ ] 中央主圖區實際高度為 1200 px
+[ ] 下方內容區實際高度為 440 px
 [ ] 左上 SSR 使用傳奇級虹彩金龍徽章
 [ ] SSR 與 SR 在輪廓、材質、星雲核心與紫色主寶石上明顯不同
 [ ] 徽章沒有遮擋成語主標、注音或拼音
