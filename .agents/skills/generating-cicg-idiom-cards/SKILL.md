@@ -33,17 +33,22 @@ Do not ask the user to repost the full template or standards when the Repository
 
 ## Production Contract
 
-Before generation, each card must have: idiom, four aligned Zhuyin readings, subtitle, difficulty, rarity, rarity rationale, theme badge, allusion summary, source status, motto, character action, historical setting, and Review filename.
+Before generation, each card must have: idiom, four aligned Zhuyin readings, four tone-marked Hanyu Pinyin syllables, subtitle, difficulty, rarity, rarity rationale, theme badge, allusion summary, source status, motto, character action, historical setting, and Review filename.
 
 When the user asks to generate an image, use the available image-generation tool. In ChatGPT, use `image_gen`; do not substitute a text prompt for the requested image.
 
-Generate only Review assets. The producing Agent cannot self-approve its own image.
+Generate only Review assets unless an independent human approval is explicitly recorded. The producing Agent cannot self-approve its own image.
 
 ## Permanent Gates
 
-- v2.1 portrait `2:3`, recommended minimum `1024 × 1536`.
-- Traditional Chinese four-character idiom with per-character vertical Zhuyin.
-- No Hanyu Pinyin or other romanization.
+- v2.6 exact canvas `1024 × 2000 px`.
+- Header `y = 0–359`, height `360 px`.
+- Main artwork `y = 360–1559`, height `1200 px`.
+- Footer `y = 1560–1999`, height `440 px`.
+- Traditional Chinese four-character idiom.
+- First row below the title: four aligned Zhuyin groups.
+- Second row below Zhuyin: lowercase tone-marked Hanyu Pinyin.
+- No numbered tones and no missing tone marks in Approved assets.
 - Rarity at upper left; difficulty at upper right; never mix them.
 - At least one person actively expresses the idiom.
 - Full theme badge at lower left.
@@ -68,6 +73,8 @@ Report only evidence-backed facts:
 - batch ID and card list
 - current status per card
 - generated filenames
+- actual image size and main-art height
+- Zhuyin and Pinyin review status
 - Drive File IDs actually returned
 - Manifest/state updates actually committed
 - findings and exact next action
