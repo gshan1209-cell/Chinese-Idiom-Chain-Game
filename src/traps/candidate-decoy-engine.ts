@@ -90,7 +90,7 @@ export function createCandidateDecoySession(
     ? options.validPlacements ?? 0
     : 0;
 
-  if (options.mode === 'standard') {
+  if (options.mode !== 'trap-candidates') {
     return Object.freeze({
       levelId: options.board.level.id,
       mode: options.mode,
@@ -133,7 +133,7 @@ export function createCandidateDecoySession(
 export function recordValidCandidatePlacement(
   session: CandidateDecoySession
 ): CandidateDecoySession {
-  if (session.mode === 'standard') return session;
+  if (session.mode !== 'trap-candidates') return session;
 
   const validPlacements = session.validPlacements + 1;
   const decoys = session.decoys.map((decoy) => {
