@@ -7,6 +7,7 @@ export {
   REQUIRED_PHASE1_FOLDER_KEYS,
   validateDriveFolderRegistry,
 } from './validate-drive-folder-registry.js';
+export { validateDriveMigrationLedger } from './validate-drive-migration-ledger.js';
 
 export type {
   DriveAssetRecord,
@@ -32,3 +33,7 @@ export type {
   DriveFolderIssueCode,
   RequiredPhase1FolderKey,
 } from './validate-drive-folder-registry.js';
+export type {
+  DriveMigrationIssue,
+  DriveMigrationIssueCode,
+} from './validate-drive-migration-ledger.js';
