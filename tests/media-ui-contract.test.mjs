@@ -47,6 +47,12 @@ test('unmounts the YouTube iframe whenever playback is paused', () => {
   );
 });
 
+test('restores the last selected item after hydration without autoplay', () => {
+  const source = readSource('src/app/media/MediaProvider.tsx');
+  assert.match(source, /type:\s*'SET_SELECTED_ITEM'/);
+  assert.match(source, /itemId:\s*next\.preferences\.lastSelectedItemId/);
+});
+
 test('reserves a visible 16:9 player and mobile safe-area space', () => {
   const css = readSource('src/app/media/media.css');
   assert.match(css, /min-width:\s*200px/);
