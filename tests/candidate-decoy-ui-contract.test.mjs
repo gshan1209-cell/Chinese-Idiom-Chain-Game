@@ -21,6 +21,12 @@ test('candidate decoy hook owns the independent trap session', async () => {
   assert.match(hook, /getVisibleCandidateDecoys/);
 });
 
+test('a newly created board resets candidate trap progress even on the same level', async () => {
+  const hook = await read('src/app/use-candidate-decoys.ts');
+  assert.match(hook, /current\.board !== board/);
+  assert.match(hook, /board:\s*options\.board/);
+});
+
 test('only a changed puzzle session records a valid trap placement', async () => {
   const hook = await read('src/app/use-puzzle-game.ts');
   assert.match(hook, /result\.session !== current/);
