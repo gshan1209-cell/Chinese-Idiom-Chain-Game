@@ -13,6 +13,7 @@ const ACTIVE_IDIOMS = Object.freeze([
 ]);
 
 const NOW = '2026-08-06T12:00:00.000Z';
+const NON_ISO_RELEASE_DATE = 'August 6, 2026 12:00 UTC';
 
 function validCard(overrides = {}) {
   return {
@@ -90,7 +91,7 @@ test('rejects pinyin syllables without an explicit tone mark', () => {
 
 test('rejects human-readable release dates that are not ISO-8601', () => {
   const result = validate([
-    validCard({ startsAt: 'August 6, 2026 12:00 UTC' })
+    validCard({ startsAt: NON_ISO_RELEASE_DATE })
   ]);
 
   assert.equal(result.validDefinitions.length, 0);
