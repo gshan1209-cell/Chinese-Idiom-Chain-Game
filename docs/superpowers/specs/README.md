@@ -46,7 +46,8 @@ docs/card-prompts/state/current-batch.json
 4. 2026-08-06-idiom-card-collection-data-integrity-amendment.md
 5. 2026-08-06-card-template-v2.1-layout-amendment.md
 6. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-7. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+7. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
+8. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 ### 規格用途
@@ -60,6 +61,7 @@ docs/card-prompts/state/current-batch.json
 | `2026-08-06-idiom-card-collection-data-integrity-amendment.md` | 定義逐字注音與先保存、後揭示的冪等獎勵交易；其中禁止拼音顯示的舊條款由 v2.6 覆寫 |
 | `2026-08-06-card-template-v2.1-layout-amendment.md` | 歷史版型基礎：典故區、主題徽章與低高度直式箴言 |
 | `2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` | 鎖定 `1024 × 2000`、中央主圖 `1200 px`、注音橫列與帶聲調漢語拼音橫列 |
+| `2026-08-06-card-template-v2.7-ssr-badge-amendment.md` | 鎖定 SSR 傳奇級虹彩金龍徽章，使 SSR 與 SR 在輪廓、材質、星雲核心及主寶石上明顯區隔 |
 
 ### 規範優先序
 
@@ -71,7 +73,8 @@ GitHub main 與最新 Approved 規格
 → 審核治理
 → 收藏資料完整性增補
 → 收藏與里程碑贈卡
-→ v2.6 卡牌模板增補
+→ v2.7 SSR 徽章增補
+→ v2.6 尺寸與發音版面增補
 → v2.1 歷史版面增補
 → Repository-local skill 與批次狀態
 → 個別卡片企劃與 Prompt
@@ -87,6 +90,8 @@ GitHub main 與最新 Approved 規格
 - v2.6 正式圖卡尺寸固定為 `1024 × 2000 px`，不再使用 `2:3` 或 `1024 × 1536`。
 - v2.6 上方資訊區為 `360 px`、中央主圖區為 `1200 px`、下方內容區為 `440 px`。
 - v2.6 主標下方第一列為逐字對齊注音，第二列為小寫、帶聲調符號的漢語拼音。
+- v2.7 只覆寫 SSR 左上徽章：使用傳奇級虹彩金龍、立體金色 SSR、紫藍洋紅星雲核心與紫色菱形主寶石。
+- SSR v2.7 必須一眼明顯高於 SR，不能只把 SR 徽章文字改成 SSR 或單純提高亮度。
 - 里程碑圖卡必須先固定並持久化 rewardId、resolvedCardId 與 acquisitionId，確認成功後才播放揭示動畫。
 
 ---
@@ -101,6 +106,8 @@ GitHub main 與最新 Approved 規格
 - 圖卡固定為 `1024 × 2000 px`，且情境插圖必須有人物。
 - 中央主圖區固定 `y = 360–1559`，高度 `1200 px`。
 - 四字主標下方必須依序顯示注音橫列與帶聲調漢語拼音橫列。
+- SSR 左上必須使用 v2.7 傳奇級虹彩金龍徽章，並與 SR 在輪廓、材質、星雲核心及紫色主寶石上明顯區隔。
+- SSR 虹彩只限左上徽章，不得污染外框、難易度框、主圖、典故區、主題徽章或箴言牌匾。
 - 典故來源須完成校訂，並以卡面最下方小字單行呈現。
 - 右下箴言使用貼合文字的低高度直式牌匾，不得留下大面積空白。
 - 只有 `Approved` 圖卡可以進入正式收藏頁、免費卡池或未來商店。
@@ -128,13 +135,20 @@ Google Drive 專案：
 90_Archive/Idiom_Cards
 ```
 
-核准 v2.6 SSR 標準模板：
+核准 v2.7 SSR 標準模板：
 
 ```text
-CICG_CardTemplate_Rarity_SSR_v2.6_Approved.png
-Drive File ID：1nfFsm6s03fl9XFq_sca98BIkfNLFTs07
+CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png
+Drive File ID：1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV
 尺寸：1024 × 2000 px
+上方資訊區：360 px
+中央主圖區：1200 px
+下方內容區：440 px
+檔案大小：3,427,910 bytes
+SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
 ```
+
+v2.6 SSR 保留為歷史核准模板；新產 SSR 圖卡以 v2.7 為準。N／R／SR 不得套用 v2.7 SSR 傳奇金龍徽章。
 
 GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素材參照；Drive 保存圖片與大型發布素材。
 
@@ -149,7 +163,9 @@ GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素�
 - 自行把未授權聯名概念升級為 UR 正式卡。
 - 省略主標下方的注音橫列或漢語拼音橫列。
 - 使用數字聲調或省略正式拼音聲調符號。
-- 將正式 v2.6 圖卡輸出為 `1024 × 1536` 或 `2:3`。
+- 將正式圖卡輸出為 `1024 × 1536` 或 `2:3`。
+- 新產 SSR 圖卡沿用 SR 徽章輪廓，或只以亮度／飽和度差異冒充 v2.7。
+- 將 SSR 虹彩色系套用到整張卡面。
 - 先播放圖卡獎勵動畫，再保存抽取與收藏結果。
 - 直接覆蓋已發布圖卡。
 - 將 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。
