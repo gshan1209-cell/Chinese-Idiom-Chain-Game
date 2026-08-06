@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "batchId": "phase1-batch0-read-only-inventory",
+  "phase": "phase1",
+  "createdAt": "2026-08-06T23:15:00+08:00",
+  "sourceCommit": "09b2fb86b137d7e652a6c6c32d718ce1a67d4f6b",
+  "status": "verified",
+  "entries": []
+}
