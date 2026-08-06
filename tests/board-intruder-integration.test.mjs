@@ -23,16 +23,16 @@ test('board intruder hook owns an independent session without puzzle mutations',
 test('board intruder engine never mutates puzzle session fields', async () => {
   const source = await read('src/traps/board-intruder-engine.ts');
   for (const assignment of [
-    '.values[',
-    '.tileByCell[',
-    '.tiles[',
-    '.selectedCellKey =',
-    '.mistakes =',
-    '.hintsUsed =',
-    '.score =',
-    '.correctCells ='
+    /\.values\[[^\]]+\]\s*=/,
+    /\.tileByCell\[[^\]]+\]\s*=/,
+    /\.tiles\[[^\]]+\]\s*=/,
+    /\.selectedCellKey\s*=/,
+    /\.mistakes\s*=/,
+    /\.hintsUsed\s*=/,
+    /\.score\s*=/,
+    /\.correctCells\s*=/
   ]) {
-    assert.equal(source.includes(assignment), false, assignment);
+    assert.doesNotMatch(source, assignment);
   }
 });
 
