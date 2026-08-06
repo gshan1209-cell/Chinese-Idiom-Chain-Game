@@ -44,9 +44,10 @@ docs/card-prompts/state/current-batch.json
 2. 2026-08-06-idiom-card-review-governance-design.md
 3. 2026-08-06-idiom-card-collection-design.md
 4. 2026-08-06-idiom-card-collection-data-integrity-amendment.md
-5. 2026-08-06-card-template-v2.1-layout-amendment.md
-6. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-7. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+5. 2026-08-06-card-collection-core-v1-design.md
+6. 2026-08-06-card-template-v2.1-layout-amendment.md
+7. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
+8. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 ### 規格用途
@@ -58,6 +59,7 @@ docs/card-prompts/state/current-batch.json
 | `2026-08-06-idiom-card-review-governance-design.md` | 定義預檢、內容、視覺、權利、發布與版本審核流程 |
 | `2026-08-06-idiom-card-collection-design.md` | 定義每十關免費贈卡、收藏頁、資料模型與未來固定商品購買 |
 | `2026-08-06-idiom-card-collection-data-integrity-amendment.md` | 定義逐字注音與先保存、後揭示的冪等獎勵交易；其中禁止拼音顯示的舊條款由 v2.6 覆寫 |
+| `2026-08-06-card-collection-core-v1-design.md` | 定義獨立收藏資料庫、十關里程碑、空卡池 pending、決定性解析與 grant／inventory 原子交易 |
 | `2026-08-06-card-template-v2.1-layout-amendment.md` | 歷史版型基礎：典故區、主題徽章與低高度直式箴言 |
 | `2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` | 鎖定 `1024 × 2000`、中央主圖 `1200 px`、注音橫列與帶聲調漢語拼音橫列 |
 
@@ -69,9 +71,10 @@ docs/card-prompts/state/current-batch.json
 GitHub main 與最新 Approved 規格
 → 稀有度標準
 → 審核治理
-→ 收藏資料完整性增補
-→ 收藏與里程碑贈卡
 → v2.6 卡牌模板增補
+→ 收藏資料完整性增補
+→ 收藏資料核心 v1
+→ 收藏與里程碑贈卡
 → v2.1 歷史版面增補
 → Repository-local skill 與批次狀態
 → 個別卡片企劃與 Prompt
@@ -87,7 +90,10 @@ GitHub main 與最新 Approved 規格
 - v2.6 正式圖卡尺寸固定為 `1024 × 2000 px`，不再使用 `2:3` 或 `1024 × 1536`。
 - v2.6 上方資訊區為 `360 px`、中央主圖區為 `1200 px`、下方內容區為 `440 px`。
 - v2.6 主標下方第一列為逐字對齊注音，第二列為小寫、帶聲調符號的漢語拼音。
+- 收藏資料核心的 `pinyin` 是唯一允許的正式漢語拼音欄位；其他任意羅馬拼音欄位仍拒絕。
 - 里程碑圖卡必須先固定並持久化 rewardId、resolvedCardId 與 acquisitionId，確認成功後才播放揭示動畫。
+- 正式卡池為空時 grant 保持 pending，不得使用 Review、Legacy、v1.0 或模板空框偽造獎勵。
+- 收藏資料使用獨立 `cicg-card-collection` database version 1，不修改 `cicg-progress` schema。
 
 ---
 
@@ -151,6 +157,7 @@ GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素�
 - 使用數字聲調或省略正式拼音聲調符號。
 - 將正式 v2.6 圖卡輸出為 `1024 × 1536` 或 `2:3`。
 - 先播放圖卡獎勵動畫，再保存抽取與收藏結果。
+- 使用 Review、Legacy、v1.0 圖卡或模板空框偽造里程碑獎勵。
 - 直接覆蓋已發布圖卡。
 - 將 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。
 - 在圖卡文件 PR 中順便修改主玩法、進度 Schema 或 production code。
