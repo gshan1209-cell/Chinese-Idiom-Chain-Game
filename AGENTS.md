@@ -108,7 +108,7 @@ npm install
 - 產生成語圖卡、繼續產圖或下一批
 - 修正上一批、審核或上傳圖卡
 - 圖卡元件、模板、renderer 或 PNG 輸出
-- 稀有度或難易度
+- 稀有度、稀有度外框或難易度
 - 每十關免費贈卡
 - 收藏頁或卡池
 - 圖卡購買或卡包
@@ -140,11 +140,12 @@ docs/card-prompts/state/current-batch.json
 5. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
 6. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
 7. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-8. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
-9. docs/card-prompts/PROJECT_PROMPT.md
+8. docs/superpowers/specs/2026-08-06-card-rarity-frame-system-amendment.md
+9. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
+10. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工。
+v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；四階外框規格定義 N／R／SR／SSR 的 frame-skin 與 effect-overlay；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工。
 
 發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、來源、授權或核准證據。
 
@@ -162,18 +163,21 @@ v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與�
 - 四字主標下方第一列為四組逐字對齊注音；第二列為小寫、帶聲調符號的漢語拼音。
 - 新產 SSR 圖卡必須使用 v2.7 傳奇級虹彩金龍徽章：大型立體金色 SSR、紫藍洋紅星雲核心與紫色菱形主寶石。
 - SSR 徽章必須與 SR 在輪廓、材質、光效與主寶石上明顯區隔；只改文字、亮度或飽和度視為 Blocking failure。
-- SSR 虹彩只限左上徽章，不得全面染色外框、難易度框、主圖、典故區、主題徽章或箴言牌匾。
-- N／R／SR 不得套用 v2.7 SSR 徽章。
+- N 外框固定為深翡翠古金；R 為霜藍鋼銀；SR 為皇家紫晶；SSR v2.8 為完整青藍、紫、洋紅、翠綠虹彩霓虹包框。
+- 完整多色虹彩包框只允許 SSR；N／R／SR 必須維持各自單一主色層級。
+- SSR v2.8 可把虹彩用於外框與 effect overlay，但不得把 canonical artwork、難易度框、典故區、主題徽章或箴言牌匾全面染色。
+- N／R／SR 不得套用 v2.7 SSR 徽章或 v2.8 SSR 完整虹彩外框。
+- 稀有度外框不得改寫難易度；右上 difficulty badge 必須是獨立元件。
 - 新建圖卡預設 `renderMode = modular`；舊整張 PNG 使用 `flat-legacy`。
 - 中央主插圖必須保存為獨立 artwork，不得烙入稀有度、難易度、主標、注音、拼音、典故、箴言或來源。
-- 難易度、稀有度、主題徽章、文字、箴言牌匾與來源必須能獨立替換。
+- 難易度、稀有度、外框、主題徽章、文字、箴言牌匾與來源必須能獨立替換。
 - Review／Approved PNG 是 derived output，不得成為唯一 canonical source。
-- 修改難易度或徽章時，`artworkAssetId` 與 artwork checksum 必須維持不變。
+- 修改難易度、徽章或外框時，`artworkAssetId` 與 artwork checksum 必須維持不變。
 - 圖卡必須使用繁體中文、人物情境與最下方單行典故來源。
 - 使用者要求正式產圖時，應使用可用的圖片生成工具；在 modular workflow 中優先產生 illustration-only artwork，再由 renderer 組卡。
 - Renderer 尚未完成時可先產 artwork，但不得退回把所有 UI 永久烙入 canonical artwork。
 - 產製 Agent 不得自行把自己的輸出直接標記為最終 Approved。
-- 產圖、審核、上傳或批次狀態改變後，必須更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 Manifest。
+- 產圖、審核、上傳或批次狀態改變後，必須更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 Manifest 或對應元件註冊表。
 
 ---
 
@@ -212,6 +216,12 @@ Drive 存放：
 ```
 
 新素材先進 Inbox；核准後移入 Approved；舊版移入 Archive。
+
+四階外框元件註冊表：
+
+```text
+docs/card-prompts/components/rarity-frame-registry-v1.md
+```
 
 ---
 

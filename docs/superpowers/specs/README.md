@@ -26,8 +26,9 @@ GitHub main
 6. 2026-08-06-card-template-v2.1-layout-amendment.md
 7. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
 8. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-9. 2026-08-06-idiom-card-modularization-design.md
-10. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+9. 2026-08-06-card-rarity-frame-system-amendment.md
+10. 2026-08-06-idiom-card-modularization-design.md
+11. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 跨聊天產圖、審核、上傳或批次接續時，另須先使用：
@@ -49,6 +50,7 @@ docs/card-prompts/state/current-batch.json
 | `card-collection-core-v1-design` | Grant、補發、決定性解析、Inventory 與獨立 IndexedDB |
 | `card-template-v2.6-dimension-and-pronunciation-amendment` | `1024 × 2000`、1200px 主圖、注音與拼音 |
 | `card-template-v2.7-ssr-badge-amendment` | SSR 傳奇級虹彩金龍徽章 |
+| `card-rarity-frame-system-amendment` | N 深翡翠、R 霜藍鋼銀、SR 皇家紫晶、SSR v2.8 虹彩霓虹外框 |
 | `idiom-card-modularization-design` | artwork、component、data、render plan 與 PNG 輸出 |
 
 ## 規範優先序
@@ -61,6 +63,7 @@ GitHub main 與最新 Approved 規格
 → 收藏資料核心 v1
 → 收藏與里程碑贈卡
 → v2.7 SSR 徽章
+→ 四階稀有度外框系統
 → v2.6 尺寸與發音
 → 元件化架構
 → v2.1 歷史版面
@@ -88,7 +91,7 @@ GitHub main 與最新 Approved 規格
 
 - 新 artwork 建議固定 `1024 × 1200 px`，只保存人物、背景、情境與道具。
 - 卡框、稀有度、難易度、主題徽章、主標、注音、拼音、典故、箴言與來源由元件及資料層組合。
-- 修改 difficulty 或 rarity badge 時，`artworkAssetId` 與 artwork SHA-256 必須不變。
+- 修改 difficulty、rarity badge 或 frame 時，`artworkAssetId` 與 artwork SHA-256 必須不變。
 - Canonical render surface 使用 `1024 × 2000` SVG 座標。
 - Review／Approved PNG 是 derived artifact，不得成為唯一 canonical source。
 - flat legacy 舊卡可顯示，但不得宣稱支援獨立元件替換。
@@ -99,7 +102,10 @@ GitHub main 與最新 Approved 規格
 - N～SSR 依正面意義、精神價值、共鳴力與代表性判定。
 - 正式圖卡固定 `1024 × 2000 px`，中央主圖區高度 `1200 px`。
 - 主標下方依序顯示注音橫列與帶聲調漢語拼音橫列。
-- SSR 左上使用 v2.7 傳奇級虹彩金龍徽章，且不得把虹彩污染到整張卡面。
+- SSR 左上使用 v2.7 傳奇級虹彩金龍徽章。
+- N 外框使用深翡翠古金；R 使用霜藍鋼銀；SR 使用皇家紫晶；SSR v2.8 使用完整多色虹彩霓虹框。
+- 完整多色虹彩包框只允許 SSR；N／R／SR 必須維持各自的單一主色層級。
+- 稀有度外框不得改寫或自動重染右上難易度元件。
 - 典故來源必須校訂，箴言使用低高度直式牌匾。
 - 只有 Approved 圖卡可以進正式收藏頁、免費卡池或未來商店。
 - 產製 Agent 不得自行把自己的輸出標記為最終 Approved。
@@ -116,12 +122,26 @@ GitHub main 與最新 Approved 規格
 90_Archive/Idiom_Cards
 ```
 
-核准 v2.7 SSR 模板：
+核准四階外框 master：
 
 ```text
-CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png
-Drive File ID：1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV
-SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
+N：CICG_CardFrame_Rarity_N_v1.0_Approved.png
+Drive File ID：1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8
+
+R：CICG_CardFrame_Rarity_R_v1.0_Approved.png
+Drive File ID：18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR
+
+SR：CICG_CardFrame_Rarity_SR_v1.0_Approved.png
+Drive File ID：1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40
+
+SSR：CICG_CardTemplate_Rarity_SSR_v2.8_Approved.png
+Drive File ID：1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz
+```
+
+完整 checksum 與元件 ID：
+
+```text
+docs/card-prompts/components/rarity-frame-registry-v1.md
 ```
 
 ## 禁止事項
@@ -130,7 +150,9 @@ SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
 - 把 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。
 - 把未授權聯名概念升級為 UR 正式卡。
 - 使用數字聲調、缺少注音／拼音，或輸出舊尺寸。
-- 把正式 UI 永久烙入 modular artwork。
+- 把正式 UI 或稀有度外框永久烙入 modular artwork。
+- 把 N／R／SR 套用 SSR 完整虹彩霓虹框。
+- 依稀有度外框自動改寫難易度。
 - 先播放獎勵動畫，再保存抽取與收藏結果。
 - 在圖卡文件 PR 中順便修改主玩法或進度 schema。
 
