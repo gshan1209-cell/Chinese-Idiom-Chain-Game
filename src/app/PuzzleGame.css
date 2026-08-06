@@ -15,6 +15,28 @@
 .puzzle-header .eyebrow { margin: 0; }
 .puzzle-title { margin: 0; font-size: clamp(2.2rem, 9vw, 4rem); }
 
+.puzzle-mode-badge {
+  justify-self: center;
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  font-size: var(--font-supporting);
+  font-weight: 900;
+  border: 2px solid;
+  border-radius: 999px;
+}
+
+.puzzle-mode-badge.standard {
+  color: #92400e;
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.puzzle-mode-badge.trap {
+  color: #5b21b6;
+  background: #f5f3ff;
+  border-color: #8b5cf6;
+}
+
 .puzzle-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -119,6 +141,24 @@
 }
 .candidate-tile:disabled { opacity: 0.2; box-shadow: none; }
 
+.candidate-decoy.active {
+  color: #5b21b6;
+  background: #f5f3ff;
+  border-color: #8b5cf6;
+  box-shadow: 0 0.22rem 0 #c4b5fd;
+  animation: candidate-decoy-reveal 2.4s ease-in-out infinite;
+}
+
+.candidate-decoy.ejecting,
+.candidate-decoy.ejecting:disabled {
+  opacity: 1;
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fb7185;
+  box-shadow: none;
+  animation: candidate-decoy-eject 280ms ease-in forwards;
+}
+
 .puzzle-actions {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -172,6 +212,44 @@
   0%, 100% { transform: translateX(0); }
   33% { transform: translateX(-0.25rem); }
   66% { transform: translateX(0.25rem); }
+}
+
+@keyframes candidate-decoy-reveal {
+  0%, 80%, 100% { transform: rotate(0); }
+  86% { transform: rotate(-1.5deg); }
+  92% { transform: rotate(1.5deg); }
+}
+
+@keyframes candidate-decoy-eject {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(1.4rem, -2rem) rotate(18deg);
+  }
+}
+
+@keyframes candidate-decoy-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-cell.wrong,
+  .candidate-decoy.active {
+    animation: none;
+  }
+
+  .candidate-decoy.active {
+    border-style: dashed;
+  }
+
+  .candidate-decoy.ejecting,
+  .candidate-decoy.ejecting:disabled {
+    animation: candidate-decoy-fade 120ms linear forwards;
+  }
 }
 
 @media (max-width: 36rem) {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Idiom } from '../domain/idiom';
 import type { PuzzleSession } from '../domain/puzzle';
+import type { PuzzlePlayMode } from '../domain/trap';
 import { loadDictionary } from '../idioms/load-dictionary';
 import { buildPuzzleBoard } from '../puzzle/puzzle-board';
 import {
@@ -14,6 +15,7 @@ import {
   usePuzzleHint
 } from '../puzzle/puzzle-engine';
 import { PUZZLE_LEVELS } from '../puzzle/levels';
+import { useCandidateDecoys } from './use-candidate-decoys';
 
 function shuffled<T>(items: readonly T[]): readonly T[] {
   const result = [...items];
@@ -47,7 +49,10 @@ export interface PuzzleFeedback {
   readonly message: string;
 }
 
-export function usePuzzleGame(initialLevelNumber = 1) {
+export function usePuzzleGame(
+  initialLevelNumber = 1,
+  playMode: PuzzlePlayMode = 'standard'
+) {
   const initialLevelIndex = indexForLevelNumber(initialLevelNumber);
   const [levelIndex, setLevelIndex] = useState(initialLevelIndex);
   const [session, setSession] = useState<PuzzleSession>(() => makeSession(initialLevelIndex));
@@ -55,21 +60,36 @@ export function usePuzzleGame(initialLevelNumber = 1) {
     tone: 'info',
     message: '先點選空格，再從下方選一個字。'
   });
-  const [idiomsById, setIdiomsById] = useState<ReadonlyMap<string, Idiom>>(new Map());
+  const [idioms, setIdioms] = useState<readonly Idiom[]>(Object.freeze([]));
 
   useEffect(() => {
     let active = true;
     void loadDictionary()
       .then(({ payload }) => {
-        if (active) setIdiomsById(new Map(payload.idioms.map((idiom) => [idiom.id, idiom])));
+        if (active) setIdioms(payload.idioms);
       })
       .catch(() => {
-        if (active) setIdiomsById(new Map());
+        if (active) setIdioms(Object.freeze([]));
       });
     return () => {
       active = false;
     };
   }, []);
+
+  const idiomsById = useMemo<ReadonlyMap<string, Idiom>>(
+    () => new Map(idioms.map((idiom) => [idiom.id, idiom])),
+    [idioms]
+  );
+  const {
+    visibleDecoys: candidateDecoys,
+    recordValidPlacement,
+    beginEjection,
+    completeEjection
+  } = useCandidateDecoys({
+    board: session.board,
+    mode: playMode,
+    idioms
+  });
 
   const level = PUZZLE_LEVELS[levelIndex];
   if (level === undefined) throw new Error('關卡索引超出範圍。');
@@ -90,18 +110,28 @@ export function usePuzzleGame(initialLevelNumber = 1) {
   }, []);
 
   const chooseTile = useCallback((tileId: string) => {
-    setSession((current) => {
-      const result = placePuzzleTile(current, tileId);
-      if (result.session.status === 'completed') {
-        setFeedback({ tone: 'success', message: '恭喜過關！所有成語都完成了。' });
-      } else if (result.correct) {
-        setFeedback({ tone: 'success', message: '答對了，繼續完成其他空格。' });
-      } else {
-        setFeedback({ tone: 'error', message: '這個字不對，可以再選一次或使用提示。' });
-      }
-      return result.session;
-    });
-  }, []);
+    const current = session;
+    const result = placePuzzleTile(current, tileId);
+    if (result.session !== current) recordValidPlacement();
+    setSession(result.session);
+
+    if (result.session.status === 'completed') {
+      setFeedback({ tone: 'success', message: '恭喜過關！所有成語都完成了。' });
+    } else if (result.correct) {
+      setFeedback({ tone: 'success', message: '答對了，繼續完成其他空格。' });
+    } else {
+      setFeedback({ tone: 'error', message: '這個字不對，可以再選一次或使用提示。' });
+    }
+  }, [recordValidPlacement, session]);
+
+  const chooseCandidateDecoy = useCallback((id: string) => {
+    beginEjection(id);
+    setFeedback({ tone: 'success', message: '抓到偽字了！點得漂亮。' });
+  }, [beginEjection]);
+
+  const finishCandidateDecoyEjection = useCallback((id: string) => {
+    completeEjection(id);
+  }, [completeEjection]);
 
   const removeSelected = useCallback(() => {
     setSession((current) => {
@@ -145,8 +175,12 @@ export function usePuzzleGame(initialLevelNumber = 1) {
     session,
     feedback,
     completedIdioms,
+    playMode,
+    candidateDecoys,
     selectCell,
     chooseTile,
+    chooseCandidateDecoy,
+    finishCandidateDecoyEjection,
     removeSelected,
     hint,
     clear,

@@ -2,12 +2,16 @@ import { useEffect, useRef } from 'react';
 
 import type { LevelCompletionResult } from '../domain/progress';
 import { cellKey } from '../domain/puzzle';
+import type { PuzzlePlayMode } from '../domain/trap';
 import { calculateStars } from '../progress/progress-engine';
+import { CandidateDecoyTile } from './CandidateDecoyTile';
+import { playCandidateDecoyEjectFeedback } from './trap-feedback';
 import { usePuzzleGame } from './use-puzzle-game';
 import './PuzzleGame.css';
 
 export interface PuzzleGameProps {
   readonly initialLevelNumber: number;
+  readonly playMode: PuzzlePlayMode;
   readonly bestStars: number;
   readonly onExitToMap: () => void;
   readonly onLevelCompleted: (result: LevelCompletionResult) => void;
@@ -20,12 +24,13 @@ function starText(stars: number): string {
 
 export function PuzzleGame({
   initialLevelNumber,
+  playMode,
   bestStars,
   onExitToMap,
   onLevelCompleted,
   onOpenNextLevel
 }: PuzzleGameProps) {
-  const game = usePuzzleGame(initialLevelNumber);
+  const game = usePuzzleGame(initialLevelNumber, playMode);
   const { board } = game.session;
   const cells = [];
   const reportedLevelRef = useRef<string | null>(null);
@@ -92,6 +97,7 @@ export function PuzzleGame({
   }
 
   const finalLevel = game.level.levelNumber === game.totalLevels;
+  const modeLabel = playMode === 'trap-candidates' ? '候選偽字模式' : '標準模式';
 
   return (
     <main className="app-shell puzzle-shell">
@@ -103,6 +109,10 @@ export function PuzzleGame({
         </div>
         <button className="text-action" type="button" onClick={() => game.restartLevel()}>重玩</button>
       </header>
+
+      <p className={`puzzle-mode-badge ${playMode === 'trap-candidates' ? 'trap' : 'standard'}`}>
+        {modeLabel}
+      </p>
 
       <section className="puzzle-stats" aria-label="關卡狀態">
         <span>進度 <strong>{game.level.levelNumber}/{game.totalLevels}</strong></span>
@@ -167,6 +177,17 @@ export function PuzzleGame({
               >
                 {tile.character}
               </button>
+            ))}
+            {game.candidateDecoys.map((decoy) => (
+              <CandidateDecoyTile
+                key={decoy.id}
+                decoy={decoy}
+                onChoose={(id) => {
+                  playCandidateDecoyEjectFeedback();
+                  game.chooseCandidateDecoy(id);
+                }}
+                onEjectionComplete={(id) => game.finishCandidateDecoyEjection(id)}
+              />
             ))}
           </div>
           <div className="puzzle-actions">

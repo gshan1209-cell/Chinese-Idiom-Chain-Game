@@ -1,18 +1,25 @@
 import { useState } from 'react';
 
 import type { CampaignProgress } from '../domain/progress';
+import type { PuzzlePlayMode } from '../domain/trap';
 import { PUZZLE_LEVELS } from '../puzzle/levels';
 import {
   getContinueLevelNumber,
   getTotalStars,
   isLevelUnlocked
 } from '../progress/progress-engine';
+import {
+  getPuzzlePlayModeLockReason,
+  isPuzzlePlayModeUnlocked
+} from '../traps/trap-unlocks';
 import './LevelMap.css';
 
 export interface LevelMapProps {
   readonly progress: CampaignProgress;
   readonly loading: boolean;
   readonly storageWarning: string | null;
+  readonly selectedPlayMode: PuzzlePlayMode;
+  readonly onPlayModeChange: (mode: PuzzlePlayMode) => void;
   readonly onOpenLevel: (levelNumber: number) => void;
   readonly onReset: () => void;
   readonly onExit: () => void;
@@ -32,6 +39,8 @@ export function LevelMap({
   progress,
   loading,
   storageWarning,
+  selectedPlayMode,
+  onPlayModeChange,
   onOpenLevel,
   onReset,
   onExit
@@ -39,6 +48,19 @@ export function LevelMap({
   const [message, setMessage] = useState('選擇已解鎖的關卡，或繼續上次進度。');
   const continueLevel = getContinueLevelNumber(progress, PUZZLE_LEVELS.length);
   const totalStars = getTotalStars(progress);
+  const candidateModeUnlocked = isPuzzlePlayModeUnlocked(progress, 'trap-candidates');
+  const candidateLockReason = getPuzzlePlayModeLockReason(progress, 'trap-candidates');
+
+  const chooseMode = (mode: PuzzlePlayMode) => {
+    if (!isPuzzlePlayModeUnlocked(progress, mode)) {
+      setMessage(getPuzzlePlayModeLockReason(progress, mode) ?? '此模式尚未解鎖。');
+      return;
+    }
+    onPlayModeChange(mode);
+    setMessage(mode === 'standard'
+      ? '已選擇標準模式，不會出現陷阱。'
+      : '已選擇候選偽字，留意混入字牌中的多餘文字。');
+  };
 
   const openLevel = (levelNumber: number) => {
     if (!isLevelUnlocked(progress, levelNumber)) {
@@ -68,6 +90,36 @@ export function LevelMap({
         <div><span>已解鎖</span><strong>{progress.highestUnlockedLevel}/20</strong></div>
         <div><span>總星數</span><strong>{totalStars}/60</strong></div>
         <div><span>上次關卡</span><strong>第 {continueLevel} 關</strong></div>
+      </section>
+
+      <section className="play-mode-panel" aria-labelledby="play-mode-title">
+        <div>
+          <p className="eyebrow">本次遊玩</p>
+          <h2 id="play-mode-title">選擇闖關模式</h2>
+        </div>
+        <div className="play-mode-grid">
+          <button
+            className={`play-mode-card ${selectedPlayMode === 'standard' ? 'selected' : ''}`}
+            type="button"
+            aria-pressed={selectedPlayMode === 'standard'}
+            onClick={() => chooseMode('standard')}
+          >
+            <strong>標準模式</strong>
+            <span>推薦預設 · 純成語填字</span>
+          </button>
+          <button
+            className={`play-mode-card trap-mode ${selectedPlayMode === 'trap-candidates' ? 'selected' : ''}`}
+            type="button"
+            disabled={!candidateModeUnlocked}
+            aria-pressed={selectedPlayMode === 'trap-candidates'}
+            onClick={() => chooseMode('trap-candidates')}
+          >
+            <strong>候選偽字</strong>
+            <span>{candidateModeUnlocked
+              ? '字牌會逐步混入可踢出的偽字'
+              : candidateLockReason}</span>
+          </button>
+        </div>
       </section>
 
       <button

@@ -20,7 +20,8 @@
     "src/pwa/**/*.ts",
     "src/puzzle/**/*.ts",
     "src/progress/**/*.ts",
-    "src/media/**/*.ts"
+    "src/media/**/*.ts",
+    "src/traps/**/*.ts"
   ],
   "exclude": [
     "**/*.test.ts",
