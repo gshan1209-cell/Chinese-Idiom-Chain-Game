@@ -6,6 +6,7 @@ import type {
   CandidateDecoyStatus,
   PuzzlePlayMode
 } from '../domain/trap.js';
+import { usesCandidateDecoys } from './trap-mode.js';
 
 const THRESHOLD_RATIOS = Object.freeze({
   1: Object.freeze([0.25]),
@@ -90,7 +91,7 @@ export function createCandidateDecoySession(
     ? options.validPlacements ?? 0
     : 0;
 
-  if (options.mode !== 'trap-candidates') {
+  if (!usesCandidateDecoys(options.mode)) {
     return Object.freeze({
       levelId: options.board.level.id,
       mode: options.mode,
@@ -133,7 +134,7 @@ export function createCandidateDecoySession(
 export function recordValidCandidatePlacement(
   session: CandidateDecoySession
 ): CandidateDecoySession {
-  if (session.mode !== 'trap-candidates') return session;
+  if (!usesCandidateDecoys(session.mode)) return session;
 
   const validPlacements = session.validPlacements + 1;
   const decoys = session.decoys.map((decoy) => {
