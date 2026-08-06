@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-06T23:15:00+08:00",
+  "updatedAt": "2026-08-07T05:33:08+08:00",
   "folders": [
     {
       "folderKey": "project.root",
@@ -136,25 +136,291 @@
       "lifecycleRole": "container"
     },
     {
-      "folderKey": "legacy.archive.idiom-cards",
+      "folderKey": "idiom-cards.archive",
       "driveFolderId": "1HTMdGnQrx9KPdOMOiM30UOIPLRyhb179",
       "name": "Idiom_Cards",
       "parentFolderKey": "project.archive",
-      "lifecycleRole": "container"
+      "lifecycleRole": "archive"
     },
     {
       "folderKey": "legacy.archive.templates-v2-5",
       "driveFolderId": "18BsnJPuh-nar6fdtob4vJcgIl5VlonFN",
       "name": "Templates_v2.5",
-      "parentFolderKey": "legacy.archive.idiom-cards",
+      "parentFolderKey": "idiom-cards.archive",
       "lifecycleRole": "container"
     },
     {
       "folderKey": "legacy.archive.templates-v2-2",
       "driveFolderId": "1jqq1tEhcfeoCIfv9uAl5YCZUZyq1uA8C",
       "name": "Templates_v2.2",
-      "parentFolderKey": "legacy.archive.idiom-cards",
+      "parentFolderKey": "idiom-cards.archive",
       "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.root",
+      "driveFolderId": "1VorW6bO2jZCDxhjC83qJf2l1TQuhauFm",
+      "name": "Idiom_Cards",
+      "parentFolderKey": "project.visuals",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.shortcuts",
+      "driveFolderId": "1R9zBbZzzA_uAqXzZfSllo0QrRJj5288V",
+      "name": "00_Readme_And_Shortcuts",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.artworks",
+      "driveFolderId": "1h-IfWb3i7mWeEXL1lWxRJ2MU4E-rNjKC",
+      "name": "01_Artworks",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.artworks.review",
+      "driveFolderId": "1G2DQppUj585LQvS-vJjOhLBSox6yLcSk",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.artworks",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.artworks.approved",
+      "driveFolderId": "1t_FbHKA_hRqDZ5byeTyo-Z9lSI1fZ63T",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.artworks",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components",
+      "driveFolderId": "1NPVrZc7OpXuVi1EkfJQv5iaEB_GTShQg",
+      "name": "02_Components",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.card-frames",
+      "driveFolderId": "11e1pfNw4IBw0Pw_9ZdDqvV4q5oJW2mwt",
+      "name": "01_Card_Frames",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.card-frames.review",
+      "driveFolderId": "1D305TgSERMgZjZz2U421ls2Iv2zrsrIj",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.card-frames",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.card-frames.approved",
+      "driveFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.card-frames",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components.rarity-badges",
+      "driveFolderId": "1HSjWL4hjvyOZef23WGHyAVSj4Tt9KfwC",
+      "name": "02_Rarity_Badges",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.rarity-badges.review",
+      "driveFolderId": "1P2n4d5279zGsiXVZpzFqsIHCl-k8rsoy",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.rarity-badges",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.rarity-badges.approved",
+      "driveFolderId": "1mjXwNI-fTngn9hxrguxvMKUvsYCfWjSI",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.rarity-badges",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components.difficulty-badges",
+      "driveFolderId": "1RJit5pN2nkG5gxiqvzX81TLwfOMX7htb",
+      "name": "03_Difficulty_Badges",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.difficulty-badges.review",
+      "driveFolderId": "1EULAzoGG-Adnwha8A6HTFRBfiLPs8d4F",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.difficulty-badges",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.difficulty-badges.approved",
+      "driveFolderId": "1TDhf5EJc0CnfWPv3joXM-FObcJZneh39",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.difficulty-badges",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components.theme-badges",
+      "driveFolderId": "1Hi82s-1MTKCY2l7jufQIgpKquLjLXQ_l",
+      "name": "04_Theme_Badges",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.theme-badges.review",
+      "driveFolderId": "1W9aY_1VBdqQOZrVuAEqOYrLmRWZl7rpD",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.theme-badges",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.theme-badges.approved",
+      "driveFolderId": "181mpCL3649D0EwZk7c4KWesxV229TZiV",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.theme-badges",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components.motto-plaques",
+      "driveFolderId": "1_tKnh9jThURl6gXC0WxCPiod8LOGjAAi",
+      "name": "05_Motto_Plaques",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.motto-plaques.review",
+      "driveFolderId": "1UsC6ZmOKRwjJjr23-IP8UDSv747oj64T",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.motto-plaques",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.motto-plaques.approved",
+      "driveFolderId": "1zkxaFgRphHyoZNieLEUX5pen7RbTRxBP",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.motto-plaques",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.components.effect-overlays",
+      "driveFolderId": "1ZiDxvArOEf6szbwxtnV8q2TM9IBRriK4",
+      "name": "06_Effect_Overlays",
+      "parentFolderKey": "idiom-cards.components",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.components.effect-overlays.review",
+      "driveFolderId": "15xp2ItzovdE3_HzZV7q85eTmeqF5YA9Q",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.components.effect-overlays",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.components.effect-overlays.approved",
+      "driveFolderId": "1ghNoyVeXTVowdtF9-SUMWDgAE3108638",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.components.effect-overlays",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.templates",
+      "driveFolderId": "1RzkhWhImVBGgIeOnB8xIKUOMavLVhHmu",
+      "name": "03_Templates",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.templates.review",
+      "driveFolderId": "1z948HUCJA4EY6QkR4sMd9PYGwo0UbCgC",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.templates",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.templates.approved",
+      "driveFolderId": "1-V2AhTqkX8dI1BLHSlBTNfTxHDlrjSl6",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.templates",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.composites",
+      "driveFolderId": "1aGQoIMZCZrncW-iRe8zkOH9DfBOWtFRB",
+      "name": "04_Composites",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "idiom-cards.composites.review",
+      "driveFolderId": "16WlQLaHImpG_xf0vh6WpZwfwf-8jqiOa",
+      "name": "10_Review",
+      "parentFolderKey": "idiom-cards.composites",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "idiom-cards.composites.approved",
+      "driveFolderId": "19rWsaRMGLNWodfoe_s22NlU5lwWzj-0y",
+      "name": "20_Approved",
+      "parentFolderKey": "idiom-cards.composites",
+      "lifecycleRole": "approved"
+    },
+    {
+      "folderKey": "idiom-cards.reference-only",
+      "driveFolderId": "1y_jA6DLo_0hew1epM6SI4zRnenEfztc6",
+      "name": "05_Reference_Only",
+      "parentFolderKey": "idiom-cards.root",
+      "lifecycleRole": "reference"
+    },
+    {
+      "folderKey": "idiom-cards.inbox",
+      "driveFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+      "name": "Idiom_Cards",
+      "parentFolderKey": "project.inbox",
+      "lifecycleRole": "inbox"
+    },
+    {
+      "folderKey": "idiom-cards.archive.artworks",
+      "driveFolderId": "1aCIBHh9xbckOBZWoSbHKavxzYLXvFJ1Z",
+      "name": "01_Artworks",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "idiom-cards.archive.components",
+      "driveFolderId": "1EWA088wpzpsDke4WsiJcmjMi4lAmyOyo",
+      "name": "02_Components",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "idiom-cards.archive.templates",
+      "driveFolderId": "1w_fvosFfu6XNALb2AN9ei_HX_bDNxSE4",
+      "name": "03_Templates",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "idiom-cards.archive.composites",
+      "driveFolderId": "1lUPAaELcjSA5iBzpjqMq_itq3Chpw1YW",
+      "name": "04_Composites",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "idiom-cards.archive.legacy-flat-cards",
+      "driveFolderId": "1ju1kEf5Qj4rYTHy43Xw6fKsDmQxC3Wos",
+      "name": "05_Legacy_Flat_Cards",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "idiom-cards.archive.rejected-unverifiable",
+      "driveFolderId": "1PX_HFBG9NboXdPaeCBNZFYWZYUtffO3Y",
+      "name": "06_Rejected_And_Unverifiable",
+      "parentFolderKey": "idiom-cards.archive",
+      "lifecycleRole": "archive"
     }
   ]
 }
