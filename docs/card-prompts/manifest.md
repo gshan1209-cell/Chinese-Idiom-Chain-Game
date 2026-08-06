@@ -3,7 +3,7 @@
 - 提示語根目錄：`docs/card-prompts/`
 - 正式模板資料夾：https://drive.google.com/drive/folders/1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB
 - Legacy 備份根目錄：https://drive.google.com/drive/folders/1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO
-- Legacy 圖片總數：62 張（以 6 個 ZIP 分卷／分類備份，另有 1 張徽章圖個別上傳）
+- Legacy 圖片總數：62 張，全部以原始 PNG 逐檔保存，不使用 ZIP 或其他壓縮檔取代原圖。
 - Legacy 說明文件：https://drive.google.com/file/d/1LavS5cnyE6T6Sur2KY0rG7Bgdcx9OGzq/view
 
 ## 模板索引
@@ -38,21 +38,29 @@
 | 盲人摸象 | SR | B | perspective | 見識 | 女性說書人與多人群像 | `docs/card-prompts/idioms/CICG_IdiomCard_盲人摸象_SR_B_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
 | 塞翁失馬 | SSR | B | perspective | 見識 | 老者與家人 | `docs/card-prompts/idioms/CICG_IdiomCard_塞翁失馬_SSR_B_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
 | 一鳴驚人 | SSR | B | governance | 內政 | 男性君主 | `docs/card-prompts/idioms/CICG_IdiomCard_一鳴驚人_SSR_B_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
-| 草木皆兵 | SSR | A | military | 軍事 | 男性敗軍將領 | `docs/card-prompts/idioms/CICG_IdiomCard_草木皆兵_SSR_A_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
+| 草木皆兵 | SSR | A | military | 軍事 | 男性敗軍將領 | `docs/card-prompts/idioms/CICG_IdiomCard_草木皆兵_SSR_A_v2.1_Prompt.md` | https://drive.google.com/file/d/16HD7CYyAJlQVlerR_h8DJkqkhgFwE4xh/view | Review | NeedsReview | 舊卡原圖已逐檔備份；正式發布前仍須重製與校訂 |
 | 鶴立雞群 | SR | B | relationships | 人際 | 女性主角 | `docs/card-prompts/idioms/CICG_IdiomCard_鶴立雞群_SR_B_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
 | 望梅止渴 | SR | B | strategy | 智謀 | 男性統帥與疲憊士兵 | `docs/card-prompts/idioms/CICG_IdiomCard_望梅止渴_SR_B_v2.1_Prompt.md` | 待補 | Legacy | NeedsReview | 正式發布前完成來源與卡面文字校訂 |
 
-## Legacy 素材備份
+## Legacy 原圖素材備份
 
-| fileName | driveImageUrl | folder | assetStatus | notes |
-|---|---|---|---|---|
-| CICG_Legacy_Template_Experiments_Part1.zip | https://drive.google.com/file/d/1vRzPZD6QJHgfkmix9vUjZcGtdN5qc4Km/view | template-experiments | Legacy | 內含 15 張歷史模板／構圖試驗圖 |
-| CICG_Legacy_Template_Experiments_Part2.zip | https://drive.google.com/file/d/1Ca-aT5bBtyCGW8KGnPbtTkfFk4T_n14r/view | template-experiments | Legacy | 內含 15 張歷史模板／構圖試驗圖 |
-| CICG_Legacy_Template_Experiments_Part3.zip | https://drive.google.com/file/d/1FeuzLhh5MUNSQ5Mjdt91Frluo2HivAOj/view | template-experiments | Legacy | 內含 15 張歷史模板／構圖試驗圖 |
-| CICG_Legacy_Template_Experiments_Part4.zip | https://drive.google.com/file/d/1J7KrKxluKrWxrYxalAtGOQ40O2pkGSdq/view | template-experiments | Legacy | 內含 14 張歷史模板／構圖試驗圖 |
-| CICG_Legacy_Idiom_Card_Drafts.zip | https://drive.google.com/file/d/1cm7YrwwcYc-0fizpl59K1awfjPRVOxl0/view | idiom-card-drafts | Review | 內含 1 張可辨識成語的舊卡草稿 |
-| CICG_Legacy_Badge_References.zip | https://drive.google.com/file/d/1pE4JXUD6CeGu5r-CYJz0BA2KIXbanxI2/view | badge-references | Legacy | 內含 2 張徽章／分類參考圖 |
-| CICG_Legacy_BadgeReference_001.png | https://drive.google.com/file/d/1ZXPwO-32yPqwO9viVzGwTAzF5A-nGLos/view | badge-references | Legacy | 已個別上傳的徽章規範參考圖 |
+| collection | driveFolderUrl | pngCount | assetStatus | notes |
+|---|---|---:|---|---|
+| template-experiments | https://drive.google.com/drive/folders/15o4T3b-6ci2mm8wVHRAWFN73ny4VegYH | 59 | Legacy | `CICG_Legacy_Template_001.png` 至 `059.png`；第 048 張標記為 Review；全部為可直接預覽與下載的原始 PNG |
+| idiom-card-drafts | https://drive.google.com/drive/folders/1sftr1bLMKrGk6tCccipE_Cb-Ijbt6Ot- | 1 | Review | `CICG_Legacy_IdiomCard_草木皆兵_001.png` 原始 PNG |
+| badge-references | https://drive.google.com/drive/folders/1lVGaYqnWnROae-xNJsCFABpPOUDPjNWq | 2 | Legacy | `CICG_Legacy_BadgeReference_001.png`、`002.png` 原始 PNG |
+
+### 個別原圖連結
+
+- 草木皆兵舊卡：https://drive.google.com/file/d/16HD7CYyAJlQVlerR_h8DJkqkhgFwE4xh/view
+- 主題徽章參考 001：https://drive.google.com/file/d/1GAeZ-OhBzFK6WZWVoInqezJlDETUcILW/view
+- 主題徽章參考 002：https://drive.google.com/file/d/1Y-rpWDqKMvjS96bWP5StAGOt21HcfeY0/view
+
+## 素材保存規則
+
+- 圖片須以原始 PNG 逐檔保存，禁止以 ZIP、RAR、7z 或其他壓縮封裝取代原圖。
+- 原圖可以資料夾分類，但每張圖片必須能在 Drive 直接預覽與個別下載。
+- 未核准圖片只標記 `Legacy` 或 `Review`，不得冒充 v2.1 正式成品。
 
 ## 發布限制
 
