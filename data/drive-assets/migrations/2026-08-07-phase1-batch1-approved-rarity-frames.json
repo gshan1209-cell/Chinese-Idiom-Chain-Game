@@ -10,7 +10,7 @@
       "resourceKind": "file",
       "assetId": "frame-n-v1.0-emerald-antique-gold",
       "driveResourceId": "1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8",
-      "operation": "move",
+      "operation": "move-and-rename",
       "before": {
         "name": "CICG_CardFrame_Rarity_N_v1.0_Approved.png",
         "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
@@ -20,7 +20,7 @@
         "webViewLink": "https://drive.google.com/file/d/1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8/view"
       },
       "after": {
-        "name": "CICG_CardFrame_Rarity_N_v1.0_Approved.png",
+        "name": "CICG_Component_RarityFrame_N_v1.0_Approved.png",
         "parentFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
         "mimeType": "image/png",
         "sizeBytes": 2285281,
@@ -42,7 +42,7 @@
       "resourceKind": "file",
       "assetId": "frame-r-v1.0-frost-blue-steel",
       "driveResourceId": "18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR",
-      "operation": "move",
+      "operation": "move-and-rename",
       "before": {
         "name": "CICG_CardFrame_Rarity_R_v1.0_Approved.png",
         "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
@@ -52,7 +52,7 @@
         "webViewLink": "https://drive.google.com/file/d/18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR/view"
       },
       "after": {
-        "name": "CICG_CardFrame_Rarity_R_v1.0_Approved.png",
+        "name": "CICG_Component_RarityFrame_R_v1.0_Approved.png",
         "parentFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
         "mimeType": "image/png",
         "sizeBytes": 2191391,
@@ -74,7 +74,7 @@
       "resourceKind": "file",
       "assetId": "frame-sr-v1.0-royal-violet",
       "driveResourceId": "1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40",
-      "operation": "move",
+      "operation": "move-and-rename",
       "before": {
         "name": "CICG_CardFrame_Rarity_SR_v1.0_Approved.png",
         "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
@@ -84,7 +84,7 @@
         "webViewLink": "https://drive.google.com/file/d/1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40/view"
       },
       "after": {
-        "name": "CICG_CardFrame_Rarity_SR_v1.0_Approved.png",
+        "name": "CICG_Component_RarityFrame_SR_v1.0_Approved.png",
         "parentFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
         "mimeType": "image/png",
         "sizeBytes": 2454266,
@@ -106,7 +106,7 @@
       "resourceKind": "file",
       "assetId": "frame-ssr-v2.8-rainbow-neon",
       "driveResourceId": "1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz",
-      "operation": "move",
+      "operation": "move-and-rename",
       "before": {
         "name": "CICG_CardTemplate_Rarity_SSR_v2.8_Approved.png",
         "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
@@ -116,7 +116,7 @@
         "webViewLink": "https://drive.google.com/file/d/1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz/view"
       },
       "after": {
-        "name": "CICG_CardTemplate_Rarity_SSR_v2.8_Approved.png",
+        "name": "CICG_Component_RarityFrame_SSR_v2.8_Approved.png",
         "parentFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
         "mimeType": "image/png",
         "sizeBytes": 3480599,
