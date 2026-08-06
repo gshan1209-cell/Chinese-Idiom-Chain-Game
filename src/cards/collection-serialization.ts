@@ -157,7 +157,7 @@ function parseInventoryItem(
 
   return freezeInventoryItem({
     cardId: value.cardId,
-    ownedCount: value.ownedCount as number,
+    ownedCount: value.ownedCount,
     firstOwnedAt: value.firstOwnedAt,
     lastOwnedAt: value.lastOwnedAt,
     acquisitionHistory: records
