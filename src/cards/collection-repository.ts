@@ -8,6 +8,10 @@ import type {
   CardCollectionTransactionResult
 } from './card-types.js';
 
+function errorFrom(value: unknown): Error {
+  return value instanceof Error ? value : new Error('收藏交易失敗。');
+}
+
 function cloneState(state: CardCollectionState): CardCollectionState {
   return parseCardCollectionState(state, state.metadata.updatedAt);
 }
@@ -39,7 +43,7 @@ class MemoryCardCollectionRepository implements CardCollectionRepository {
       this.state = next;
       return Promise.resolve(result.value);
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(errorFrom(error));
     }
   }
 
