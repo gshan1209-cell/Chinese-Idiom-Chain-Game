@@ -148,19 +148,40 @@ test('ejection is idempotent and requires animation completion', () => {
 });
 
 test('visible decoys include active and ejecting but exclude scheduled and removed', () => {
-  const active = decoySession(100);
-  const ejecting = beginCandidateDecoyEjection(active, active.decoys[0].id);
-  const visible = getVisibleCandidateDecoys(ejecting);
-  assert.equal(visible.some((decoy) => decoy.status === 'ejecting'), true);
-  assert.equal(visible.some((decoy) => decoy.status === 'active'), true);
+  const mixed = Object.freeze({
+    levelId: 'level-test',
+    mode: 'trap-candidates',
+    validPlacements: 4,
+    decoys: Object.freeze([
+      Object.freeze({
+        id: 'scheduled',
+        character: '甲',
+        activationAfterValidPlacements: 8,
+        status: 'scheduled'
+      }),
+      Object.freeze({
+        id: 'active',
+        character: '乙',
+        activationAfterValidPlacements: 2,
+        status: 'active'
+      }),
+      Object.freeze({
+        id: 'ejecting',
+        character: '丙',
+        activationAfterValidPlacements: 3,
+        status: 'ejecting'
+      }),
+      Object.freeze({
+        id: 'removed',
+        character: '丁',
+        activationAfterValidPlacements: 1,
+        status: 'removed'
+      })
+    ])
+  });
 
-  const removed = completeCandidateDecoyEjection(ejecting, active.decoys[0].id);
-  assert.equal(
-    getVisibleCandidateDecoys(removed).some((decoy) => decoy.status === 'removed'),
-    false
-  );
-  assert.equal(
-    getVisibleCandidateDecoys(decoySession()).some((decoy) => decoy.status === 'scheduled'),
-    false
+  assert.deepEqual(
+    getVisibleCandidateDecoys(mixed).map((decoy) => decoy.status),
+    ['active', 'ejecting']
   );
 });
