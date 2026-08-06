@@ -131,7 +131,7 @@ npm install
 - PWA precache：12 entries，355.44 KiB
 - npm audit：419 packages，0 vulnerabilities
 
-文件更新後，PR 最新 HEAD 仍須再執行相同的同樹 CI。PR 僅在該 CI 成功且 `behind_by = 0` 時合併；最終 Run 編號與 merge SHA 以 PR 紀錄為準。
+文件更新後，PR 最新 HEAD 必須再執行相同的同樹 CI。PR 僅在該 CI 成功且 `behind_by = 0` 時合併；最終 Run 編號與 merge SHA 以 PR 紀錄為準。
 
 非阻擋警告：GitHub Actions runner 將 `actions/checkout@v4` 與 `actions/setup-node@v4` 從內部 Node 20 強制執行於 Node 24；專案驗證本身使用 Node 22.16.0 並成功。
 
