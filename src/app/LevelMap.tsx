@@ -35,6 +35,17 @@ function starText(stars: number): string {
   return `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`;
 }
 
+function modeMessage(mode: PuzzlePlayMode): string {
+  if (mode === 'standard') return '已選擇標準模式，不會出現陷阱。';
+  if (mode === 'trap-candidates') {
+    return '已選擇候選偽字，留意混入字牌中的多餘文字。';
+  }
+  if (mode === 'trap-board') {
+    return '已選擇盤面伏字，候選區與空格都可能出現怪字。';
+  }
+  return '此模式尚未開放。';
+}
+
 export function LevelMap({
   progress,
   loading,
@@ -50,6 +61,8 @@ export function LevelMap({
   const totalStars = getTotalStars(progress);
   const candidateModeUnlocked = isPuzzlePlayModeUnlocked(progress, 'trap-candidates');
   const candidateLockReason = getPuzzlePlayModeLockReason(progress, 'trap-candidates');
+  const boardModeUnlocked = isPuzzlePlayModeUnlocked(progress, 'trap-board');
+  const boardLockReason = getPuzzlePlayModeLockReason(progress, 'trap-board');
 
   const chooseMode = (mode: PuzzlePlayMode) => {
     if (!isPuzzlePlayModeUnlocked(progress, mode)) {
@@ -57,9 +70,7 @@ export function LevelMap({
       return;
     }
     onPlayModeChange(mode);
-    setMessage(mode === 'standard'
-      ? '已選擇標準模式，不會出現陷阱。'
-      : '已選擇候選偽字，留意混入字牌中的多餘文字。');
+    setMessage(modeMessage(mode));
   };
 
   const openLevel = (levelNumber: number) => {
@@ -118,6 +129,18 @@ export function LevelMap({
             <span>{candidateModeUnlocked
               ? '字牌會逐步混入可踢出的偽字'
               : candidateLockReason}</span>
+          </button>
+          <button
+            className={`play-mode-card trap-mode board-trap-mode ${selectedPlayMode === 'trap-board' ? 'selected' : ''}`}
+            type="button"
+            disabled={!boardModeUnlocked}
+            aria-pressed={selectedPlayMode === 'trap-board'}
+            onClick={() => chooseMode('trap-board')}
+          >
+            <strong>盤面伏字</strong>
+            <span>{boardModeUnlocked
+              ? '候選區與空格會逐步出現可拔除怪字'
+              : boardLockReason}</span>
           </button>
         </div>
       </section>
