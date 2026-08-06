@@ -38,3 +38,31 @@ test('decoy clicks never call puzzle placement or selection functions', async ()
   assert.equal(handler.includes('selectPuzzleCell('), false);
   assert.match(handler, /beginEjection\(id\)/);
 });
+
+test('campaign defaults to standard and passes the selected mode to map and puzzle', async () => {
+  const source = await read('src/app/CampaignGame.tsx');
+  assert.match(source, /useState<PuzzlePlayMode>\('standard'\)/);
+  assert.match(source, /selectedPlayMode=\{playMode\}/);
+  assert.match(source, /playMode=\{playMode\}/);
+});
+
+test('level map only exposes standard and candidate modes with unlock protection', async () => {
+  const source = await read('src/app/LevelMap.tsx');
+  assert.match(source, /isPuzzlePlayModeUnlocked/);
+  assert.match(source, />標準模式</);
+  assert.match(source, />候選偽字</);
+  assert.equal(source.includes('盤面伏字'), false);
+  assert.equal(source.includes('頑固伏字'), false);
+});
+
+test('candidate tile completes removal only after animation end', async () => {
+  const source = await read('src/app/CandidateDecoyTile.tsx');
+  assert.match(source, /onAnimationEnd/);
+  assert.match(source, /onEjectionComplete/);
+});
+
+test('reduced motion has a non-moving candidate decoy treatment', async () => {
+  const css = await read('src/app/PuzzleGame.css');
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
+  assert.match(css, /candidate-decoy/);
+});
