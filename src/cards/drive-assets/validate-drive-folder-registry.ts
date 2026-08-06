@@ -1,4 +1,5 @@
 import type {
+  DriveFolderLifecycleRole,
   DriveFolderRecord,
   DriveFolderRegistry,
 } from './drive-asset-types.js';
@@ -54,7 +55,11 @@ export type RequiredPhase1FolderKey =
 
 export type DriveFolderIssueCode =
   | 'missing-required-folder'
-  | 'duplicate-drive-folder-id';
+  | 'duplicate-drive-folder-id'
+  | 'duplicate-folder-key'
+  | 'unknown-parent-folder'
+  | 'parent-cycle'
+  | 'lifecycle-role-mismatch';
 
 export interface DriveFolderIssue {
   readonly code: DriveFolderIssueCode;
@@ -70,6 +75,65 @@ function issue(
   return Object.freeze({ code, folderKey, message });
 }
 
+function expectedLifecycleRole(folderKey: string): DriveFolderLifecycleRole {
+  if (folderKey === 'project.root') {
+    return 'root';
+  }
+  if (folderKey === 'project.inbox' || folderKey === 'idiom-cards.inbox') {
+    return 'inbox';
+  }
+  if (
+    folderKey === 'project.archive' ||
+    folderKey === 'idiom-cards.archive' ||
+    folderKey.startsWith('idiom-cards.archive.')
+  ) {
+    return 'archive';
+  }
+  if (folderKey.endsWith('.review')) {
+    return 'review';
+  }
+  if (folderKey.endsWith('.approved')) {
+    return 'approved';
+  }
+  if (folderKey === 'idiom-cards.reference-only') {
+    return 'reference';
+  }
+  return 'container';
+}
+
+function cycleKeys(
+  folderByKey: ReadonlyMap<string, DriveFolderRecord>,
+): ReadonlySet<string> {
+  const cycleMembers = new Set<string>();
+
+  for (const startKey of folderByKey.keys()) {
+    const path: string[] = [];
+    const pathIndex = new Map<string, number>();
+    let currentKey: string | null = startKey;
+
+    while (currentKey !== null) {
+      const cycleStart = pathIndex.get(currentKey);
+      if (cycleStart !== undefined) {
+        for (const member of path.slice(cycleStart)) {
+          cycleMembers.add(member);
+        }
+        break;
+      }
+
+      const current = folderByKey.get(currentKey);
+      if (current === undefined) {
+        break;
+      }
+
+      pathIndex.set(currentKey, path.length);
+      path.push(currentKey);
+      currentKey = current.parentFolderKey;
+    }
+  }
+
+  return cycleMembers;
+}
+
 export function validateDriveFolderRegistry(
   registry: DriveFolderRegistry,
 ): readonly DriveFolderIssue[] {
@@ -78,18 +142,25 @@ export function validateDriveFolderRegistry(
   const folderByDriveId = new Map<string, DriveFolderRecord>();
 
   for (const folder of registry.folders) {
-    if (!folderByKey.has(folder.folderKey)) {
+    const existingKey = folderByKey.get(folder.folderKey);
+    if (existingKey === undefined) {
       folderByKey.set(folder.folderKey, folder);
+    } else {
+      issues.push(issue(
+        'duplicate-folder-key',
+        folder.folderKey,
+        `Folder key ${folder.folderKey} 重複。`,
+      ));
     }
 
-    const existing = folderByDriveId.get(folder.driveFolderId);
-    if (existing === undefined) {
+    const existingDriveId = folderByDriveId.get(folder.driveFolderId);
+    if (existingDriveId === undefined) {
       folderByDriveId.set(folder.driveFolderId, folder);
     } else {
       issues.push(issue(
         'duplicate-drive-folder-id',
         folder.folderKey,
-        `Drive Folder ID ${folder.driveFolderId} 已由 ${existing.folderKey} 使用。`,
+        `Drive Folder ID ${folder.driveFolderId} 已由 ${existingDriveId.folderKey} 使用。`,
       ));
     }
   }
@@ -102,6 +173,36 @@ export function validateDriveFolderRegistry(
         `缺少必要的 Phase 1 資料夾：${folderKey}。`,
       ));
     }
+  }
+
+  for (const folder of folderByKey.values()) {
+    if (
+      folder.parentFolderKey !== null &&
+      !folderByKey.has(folder.parentFolderKey)
+    ) {
+      issues.push(issue(
+        'unknown-parent-folder',
+        folder.folderKey,
+        `Parent folder key ${folder.parentFolderKey} 不存在。`,
+      ));
+    }
+
+    const expectedRole = expectedLifecycleRole(folder.folderKey);
+    if (folder.lifecycleRole !== expectedRole) {
+      issues.push(issue(
+        'lifecycle-role-mismatch',
+        folder.folderKey,
+        `Folder ${folder.folderKey} 必須使用 lifecycle role ${expectedRole}。`,
+      ));
+    }
+  }
+
+  for (const folderKey of cycleKeys(folderByKey)) {
+    issues.push(issue(
+      'parent-cycle',
+      folderKey,
+      `Folder ${folderKey} 位於 parent cycle 中。`,
+    ));
   }
 
   return Object.freeze(issues.sort((left, right) =>
