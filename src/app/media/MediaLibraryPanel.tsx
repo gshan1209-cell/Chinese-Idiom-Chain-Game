@@ -98,7 +98,9 @@ export function MediaLibraryPanel() {
           </div>
         )}
 
-        {media.activeItem !== null && media.activeItem.type !== 'radio' ? (
+        {media.playback.youtubePlaying &&
+        media.activeItem !== null &&
+        media.activeItem.type !== 'radio' ? (
           <YouTubePlayer
             item={media.activeItem}
             onClose={() => media.pauseAll()}
