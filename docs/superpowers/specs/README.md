@@ -44,11 +44,10 @@ docs/card-prompts/state/current-batch.json
 2. 2026-08-06-idiom-card-review-governance-design.md
 3. 2026-08-06-idiom-card-collection-design.md
 4. 2026-08-06-idiom-card-collection-data-integrity-amendment.md
-5. 2026-08-06-card-collection-core-v1-design.md
-6. 2026-08-06-card-template-v2.1-layout-amendment.md
-7. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-8. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-9. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+5. 2026-08-06-card-template-v2.1-layout-amendment.md
+6. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
+7. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
+8. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 ### 規格用途
@@ -60,7 +59,6 @@ docs/card-prompts/state/current-batch.json
 | `2026-08-06-idiom-card-review-governance-design.md` | 定義預檢、內容、視覺、權利、發布與版本審核流程 |
 | `2026-08-06-idiom-card-collection-design.md` | 定義每十關免費贈卡、收藏頁、資料模型與未來固定商品購買 |
 | `2026-08-06-idiom-card-collection-data-integrity-amendment.md` | 定義逐字注音與先保存、後揭示的冪等獎勵交易；其中禁止拼音顯示的舊條款由 v2.6 覆寫 |
-| `2026-08-06-card-collection-core-v1-design.md` | 定義里程碑 Grant、補發、決定性解析、冪等 Inventory 與獨立 IndexedDB 交易核心 |
 | `2026-08-06-card-template-v2.1-layout-amendment.md` | 歷史版型基礎：典故區、主題徽章與低高度直式箴言 |
 | `2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` | 鎖定 `1024 × 2000`、中央主圖 `1200 px`、注音橫列與帶聲調漢語拼音橫列 |
 | `2026-08-06-card-template-v2.7-ssr-badge-amendment.md` | 鎖定 SSR 傳奇級虹彩金龍徽章，使 SSR 與 SR 在輪廓、材質、星雲核心及主寶石上明顯區隔 |
@@ -74,7 +72,6 @@ GitHub main 與最新 Approved 規格
 → 稀有度標準
 → 審核治理
 → 收藏資料完整性增補
-→ 收藏資料核心 v1
 → 收藏與里程碑贈卡
 → v2.7 SSR 徽章增補
 → v2.6 尺寸與發音版面增補
@@ -90,7 +87,6 @@ GitHub main 與最新 Approved 規格
 - 收藏規格第 3.1 節的舊句「稀有度描述卡牌收藏價值與視覺規格」已被稀有度標準取代。
 - 正確規則：N～SSR 主要依成語正面意義、勵志程度、精神象徵、共鳴力與代表性判定。
 - UR 是正式授權 IP 聯名的例外等級，不得進入一般里程碑卡池。
-- 收藏資料核心使用獨立 `cicg-card-collection` database version 1，不修改 `cicg-progress` schema。
 - v2.6 正式圖卡尺寸固定為 `1024 × 2000 px`，不再使用 `2:3` 或 `1024 × 1536`。
 - v2.6 上方資訊區為 `360 px`、中央主圖區為 `1200 px`、下方內容區為 `440 px`。
 - v2.6 主標下方第一列為逐字對齊注音，第二列為小寫、帶聲調符號的漢語拼音。
