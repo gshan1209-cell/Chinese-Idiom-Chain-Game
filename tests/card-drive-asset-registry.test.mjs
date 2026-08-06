@@ -58,33 +58,87 @@ const approved = Object.freeze({
   licenseEvidenceId: null,
 });
 
-test('rejects duplicate current Approved masters in one asset family', () => {
-  const issues = validateDriveAssetRegistry({
+function validate(assets) {
+  return validateDriveAssetRegistry({
     schemaVersion: 1,
     updatedAt: '2026-08-06T14:00:00+08:00',
-    assets: [
-      approved,
-      {
-        ...approved,
-        assetId: 'frame-n-v1.1-emerald-antique-gold',
-        driveFileId: 'frame-n-v1.1-drive-file',
-        version: '1.1',
-      },
-    ],
+    assets,
   });
+}
+
+test('rejects duplicate current Approved masters in one asset family', () => {
+  const issues = validate([
+    approved,
+    {
+      ...approved,
+      assetId: 'frame-n-v1.1-emerald-antique-gold',
+      driveFileId: 'frame-n-v1.1-drive-file',
+      version: '1.1',
+    },
+  ]);
 
   assert.ok(issues.some(({ code }) => code === 'duplicate-current-approved'));
 });
 
 test('rejects Approved assets without checksum or approval evidence', () => {
-  const issues = validateDriveAssetRegistry({
-    schemaVersion: 1,
-    updatedAt: '2026-08-06T14:00:00+08:00',
-    assets: [{ ...approved, sha256: '', approvalEvidenceIds: [] }],
-  });
+  const issues = validate([{ ...approved, sha256: '', approvalEvidenceIds: [] }]);
 
   assert.deepEqual(issues.map(({ code }) => code).sort(), [
     'approved-missing-evidence',
     'invalid-sha256',
   ]);
+});
+
+test('rejects duplicate asset and Drive file identifiers', () => {
+  const issues = validate([
+    approved,
+    {
+      ...approved,
+      identity: 'rarity-frame-r',
+      currentApproved: false,
+    },
+  ]);
+
+  assert.deepEqual(issues.map(({ code }) => code).sort(), [
+    'duplicate-asset-id',
+    'duplicate-drive-file-id',
+  ]);
+});
+
+test('rejects invalid semantic versions', () => {
+  const issues = validate([{ ...approved, version: 'v1' }]);
+  assert.deepEqual(issues.map(({ code }) => code), ['invalid-version']);
+});
+
+test('requires published assets to remain the current Approved master', () => {
+  const issues = validate([{ ...approved, status: 'published', currentApproved: false }]);
+  assert.deepEqual(issues.map(({ code }) => code), ['published-not-approved']);
+});
+
+test('requires license evidence for UR asset families', () => {
+  const issues = validate([{
+    ...approved,
+    assetId: 'ur-collab-card-v1.0',
+    identity: 'ur-collab-card',
+    driveFileId: 'ur-collab-card-drive-id',
+  }]);
+  assert.deepEqual(issues.map(({ code }) => code), ['ur-missing-license']);
+});
+
+test('requires bidirectional supersession links', () => {
+  const issues = validate([
+    {
+      ...approved,
+      currentApproved: false,
+      supersededByAssetId: 'frame-n-v1.1-emerald-antique-gold',
+    },
+    {
+      ...approved,
+      assetId: 'frame-n-v1.1-emerald-antique-gold',
+      driveFileId: 'frame-n-v1.1-drive-file',
+      version: '1.1',
+      supersedesAssetId: null,
+    },
+  ]);
+  assert.ok(issues.some(({ code }) => code === 'broken-supersession'));
 });
