@@ -1,9 +1,14 @@
 import type {
-  DriveMigrationLedger,
+  DriveMigrationEntry,
+  DriveMigrationEntryStatus,
+  DriveMigrationLedgerStatus,
+  DriveMigrationOperation,
   DriveResourceSnapshot,
 } from './drive-asset-types.js';
 
 export type DriveMigrationIssueCode =
+  | 'invalid-ledger-shape'
+  | 'invalid-migration-entry'
   | 'invalid-source-commit'
   | 'duplicate-drive-resource-id'
   | 'missing-snapshot'
@@ -24,6 +29,25 @@ export interface DriveMigrationIssue {
 const COMMIT_PATTERN = /^[a-f0-9]{40}$/u;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 const DRIVE_FOLDER_MIME = 'application/vnd.google-apps.folder';
+const DRIVE_MIGRATION_OPERATIONS = [
+  'move',
+  'move-and-rename',
+  'archive',
+] as const;
+const DRIVE_MIGRATION_ENTRY_STATUSES = [
+  'planned',
+  'applied',
+  'verified',
+  'rolled-back',
+  'blocked',
+] as const;
+const DRIVE_MIGRATION_LEDGER_STATUSES = [
+  'planned',
+  'in-progress',
+  'verified',
+  'rolled-back',
+  'blocked',
+] as const;
 
 function issue(
   code: DriveMigrationIssueCode,
@@ -31,6 +55,71 @@ function issue(
   message: string,
 ): DriveMigrationIssue {
   return Object.freeze({ code, driveResourceId, message });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function isNullableNonEmptyString(value: unknown): value is string | null {
+  return value === null || isNonEmptyString(value);
+}
+
+function isNullableNumber(value: unknown): value is number | null {
+  return value === null || (typeof value === 'number' && Number.isFinite(value));
+}
+
+function isNullableString(value: unknown): value is string | null {
+  return value === null || typeof value === 'string';
+}
+
+function isDriveResourceSnapshot(value: unknown): value is DriveResourceSnapshot {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    isNonEmptyString(value.name) &&
+    isNonEmptyString(value.parentFolderId) &&
+    isNonEmptyString(value.mimeType) &&
+    isNullableNumber(value.sizeBytes) &&
+    isNullableString(value.sha256) &&
+    isNonEmptyString(value.webViewLink)
+  );
+}
+
+function isNullableSnapshot(
+  value: unknown,
+): value is DriveResourceSnapshot | null {
+  return value === null || isDriveResourceSnapshot(value);
+}
+
+function isDriveMigrationEntry(value: unknown): value is DriveMigrationEntry {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    (value.resourceKind === 'file' || value.resourceKind === 'folder') &&
+    isNullableNonEmptyString(value.assetId) &&
+    isNonEmptyString(value.driveResourceId) &&
+    typeof value.operation === 'string' &&
+    DRIVE_MIGRATION_OPERATIONS.includes(
+      value.operation as DriveMigrationOperation,
+    ) &&
+    isNullableSnapshot(value.before) &&
+    isNullableSnapshot(value.after) &&
+    isNullableSnapshot(value.rollback) &&
+    typeof value.status === 'string' &&
+    DRIVE_MIGRATION_ENTRY_STATUSES.includes(
+      value.status as DriveMigrationEntryStatus,
+    ) &&
+    (value.blockingReason === null || typeof value.blockingReason === 'string')
+  );
 }
 
 function snapshotsEqual(
@@ -80,9 +169,32 @@ function verifiedMoveMatches(
 }
 
 export function validateDriveMigrationLedger(
-  ledger: DriveMigrationLedger,
+  ledger: unknown,
 ): readonly DriveMigrationIssue[] {
+  if (
+    !isRecord(ledger) ||
+    ledger.schemaVersion !== 1 ||
+    !isNonEmptyString(ledger.batchId) ||
+    (ledger.phase !== 'phase1' && ledger.phase !== 'phase2') ||
+    typeof ledger.createdAt !== 'string' ||
+    typeof ledger.sourceCommit !== 'string' ||
+    typeof ledger.status !== 'string' ||
+    !DRIVE_MIGRATION_LEDGER_STATUSES.includes(
+      ledger.status as DriveMigrationLedgerStatus,
+    ) ||
+    !Array.isArray(ledger.entries)
+  ) {
+    return Object.freeze([
+      issue(
+        'invalid-ledger-shape',
+        null,
+        'Drive Migration Ledger 根節點格式無效。',
+      ),
+    ]);
+  }
+
   const issues: DriveMigrationIssue[] = [];
+  const validEntries: DriveMigrationEntry[] = [];
   const seenResourceIds = new Set<string>();
 
   if (!COMMIT_PATTERN.test(ledger.sourceCommit)) {
@@ -93,7 +205,23 @@ export function validateDriveMigrationLedger(
     ));
   }
 
-  for (const entry of ledger.entries) {
+  for (const candidate of ledger.entries) {
+    if (!isDriveMigrationEntry(candidate)) {
+      const driveResourceId = isRecord(candidate) &&
+        typeof candidate.driveResourceId === 'string'
+        ? candidate.driveResourceId
+        : null;
+      issues.push(issue(
+        'invalid-migration-entry',
+        driveResourceId,
+        'Drive Migration Ledger 包含欄位缺失或型別無效的搬移紀錄。',
+      ));
+      continue;
+    }
+
+    const entry = candidate;
+    validEntries.push(entry);
+
     if (seenResourceIds.has(entry.driveResourceId)) {
       issues.push(issue(
         'duplicate-drive-resource-id',
@@ -104,9 +232,9 @@ export function validateDriveMigrationLedger(
       seenResourceIds.add(entry.driveResourceId);
     }
 
-    const before = entry.before as DriveResourceSnapshot | null;
-    const after = entry.after as DriveResourceSnapshot | null;
-    const rollback = entry.rollback as DriveResourceSnapshot | null;
+    const before = entry.before;
+    const after = entry.after;
+    const rollback = entry.rollback;
 
     if (entry.status === 'blocked') {
       if (entry.blockingReason === null || entry.blockingReason.trim() === '') {
@@ -182,7 +310,7 @@ export function validateDriveMigrationLedger(
 
   if (
     ledger.status === 'verified' &&
-    ledger.entries.some((entry) => entry.status !== 'verified')
+    validEntries.some((entry) => entry.status !== 'verified')
   ) {
     issues.push(issue(
       'ledger-not-fully-verified',
