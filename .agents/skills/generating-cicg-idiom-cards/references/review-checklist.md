@@ -5,8 +5,11 @@ A card cannot become Approved while any Blocking item fails.
 ## Content
 
 - [ ] Exactly four Traditional Chinese idiom characters
-- [ ] Correct vertical Zhuyin aligned to each character
-- [ ] No Hanyu Pinyin, English phonetics, or romanization
+- [ ] Correct Zhuyin for all four characters
+- [ ] Zhuyin appears as one aligned row immediately below the title
+- [ ] Correct lowercase tone-marked Hanyu Pinyin for all four syllables
+- [ ] Pinyin appears as one row immediately below Zhuyin
+- [ ] No numbered tones and no missing tone marks
 - [ ] Subtitle matches the idiom meaning
 - [ ] Difficulty follows familiarity and comprehension threshold
 - [ ] Rarity follows positive meaning and spiritual value
@@ -14,9 +17,12 @@ A card cannot become Approved while any Blocking item fails.
 - [ ] Allusion type, summary, and source are accurate
 - [ ] Original motto is not presented as a classical quotation
 
-## Layout
+## Dimensions and layout
 
-- [ ] Portrait `2:3`, recommended minimum `1024 × 1536`
+- [ ] Exact canvas is `1024 × 2000 px`
+- [ ] Header is `y = 0–359`, height `360 px`
+- [ ] Main artwork is `y = 360–1559`, height `1200 px`
+- [ ] Footer is `y = 1560–1999`, height `440 px`
 - [ ] Rarity appears only at upper left
 - [ ] Difficulty appears only at upper right
 - [ ] Main illustration is the largest visual area
@@ -24,6 +30,7 @@ A card cannot become Approved while any Blocking item fails.
 - [ ] Full fixed theme badge appears at lower left
 - [ ] Story section label is exactly `典故`
 - [ ] Motto uses a low-height narrow vertical plaque at lower right
+- [ ] Motto plaque does not intrude into the 1200 px main-art region
 - [ ] Source is one small line at the bottom
 - [ ] Text is readable on a mobile-sized card
 
@@ -37,7 +44,8 @@ A card cannot become Approved while any Blocking item fails.
 
 ## Workflow evidence
 
-- [ ] Review filename follows the current version convention
+- [ ] Review filename follows the current `v2.6` convention
+- [ ] Actual PNG dimensions were verified after generation
 - [ ] `current-batch.json` matches the actual card status
 - [ ] Drive File ID is present only after confirmed upload
 - [ ] Manifest is updated when Drive or publication status changes
