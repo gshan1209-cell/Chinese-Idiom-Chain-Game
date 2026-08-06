@@ -13,6 +13,7 @@ const ACTIVE_IDIOMS = Object.freeze([
 ]);
 
 const NOW = '2026-08-06T12:00:00.000Z';
+const NON_ISO_RELEASE_DATE = 'August 6, 2026 12:00 UTC';
 
 function validCard(overrides = {}) {
   return {
@@ -77,6 +78,35 @@ test('rejects numeric tones uppercase pinyin and unknown romanization fields', (
   assert.equal(uppercase.validDefinitions.length, 0);
   assert.equal(unknown.validDefinitions.length, 0);
   assert.ok(unknown.findings.some((finding) => finding.code === 'unknown-field'));
+});
+
+test('rejects pinyin syllables without an explicit tone mark', () => {
+  const result = validate([
+    validCard({ pinyin: ['shui', 'dī', 'shí', 'chuān'] })
+  ]);
+
+  assert.equal(result.validDefinitions.length, 0);
+  assert.ok(result.findings.some((finding) => finding.code === 'invalid-pinyin'));
+});
+
+test('rejects human-readable release dates that are not ISO-8601', () => {
+  const result = validate([
+    validCard({ startsAt: NON_ISO_RELEASE_DATE })
+  ]);
+
+  assert.equal(result.validDefinitions.length, 0);
+  assert.ok(result.findings.some((finding) => finding.code === 'invalid-release-window'));
+});
+
+test('rejects a validation clock that is not ISO-8601', () => {
+  const result = validateIdiomCardDefinitions(
+    [validCard()],
+    ACTIVE_IDIOMS,
+    NON_ISO_RELEASE_DATE
+  );
+
+  assert.equal(result.validDefinitions.length, 0);
+  assert.ok(result.findings.some((finding) => finding.code === 'invalid-validation-time'));
 });
 
 test('requires the title to match an enabled source idiom', () => {
