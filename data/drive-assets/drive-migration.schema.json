@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cicg.local/schemas/drive-migration.schema.json",
+  "title": "CICG Drive Migration Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "batchId", "phase", "createdAt", "sourceCommit", "status", "entries"
+  ],
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name", "parentFolderId", "mimeType", "sizeBytes", "sha256", "webViewLink"
+      ],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "parentFolderId": { "type": "string", "minLength": 1 },
+        "mimeType": { "type": "string", "minLength": 1 },
+        "sizeBytes": {
+          "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+        },
+        "sha256": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            { "type": "null" }
+          ]
+        },
+        "webViewLink": { "type": "string", "format": "uri" }
+      }
+    },
+    "nullableSnapshot": {
+      "anyOf": [{ "$ref": "#/$defs/snapshot" }, { "type": "null" }]
+    }
+  },
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "batchId": { "type": "string", "minLength": 1 },
+    "phase": { "enum": ["phase1", "phase2"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "status": {
+      "enum": ["planned", "in-progress", "verified", "rolled-back", "blocked"]
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resourceKind", "assetId", "driveResourceId", "operation",
+          "before", "after", "rollback", "status", "blockingReason"
+        ],
+        "properties": {
+          "resourceKind": { "enum": ["file", "folder"] },
+          "assetId": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          },
+          "driveResourceId": { "type": "string", "minLength": 1 },
+          "operation": { "enum": ["move", "move-and-rename", "archive"] },
+          "before": { "$ref": "#/$defs/nullableSnapshot" },
+          "after": { "$ref": "#/$defs/nullableSnapshot" },
+          "rollback": { "$ref": "#/$defs/nullableSnapshot" },
+          "status": {
+            "enum": ["planned", "applied", "verified", "rolled-back", "blocked"]
+          },
+          "blockingReason": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          }
+        }
+      }
+    }
+  }
+}
