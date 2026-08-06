@@ -243,7 +243,7 @@ test('replaying the same level creates fresh board trap counters', () => {
   assert.equal(fresh.intruders.every((intruder) => intruder.status === 'scheduled'), true);
 });
 
-test('stubborn mode creates neither phase one nor phase two traps', () => {
+test('stubborn mode composes phase one and phase two traps', () => {
   const { board, session } = context();
   const idioms = [idiom('safe', '龘龖靐齉')];
   const candidates = createCandidateDecoySession({
@@ -257,9 +257,16 @@ test('stubborn mode creates neither phase one nor phase two traps', () => {
     puzzleSession: session,
     idioms,
     mode: 'trap-stubborn',
+    excludedCharacters: candidates.decoys.map((decoy) => decoy.character),
     orderCharacters: (characters) => characters,
     orderCellKeys: (keys) => keys
   });
-  assert.deepEqual(candidates.decoys, []);
-  assert.deepEqual(boardTraps.intruders, []);
+
+  assert.ok(candidates.decoys.length > 0);
+  assert.ok(boardTraps.intruders.length > 0);
+  const candidateCharacters = new Set(candidates.decoys.map((decoy) => decoy.character));
+  assert.equal(
+    boardTraps.intruders.every((intruder) => !candidateCharacters.has(intruder.character)),
+    true
+  );
 });
