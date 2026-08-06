@@ -15,6 +15,8 @@ const THRESHOLD_RATIOS = Object.freeze({
 } as const);
 
 const MAX_VISIBLE_STUBBORN_INTRUDERS = 1;
+const MIN_HIT_INTERVAL_MS = 80;
+const MAX_HIT_INTERVAL_MS = 700;
 
 export type StubbornCharacterOrderer = (
   characters: readonly string[]
@@ -80,6 +82,41 @@ function isCellEmpty(puzzleSession: PuzzleSession, key: string): boolean {
 
 function isVisibleStatus(status: StubbornIntruderStatus): boolean {
   return status === 'active' || status === 'ejecting';
+}
+
+function replaceIntruders(
+  session: StubbornIntruderSession,
+  intruders: readonly StubbornIntruder[]
+): StubbornIntruderSession {
+  const frozen = Object.freeze([...intruders]);
+  if (
+    frozen.length === session.intruders.length &&
+    frozen.every((intruder, index) => intruder === session.intruders[index])
+  ) {
+    return session;
+  }
+  return Object.freeze({ ...session, intruders: frozen });
+}
+
+function resetPartialHitStreaks(
+  session: StubbornIntruderSession
+): StubbornIntruderSession {
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder) => {
+      if (
+        intruder.status !== 'active' ||
+        (intruder.currentHitStreak === 0 && intruder.lastAcceptedHitAtMs === null)
+      ) {
+        return intruder;
+      }
+      return Object.freeze({
+        ...intruder,
+        currentHitStreak: 0,
+        lastAcceptedHitAtMs: null
+      });
+    })
+  );
 }
 
 export function stubbornIntruderCount(fillableCellCount: number): number {
@@ -208,6 +245,121 @@ export function createStubbornIntruderSession(
     actionCount,
     intruders: Object.freeze(intruders)
   });
+}
+
+export function activateNextDueStubbornIntruder(
+  session: StubbornIntruderSession
+): StubbornIntruderSession {
+  if (!usesStubbornIntruders(session.mode)) return session;
+  if (session.intruders.some((intruder) => isVisibleStatus(intruder.status))) {
+    return session;
+  }
+
+  const index = session.intruders.findIndex(
+    (intruder) =>
+      intruder.status === 'scheduled' &&
+      intruder.activationAfterValidPlacements <= session.validPlacements
+  );
+  if (index < 0) return session;
+
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder, intruderIndex) =>
+      intruderIndex === index
+        ? Object.freeze({
+            ...intruder,
+            status: 'active' as const,
+            currentHitStreak: 0,
+            lastAcceptedHitAtMs: null
+          })
+        : intruder
+    )
+  );
+}
+
+export function recordStubbornValidPlacement(
+  session: StubbornIntruderSession
+): StubbornIntruderSession {
+  if (!usesStubbornIntruders(session.mode)) return session;
+  const reset = resetPartialHitStreaks(session);
+  const advanced = Object.freeze({
+    ...reset,
+    validPlacements: reset.validPlacements + 1,
+    actionCount: reset.actionCount + 1
+  });
+  return activateNextDueStubbornIntruder(advanced);
+}
+
+export function recordStubbornPuzzleAction(
+  session: StubbornIntruderSession
+): StubbornIntruderSession {
+  if (!usesStubbornIntruders(session.mode)) return session;
+  const reset = resetPartialHitStreaks(session);
+  return Object.freeze({ ...reset, actionCount: reset.actionCount + 1 });
+}
+
+export function hitStubbornIntruder(
+  session: StubbornIntruderSession,
+  id: string,
+  nowMs: number
+): StubbornIntruderSession {
+  if (!Number.isFinite(nowMs) || nowMs < 0) return session;
+  const index = session.intruders.findIndex(
+    (intruder) => intruder.id === id && intruder.status === 'active'
+  );
+  if (index < 0) return session;
+
+  const target = session.intruders[index];
+  if (target === undefined) return session;
+  const previousAt = target.lastAcceptedHitAtMs;
+  if (previousAt !== null && nowMs - previousAt < MIN_HIT_INTERVAL_MS) {
+    return session;
+  }
+
+  const currentHitStreak = previousAt === null || nowMs - previousAt > MAX_HIT_INTERVAL_MS
+    ? 1
+    : Math.min(target.requiredHitCount, target.currentHitStreak + 1);
+  const status = currentHitStreak >= target.requiredHitCount
+    ? 'ejecting' as const
+    : 'active' as const;
+
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder, intruderIndex) =>
+      intruderIndex === index
+        ? Object.freeze({
+            ...intruder,
+            currentHitStreak,
+            lastAcceptedHitAtMs: nowMs,
+            status
+          })
+        : intruder
+    )
+  );
+}
+
+export function completeStubbornEjection(
+  session: StubbornIntruderSession,
+  id: string
+): StubbornIntruderSession {
+  const index = session.intruders.findIndex(
+    (intruder) => intruder.id === id && intruder.status === 'ejecting'
+  );
+  if (index < 0) return session;
+
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder, intruderIndex) =>
+      intruderIndex === index
+        ? Object.freeze({
+            ...intruder,
+            status: 'removed' as const,
+            currentHitStreak: 0,
+            lastAcceptedHitAtMs: null
+          })
+        : intruder
+    )
+  );
 }
 
 export function getVisibleStubbornIntruders(
