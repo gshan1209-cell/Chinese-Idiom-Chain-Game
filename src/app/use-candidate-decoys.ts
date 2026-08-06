@@ -26,6 +26,7 @@ function shuffledCharacters(characters: readonly string[]): readonly string[] {
 }
 
 interface CandidateDecoyHookState {
+  readonly board: PuzzleBoard;
   readonly contextKey: string;
   readonly dictionaryReady: boolean;
   readonly session: CandidateDecoySession;
@@ -42,6 +43,7 @@ function makeHookState(
   validPlacements: number
 ): CandidateDecoyHookState {
   return Object.freeze({
+    board: options.board,
     contextKey: `${options.board.level.id}:${options.mode}`,
     dictionaryReady: options.idioms.length > 0,
     session: createCandidateDecoySession({
@@ -55,23 +57,25 @@ function makeHookState(
 }
 
 export function useCandidateDecoys(options: UseCandidateDecoysOptions) {
-  const contextKey = `${options.board.level.id}:${options.mode}`;
+  const { board, idioms, mode } = options;
+  const contextKey = `${board.level.id}:${mode}`;
   const [state, setState] = useState<CandidateDecoyHookState>(() =>
     makeHookState(options, 0)
   );
 
   useEffect(() => {
     setState((current) => {
-      const contextChanged = current.contextKey !== contextKey;
+      const boardChanged = current.board !== board;
+      const contextChanged = current.contextKey !== contextKey || boardChanged;
       const dictionaryBecameReady =
-        !current.dictionaryReady && options.idioms.length > 0;
+        !current.dictionaryReady && idioms.length > 0;
       if (!contextChanged && !dictionaryBecameReady) return current;
       return makeHookState(
-        options,
+        { board, idioms, mode },
         contextChanged ? 0 : current.session.validPlacements
       );
     });
-  }, [contextKey, options]);
+  }, [board, contextKey, idioms, mode]);
 
   const recordValidPlacement = useCallback(() => {
     setState((current) => Object.freeze({
@@ -99,10 +103,10 @@ export function useCandidateDecoys(options: UseCandidateDecoysOptions) {
   }, []);
 
   const visibleDecoys = useMemo(
-    () => state.contextKey === contextKey
+    () => state.contextKey === contextKey && state.board === board
       ? getVisibleCandidateDecoys(state.session)
       : Object.freeze([]),
-    [contextKey, state]
+    [board, contextKey, state]
   );
 
   return {
