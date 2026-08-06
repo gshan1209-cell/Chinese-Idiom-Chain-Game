@@ -109,9 +109,17 @@ export function useCandidateDecoys(options: UseCandidateDecoysOptions) {
     [board, contextKey, state]
   );
 
+  const reservedCharacters = useMemo(
+    () => Object.freeze(
+      state.session.decoys.map((decoy) => decoy.character)
+    ),
+    [state.session.decoys]
+  );
+
   return {
     session: state.session,
     visibleDecoys,
+    reservedCharacters,
     recordValidPlacement,
     beginEjection,
     completeEjection
