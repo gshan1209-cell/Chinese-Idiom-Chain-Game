@@ -154,6 +154,96 @@
   animation: board-intruder-eject 320ms ease-in forwards;
 }
 
+.stubborn-intruder {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  padding: 0;
+  touch-action: manipulation;
+  user-select: none;
+  font-family: "DFKai-SB", "BiauKai", serif;
+  font-size: clamp(1.5rem, 6.8vw, 2.55rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #7f1d1d;
+  background:
+    linear-gradient(135deg, rgba(254, 226, 226, 0.96), rgba(254, 202, 202, 0.98));
+  border: 4px double #991b1b;
+  border-radius: 0.65rem;
+  box-shadow:
+    inset 0 0 0 2px rgba(254, 242, 242, 0.9),
+    0 0.18rem 0 rgba(127, 29, 29, 0.34),
+    0 0 0.75rem rgba(220, 38, 38, 0.24);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.stubborn-intruder::before,
+.stubborn-intruder::after {
+  position: absolute;
+  z-index: -1;
+  width: 48%;
+  height: 3px;
+  content: "";
+  background: transparent;
+  transform-origin: center;
+}
+
+.stubborn-intruder small {
+  position: absolute;
+  right: 0.18rem;
+  bottom: 0.12rem;
+  padding: 0.06rem 0.18rem;
+  font-family: system-ui, sans-serif;
+  font-size: clamp(0.55rem, 2.4vw, 0.72rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  background: rgba(127, 29, 29, 0.86);
+  border-radius: 999px;
+}
+
+.stubborn-intruder.hit-1 {
+  border-style: solid;
+  animation: stubborn-intruder-hit-one 150ms ease-in-out;
+}
+
+.stubborn-intruder.hit-1::before {
+  background: #7f1d1d;
+  transform: translate(-0.45rem, -0.2rem) rotate(42deg);
+}
+
+.stubborn-intruder.hit-2 {
+  color: #991b1b;
+  background: #fee2e2;
+  border-style: solid;
+  animation: stubborn-intruder-hit-two 170ms ease-in-out;
+}
+
+.stubborn-intruder.hit-2::before {
+  background: #7f1d1d;
+  transform: translate(-0.45rem, -0.25rem) rotate(42deg);
+}
+
+.stubborn-intruder.hit-2::after {
+  background: #7f1d1d;
+  transform: translate(0.42rem, 0.22rem) rotate(-48deg);
+}
+
+.stubborn-intruder.ejecting {
+  pointer-events: none;
+  color: #450a0a;
+  background: #fecaca;
+  border-color: #7f1d1d;
+  animation: stubborn-intruder-eject 360ms ease-in forwards;
+}
+
 .puzzle-feedback {
   min-height: 3.2rem;
   margin: 1rem 0 0;
@@ -309,6 +399,34 @@
   to { opacity: 0; }
 }
 
+@keyframes stubborn-intruder-hit-one {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  45% { transform: translateX(-2px) rotate(-1deg); }
+  75% { transform: translateX(2px) rotate(1deg); }
+}
+
+@keyframes stubborn-intruder-hit-two {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  30% { transform: translate(-3px, 1px) rotate(-1.5deg); }
+  60% { transform: translate(3px, -1px) rotate(1.5deg); }
+}
+
+@keyframes stubborn-intruder-eject {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-0.9rem, -2rem) rotate(-16deg) scale(0.72);
+  }
+}
+
+@keyframes stubborn-intruder-eject-reduced {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .puzzle-cell.wrong,
   .candidate-decoy.active {
@@ -332,6 +450,18 @@
   .board-intruder.ejecting {
     transform: none;
     animation: board-intruder-eject-reduced 250ms linear forwards;
+  }
+
+  .stubborn-intruder,
+  .stubborn-intruder.hit-1,
+  .stubborn-intruder.hit-2 {
+    transform: none;
+    animation: none;
+  }
+
+  .stubborn-intruder.ejecting {
+    transform: none;
+    animation: stubborn-intruder-eject-reduced 180ms linear forwards;
   }
 }
 
