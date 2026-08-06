@@ -141,7 +141,11 @@ Google Drive 專案：
 CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png
 Drive File ID：1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV
 尺寸：1024 × 2000 px
-SHA-256：8e21a8b84aa21ad5ff457cfe31e1cd5adbca941fd1c2fbcaed830502a6294c59
+上方資訊區：360 px
+中央主圖區：1200 px
+下方內容區：440 px
+檔案大小：3,427,910 bytes
+SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
 ```
 
 v2.6 SSR 保留為歷史核准模板；新產 SSR 圖卡以 v2.7 為準。N／R／SR 不得套用 v2.7 SSR 傳奇金龍徽章。
