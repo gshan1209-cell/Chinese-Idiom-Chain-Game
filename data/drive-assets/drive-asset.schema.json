@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cicg.local/schemas/drive-asset.schema.json",
+  "title": "CICG Drive Asset Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "assets"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assetId", "assetType", "identity", "version", "status",
+          "currentApproved", "filename", "driveFileId", "parentFolderKey",
+          "mimeType", "sizeBytes", "sha256", "widthPx", "heightPx",
+          "webViewLink", "supersedesAssetId", "supersededByAssetId",
+          "approvalEvidenceIds", "licenseEvidenceId"
+        ],
+        "properties": {
+          "assetId": { "type": "string", "minLength": 1 },
+          "assetType": {
+            "enum": [
+              "artwork", "card-frame", "rarity-badge", "difficulty-badge",
+              "theme-badge", "motto-plaque", "effect-overlay", "template",
+              "composite", "reference-only", "legacy-flat-card"
+            ]
+          },
+          "identity": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+          "status": {
+            "enum": [
+              "intake", "classified", "review", "changes-requested",
+              "approved", "published", "archived", "quarantined",
+              "rejected", "unverifiable"
+            ]
+          },
+          "currentApproved": { "type": "boolean" },
+          "filename": { "type": "string", "minLength": 1 },
+          "driveFileId": { "type": "string", "minLength": 1 },
+          "parentFolderKey": { "type": "string", "minLength": 1 },
+          "mimeType": { "type": "string", "minLength": 1 },
+          "sizeBytes": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "widthPx": {
+            "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+          },
+          "heightPx": {
+            "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+          },
+          "webViewLink": { "type": "string", "format": "uri" },
+          "supersedesAssetId": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          },
+          "supersededByAssetId": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          },
+          "approvalEvidenceIds": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "licenseEvidenceId": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          }
+        }
+      }
+    }
+  }
+}
