@@ -1,37 +1,31 @@
 # Chinese-Idiom-Chain-Game
 
-**中文成語填填字（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語填字闖關 PWA。
+**中文成語填填字（CICG）**是一款手機優先、大字體、繁體中文、離線優先、可安裝 PWA 的成語填字闖關遊戲。
 
-目前完成 PWA 基礎、離線成語資料、第一章 20 關填字闖關、關卡地圖、星級與 IndexedDB 本機進度保存；自由接龍保留為附加模式，並加入可自行啟動的 15 秒成語打地鼠獎勵關卡、選用的網路收音機與 YouTube 影音中心，以及完成第 5／10 關後可選擇的候選偽字與盤面伏字陷阱模式。
+主玩法是第一章 20 關縱橫成語填字；自由接龍、成語打地鼠、成語電台與影音中心均為附加功能。主線另提供完成第 5／10／15 關後解鎖的三階段陷阱玩法，以及每完成 10 個不同主線關卡建立一筆圖卡收藏獎勵的資料核心。
 
 ## 目前完成範圍
 
-- React + TypeScript + Vite PWA。
-- 成語 CSV、JSON Schema、資料驗證、首尾字索引與 SHA-256 校驗。
-- 70 筆可形成接龍關係的繁體中文開發示範資料。
-- 第一章 20 關縱橫成語填字，從 2 個成語逐步增加到 4 個成語。
-- 第一章共使用 61 個不同成語，同一成語不會跨關重複。
-- 純 TypeScript 填字盤面與 session 引擎。
-- 關卡地圖、逐關解鎖、1～3 星評價、最高分與繼續上次關卡。
-- IndexedDB 本機進度保存與序列化寫入佇列。
-- 候選偽字陷阱：第 5 關後解鎖、安全字過濾、逐步出現、點擊驅逐與 reduced-motion。
-- 盤面伏字陷阱：第 10 關後解鎖、獨立盤面覆蓋層、自然露餡、單擊／填字／提示驅逐與完成保底。
-- 自由接龍：接龍判定、重複防護、計分、連擊、提示與自然結束。
-- 自由接龍趣味獎勵：能量槽、自選獎勵、15 秒補最後一字打地鼠。
-- 提示券、失誤護盾、雙倍分數，以及後續限時模式可使用的加時資源。
-- 打地鼠 6／9 洞位、數字鍵 1～9、四級難度、單題輪替與背景暫停防護。
-- 成語電台：HTTPS 網路收音機、跨遊戲畫面播放、音量、靜音、收藏與排序。
-- YouTube 影音區：官方可見 iframe、影片與播放清單連結、播放互斥與安全網址解析。
-- 媒體清單本機保存、JSON 匯出／匯入，以及 IndexedDB 失敗時的記憶體 fallback。
-- Android／Chromium 安裝提示、iPhone／iPad 加入主畫面教學與離線更新提示。
+- React + TypeScript strict + Vite PWA。
+- 70 筆繁體中文開發示範成語、JSON Schema、索引與 SHA-256 驗證。
+- 第一章 20 關、61 個 placement、61 個不同 `idiomId`、61 個不同成語文字。
+- 純 TypeScript 填字盤面、智慧自動跳格與 session 引擎。
+- 關卡地圖、逐關解鎖、1～3 星、最佳紀錄與 IndexedDB 本機保存。
+- 候選偽字：完成第 5 關後解鎖。
+- 盤面伏字：完成第 10 關後解鎖。
+- 頑固伏字：完成第 15 關後解鎖，三次有效連擊拔除。
+- 自由接龍、能量槽、15 秒成語打地鼠與四種難度。
+- HTTPS 成語電台、可見 YouTube iframe、媒體互斥播放與本機備份。
+- 圖卡收藏資料核心 v1：每十關里程碑、舊進度補發、決定性解析、冪等 inventory 與原子化 IndexedDB 交易。
+- Android／Chromium 安裝提示、iPhone／iPad 加入主畫面與離線更新提示。
 
 ## 尚未實作
 
 - 第二章與更多關卡。
-- 頑固伏字與連續點擊拔除。
-- 登入、雲端備份與跨裝置自動同步。
-- 60 秒限時模式與選擇題模式。
-- 成語小冊、發音輔助與完整設定頁。
+- 正式核准的成語圖卡卡池。
+- 圖卡收藏圖鑑、卡片詳細頁與揭示動畫。
+- 圖卡購買、固定內容卡包、登入、雲端備份與跨裝置同步。
+- 60 秒限時模式、選擇題模式、成語小冊與完整設定頁。
 - 核准後的正式內建電台／YouTube 清單。
 - Lighthouse、瀏覽器 E2E、Android／iOS 實機與完整離線 PWA 驗收。
 
@@ -54,141 +48,110 @@
 ## 成語填字闖關
 
 - 上方顯示由 2～4 個成語交叉組成的方格。
-- 點選任一可填格，或直接依智慧自動跳轉順序連續點選候選字輸入。
-- 不論填對或填錯均自動跳格；綠色格代表正確，紅色格代表保留的錯字。
-- 盤面仍有空格時優先填滿空格，全盤填滿後自動巡回錯誤格。
-- 提示會填入一格正確答案；重排只改變候選字順序。
+- 點選可填格，或依智慧自動跳轉順序連續輸入候選字。
+- 正確格顯示綠色；錯字保留並顯示紅色。
+- 盤面未填滿時先尋找下一空格；填滿後巡回錯誤格。
+- 提示填入一格正確答案；重排只改變候選字順序。
 - 全部完成後顯示本關成語與解釋。
-- 第一章每個成語只會出現在一個關卡；`idiomId` 與成語文字皆有自動唯一性 Gate。
 
-### 闖關與保存
+### 闖關保存
 
 - 第 1 關永遠解鎖；完成第 N 關後解鎖第 N+1 關。
-- 三星：0 次提示、0 次錯誤。
-- 二星：提示不超過 1 次，錯誤不超過 2 次。
-- 一星：完成關卡但未達二星條件。
-- 重玩只更新更佳星級、最高分、最少錯誤與最少提示。
-- 進度保存在 IndexedDB：database `cicg-progress`、version `1`、store `campaigns`、key `chapter-1`。
-- IndexedDB 不可用時仍可遊玩，但會顯示本次可能無法保存的警告。
+- 三星：0 提示、0 錯誤。
+- 二星：最多 1 次提示、2 次錯誤。
+- 一星：完成關卡。
+- 重玩只保存更佳星級、最高分、最少錯誤與最少提示。
 
-## 候選偽字陷阱模式
+```text
+Database：cicg-progress
+Version：1
+Store：campaigns
+Key：chapter-1
+```
 
-候選偽字是第一章填字闖關的選用玩法，不會取代標準模式。
+收藏功能不修改上述 schema。
 
-- 標準模式永遠是預設，且完全不產生陷阱。
-- 完成第 5 關後，關卡地圖解鎖「候選偽字」。
-- 每關依可填格數產生 1～4 張偽字，並依合法放字進度逐步混入候選區。
-- 偽字只使用本機已啟用成語字典中的字元。
-- 系統會排除本關答案字元、合法候選字、停用資料與重複字；安全字不足時自動減少數量。
-- 只有成功放入合法字牌才推進偽字出現門檻；提示、移除、重排、清空、無效操作與點擊偽字都不推進。
-- 點擊偽字不會填入盤面、不增加錯誤、不扣分、不消耗提示，也不改變選取格或智慧跳格方向。
-- 偽字會先播放飛出效果，動畫完成後才移除；減少動態效果模式改用無位移淡出。
-- 重玩同一關會重新建立陷阱，不沿用上一局的偽字進度或移除狀態。
-- 標準模式與候選偽字模式共用原本的星級與最佳紀錄規則，陷阱不提供額外分數。
+## 三階段陷阱模式
 
-## 盤面伏字陷阱模式
+陷阱是主線的選用玩法，標準模式永遠是預設。
 
-盤面伏字是完成第 10 關後解鎖的進階選用玩法，會同時保留候選偽字。
+### 候選偽字
 
-- 伏字總數為 `clamp(ceil(可填格數 × 10%), 1, 3)`，同時最多顯示 2 個。
-- 伏字只覆蓋尚未填寫的合法空格，不會寫入 `PuzzleSession` 或改變格子答案。
-- 字元只來自本機已啟用成語字典，並排除本關答案、合法候選字、停用資料、候選偽字保留字元及同關重複字。
-- 伏字依合法放字進度啟用；啟用後每隔 3、5 或 7 次有效盤面操作短暫露餡，最多 3 次。
-- 空格移除、無內容清空、無提示結果、選格、重排與點擊陷阱都不會推進露餡計數。
-- 玩家可單擊拔除；合法字牌或提示填入伏字目標格時也會自動驅逐。
-- 點擊伏字不會選取下方格、填字、增加錯誤、扣分、消耗提示、改變分數或觸發智慧跳格。
-- 最後一個正確字完成關卡時，所有排程中、顯示中或飛出中的伏字立即取消，不會阻擋結算。
-- 重玩同一關會重建伏字計畫，合法放字與有效操作計數歸零。
-- reduced-motion 使用無位移邊框／透明度回饋；短促音效由 Web Audio 即時產生，瀏覽器拒絕時靜默降級。
-- 本階段沒有使用 Drive 圖片、遠端音效或授權媒體；頑固伏字仍保持關閉。
+- 完成第 5 關後解鎖。
+- 安全偽字只使用啟用字典，排除答案與合法候選字。
+- 只有成功放入合法字牌才推進偽字出現。
+- 點擊偽字不填盤面、不記錯、不扣分、不消耗提示。
 
-## 自由接龍＋成語打地鼠
+### 盤面伏字
 
-### 接龍規則
+- 完成第 10 關後解鎖，並保留候選偽字。
+- 以獨立 overlay 覆蓋合法空格，不寫入 `PuzzleSession`。
+- 可單擊拔除；放字或提示命中目標格時也會安全驅逐。
+- 完成關卡時所有未處理伏字立即取消，不阻擋結算。
+
+### 頑固伏字
+
+- 完成第 15 關後解鎖，組合三層陷阱。
+- 同時最多顯示一個，需三次有效連擊拔除。
+- 最小有效點擊間隔 80ms；連擊視窗 700ms。
+- 被占用格不允許一般放字；提示會先清除伏字再填入答案。
+- 支援 44px 觸控、Pointer Events、ARIA 進度與 reduced-motion。
+
+## 圖卡收藏資料核心 v1
+
+完成不同主線關卡數達 10、20、30……時，建立固定且不可重複的獎勵：
+
+```text
+card-grant:main-levels:10
+card-grant:main-levels:20
+```
+
+規則：
+
+- 只計算首次完成的不同主線關卡；重玩與升星不增加里程碑。
+- 舊玩家載入後會依已保存進度補建缺少的里程碑 Grant。
+- 正式卡片必須有四字逐字注音與四字帶聲調漢語拼音。
+- Review、Legacy、NeedsReview、未核准稀有度、遠端素材與模板空框不得進池。
+- UR 僅保留給具正式授權證據的 IP 聯名，且不進一般十關卡池。
+- 未持有卡優先；核心使用注入 RNG，不直接散落呼叫 `Math.random()`。
+- `rewardId` 與 `acquisitionId` 均具冪等保護。
+- Grant 與 inventory 在同一 IndexedDB readwrite transaction 保存。
+- 已解析 Grant 若缺少 inventory，可依既有卡片與 acquisitionId 修復，不重新抽卡。
+- 空白正式卡池不需載入字典，仍可離線建立 pending Grant。
+- 關卡進度保存成功後才同步收藏；收藏失敗不回滾闖關結果。
+
+```text
+Database：cicg-card-collection
+Version：1
+Stores：grants、inventory、metadata
+Metadata key：collection
+```
+
+目前 `IDIOM_CARD_DEFINITIONS` 為空陣列，因此第 10／20 關獎勵會安全保持 `pending`，不會使用未核准圖片冒充已取得圖卡。
+
+## 自由接龍與成語打地鼠
 
 - 下一個成語第一字必須等於目前成語最後一字。
-- 僅接受本機字典內已啟用的四字成語。
-- 同一局不能重複使用相同成語。
-- 基礎分 100；連擊每次增加 20，上限加成 200。
-- 沒有提示券時使用提示扣 50 分。
-- 護盾會在答錯時消耗一層並保留連擊。
-- 雙倍分數依剩餘題數套用，不重複相加。
-
-### 能量累積
-
-| 條件 | 能量 |
-|---|---:|
-| 一般答對 | +15% |
-| 連擊達 3 題 | 額外 +5% |
-| 連擊達 5 題以上 | 再額外 +10% |
-| 困難成語 | 額外 +5% |
-| 使用提示後答對 | 僅取得基本 +15% |
-
-- 能量最高 100%，滿格後由玩家自行啟動。
-- 離開獎勵選擇畫面不扣能量。
-- 可用安全題目少於 8 題時禁止啟動，能量保持不變。
-- 完成一輪自由接龍後，下一輪最多保留 50% 能量。
-
-### 獎勵與操作
-
-經典自由接龍可選：
-
-- **提示券**：下一次提示優先免費使用。
-- **雙倍分數**：下一批正確答案取得 2 倍分數。
-- **失誤護盾**：答錯時保留連擊。
-
-打地鼠規則：
-
-- 基礎時間 15 秒，題型固定為補最後一字。
-- 每題提供 4 個安全且唯一的候選字。
-- 手機顯示 6 洞；寬度至少 768px 時顯示 9 洞。
-- 支援觸控、滑鼠與鍵盤數字鍵 `1`～`9`。
-- 單題依難度每 1.5～2.5 秒自動輪替。
-- 第一次切到背景會暫停；第二次切到背景視為放棄該輪。
-
-| 難度 | 單題時間 | 打錯處罰 |
-|---|---:|---|
-| 輕鬆 | 2.5 秒 | 扣 20 分，保留連擊 |
-| 標準 | 2.0 秒 | 扣 50 分，連擊歸零 |
-| 挑戰 | 1.7 秒 | 扣 50 分並減少 1 秒 |
-| 極限 | 1.5 秒 | 減少 1 秒，連擊歸零 |
+- 只接受啟用中的四字成語，同一局不能重複。
+- 基礎分 100；連擊加成每次增加 20，上限 200。
+- 能量滿後由玩家自行啟動 15 秒打地鼠。
+- 手機 6 洞、桌面 9 洞，支援觸控、滑鼠與數字鍵。
+- 獎勵包含提示券、雙倍分數與失誤護盾。
 
 ## 成語電台與 YouTube 影音中心
 
-媒體功能是選用的網路功能，不影響離線成語闖關。
-
-### 播放規則
-
-- 首次開啟 App 不會自動發聲，必須由玩家主動按下播放。
-- HTTPS 收音機開始後，可跨首頁、闖關地圖、關卡與自由接龍持續播放。
-- 打地鼠開始時，收音機有效音量自動降為最新基準音量的 30%；結束後恢復最新基準音量。
-- 收音機與 YouTube 互斥播放；開啟一方會暫停另一方。
-- 暫停後保留目前選取項目，可直接由常駐播放器恢復。
-- 重新開啟 App 時只恢復上次選取項目與偏好，不會自動播放。
-- 離線或網路來源失敗時只停用媒體播放，遊戲仍可正常使用。
-
-### 自訂內容與安全
-
-- 收音機只接受完整 HTTPS URL；拒絕 HTTP、危險協定、帳密網址與 iframe HTML。
-- 新增收音機前會在玩家操作手勢內試播最多 10 秒，成功後才保存。
-- YouTube 只接受官方網域的影片或播放清單網址。
-- YouTube 使用可見的官方 16:9 iframe，最小可視尺寸 200 × 200，不抽取或下載音訊。
-- 目前 Drive 尚無核准的正式媒體來源，因此 `data/media/default-library.json` 保持空陣列；玩家仍可新增自己的連結。
-
-### 本機保存與備份
-
-媒體資料與闖關進度完全分離：
+- 首次開啟不會自動發聲，必須由玩家主動播放。
+- HTTPS 收音機可跨首頁、闖關與自由接龍持續播放。
+- 打地鼠期間音量降至最新基準音量的 30%，結束後恢復。
+- 收音機與 YouTube 互斥播放。
+- YouTube 使用可見的官方 16:9 iframe，不抽取或下載音訊。
+- 離線或網路來源失敗不影響成語遊戲。
 
 ```text
 Database：cicg-media
 Version：1
 Stores：library、preferences
 ```
-
-- 保存自訂清單、收藏、排序、音量、靜音、播放器收合狀態與上次選取項目。
-- IndexedDB 不可用或寫入失敗時改用記憶體暫存，不阻擋遊戲。
-- JSON 匯出／匯入只包含自訂媒體、收藏與播放器偏好。
-- 不保存 YouTube 登入資訊、Cookie、API Token 或闖關進度。
 
 ## 成語資料
 
@@ -199,50 +162,45 @@ npm run build:data
 ```
 
 > [!WARNING]
-> 現有 70 筆內容是開發用示範資料。正式教育產品發布前，必須完成來源授權、文字校訂、注音／拼音補充及例句審核。
+> 現有 70 筆內容是開發示範資料。正式教育產品發布前，必須完成來源授權、文字、注音、拼音、解釋與例句校訂。
 
 ## 架構
 
 ```text
 src/domain       領域型別與遊戲契約
 src/idioms       字典索引與載入
-src/puzzle       填字關卡、盤面與 session 引擎
-src/progress     星級、解鎖、IndexedDB 與寫入佇列
-src/traps        陷阱解鎖、安全字元、插入門檻與狀態機
-src/game         自由接龍引擎
-src/game/bonus   能量、出題、打地鼠回合與獎勵引擎
-src/media        媒體 URL、清單、備份、播放政策與 IndexedDB
+src/puzzle       填字關卡、盤面與導航
+src/progress     星級、解鎖與闖關 IndexedDB
+src/traps        三階段陷阱純 TypeScript 引擎
+src/cards        圖卡定義、里程碑、Inventory 與收藏 IndexedDB
+src/game         自由接龍
+src/bonus        打地鼠
+src/media        媒體清單、播放政策與 IndexedDB
 src/app          React UI 與瀏覽器事件 Hook
-src/app/media    收音機、YouTube、媒體面板與常駐播放器
 src/pwa          PWA 安裝與裝置判斷
 ```
 
-規則維持純 TypeScript；React 只呈現狀態並傳送玩家操作。
+領域規則維持純 TypeScript；React 只負責畫面、瀏覽器事件與協調安全保存節點。
 
 ## 驗證
 
-- Pull Request CI 會執行 `./scripts/verify.sh`，包含資料建置、全部 Node 測試、TypeScript strict、ESLint 與 production PWA build。
-- 第一章永久 Gate 驗證 20 關、61 個 placement、61 個唯一 `idiomId`、61 個唯一成語文字、來源字典一致性、交叉鏈與逐關可完成性。
-- 候選偽字永久 Gate 驗證模式解鎖、安全字元過濾、固定數量與門檻、不可變狀態、操作隔離、動畫完成移除、reduced-motion 及同關重玩重設。
-- 盤面伏字永久 Gate 驗證模式組合、第 10 關解鎖、安全字與空格目標、最大可見數量、啟用後露餡、事件隔離、空操作防刷、填字／提示驅逐、完成保底、reduced-motion 及重玩重設。
-- 媒體永久 Gate 驗證 URL 安全、YouTube ID、清單去重、JSON 匯入匯出、播放互斥、打地鼠降音、本機保存、可見 iframe、選取恢復與行動裝置安全空間。
+Pull Request CI 執行 `./scripts/verify.sh`，包含資料建置、全部 Node 測試、TypeScript strict、ESLint 與 production PWA build。
+
+永久 Gate 包含：
+
+- 第一章 20 關、61 個唯一 `idiomId` 與 61 個唯一成語文字。
+- Puzzle 導航、逐關可完成性與進度保存。
+- 三階段陷阱解鎖、安全字／安全格、操作隔離、重玩重設與 reduced-motion。
+- 媒體 URL 安全、播放互斥、打地鼠降音、本機保存與可見 iframe。
+- 圖卡定義 allowlist、注音／拼音、核准 Gate、里程碑補發、決定性解析、冪等 inventory、snapshot 隔離、原子 IndexedDB transaction 與闖關保存順序。
 
 ## 文件
 
 - [開發規格書](docs/specs/chinese-idiom-chain-game-v1.0-spec.md)
-- [Phase 4 Idiom Crossword Plan](docs/superpowers/plans/2026-08-05-phase-4-idiom-crossword.md)
-- [Phase 5 Campaign Progress Design](docs/superpowers/specs/2026-08-05-phase-5-campaign-progress-design.md)
-- [Phase 5 Campaign Progress Plan](docs/superpowers/plans/2026-08-05-phase-5-campaign-progress.md)
-- [成語打地鼠設計規格](docs/superpowers/specs/2026-08-05-whack-a-mole-bonus-design.md)
-- [成語打地鼠實作計畫](docs/superpowers/plans/2026-08-05-whack-a-mole-bonus.md)
-- [成語打地鼠交付報告](docs/superpowers/reports/2026-08-05-whack-a-mole-bonus-delivery.md)
-- [第一章成語不重複設計規格](docs/superpowers/specs/2026-08-06-chapter-one-unique-idioms-design.md)
-- [第一章成語不重複實作計畫](docs/superpowers/plans/2026-08-06-chapter-one-unique-idioms.md)
 - [成語電台與 YouTube 影音中心設計規格](docs/superpowers/specs/2026-08-06-media-center-design.md)
-- [成語電台與 YouTube 影音中心實作計畫](docs/superpowers/plans/2026-08-06-media-center.md)
-- [成語電台與 YouTube 影音中心交付報告](docs/superpowers/reports/2026-08-06-media-center-delivery.md)
 - [進階陷阱模式設計規格](docs/superpowers/specs/2026-08-06-trap-mode-design.md)
-- [候選偽字實作計畫](docs/superpowers/plans/2026-08-06-trap-candidate-decoys.md)
-- [候選偽字交付報告](docs/superpowers/reports/2026-08-06-trap-candidate-decoys-delivery.md)
-- [盤面伏字實作計畫](docs/superpowers/plans/2026-08-06-board-intruders.md)
-- [盤面伏字交付報告](docs/superpowers/reports/2026-08-06-board-intruders-delivery.md)
+- [頑固伏字交付報告](docs/superpowers/reports/2026-08-06-trap-stubborn-intruders-delivery.md)
+- [圖卡收藏與十關贈卡設計規格](docs/superpowers/specs/2026-08-06-idiom-card-collection-design.md)
+- [收藏資料核心 v1 設計規格](docs/superpowers/specs/2026-08-06-card-collection-core-v1-design.md)
+- [收藏資料核心 v1 Implementation Plan](docs/superpowers/plans/2026-08-06-card-collection-core-v1.md)
+- [收藏資料核心 v1 交付報告](docs/superpowers/reports/2026-08-06-card-collection-core-v1-delivery.md)

@@ -14,6 +14,11 @@ import { createProgressWriteQueue } from '../progress/progress-write-queue';
 const TOTAL_LEVELS = PUZZLE_LEVELS.length;
 const STORAGE_WARNING = '目前無法保存本機進度；本次仍可正常遊玩。';
 
+export interface CampaignCompletionPersistence {
+  readonly progress: CampaignProgress;
+  readonly persisted: Promise<void>;
+}
+
 function now(): string {
   return new Date().toISOString();
 }
@@ -38,15 +43,17 @@ export function useCampaignProgress() {
     setProgress(next);
   }, []);
 
-  const persist = useCallback((next: CampaignProgress) => {
+  const persist = useCallback((next: CampaignProgress): Promise<void> => {
     if (repository === null) {
       setStorageWarning(STORAGE_WARNING);
-      return;
+      return Promise.reject(new Error(STORAGE_WARNING));
     }
-    void writeQueue.enqueue(() => repository.save(next)).then(
+    const persisted = writeQueue.enqueue(() => repository.save(next));
+    void persisted.then(
       () => setStorageWarning(null),
       () => setStorageWarning(STORAGE_WARNING)
     );
+    return persisted;
   }, [repository, writeQueue]);
 
   useEffect(() => {
@@ -86,11 +93,13 @@ export function useCampaignProgress() {
       now()
     );
     setCurrentProgress(next);
-    persist(next);
+    void persist(next).catch(() => undefined);
     return next;
   }, [persist, setCurrentProgress]);
 
-  const completeLevel = useCallback((result: LevelCompletionResult): CampaignProgress => {
+  const completeLevel = useCallback((
+    result: LevelCompletionResult
+  ): CampaignCompletionPersistence => {
     const next = recordLevelCompletion(
       progressRef.current,
       result,
@@ -98,8 +107,8 @@ export function useCampaignProgress() {
       now()
     );
     setCurrentProgress(next);
-    persist(next);
-    return next;
+    const persisted = persist(next);
+    return Object.freeze({ progress: next, persisted });
   }, [persist, setCurrentProgress]);
 
   const clearProgress = useCallback(() => {
