@@ -46,9 +46,35 @@ test('candidate traps unlock only after level five is completed', () => {
   );
 });
 
-test('locked mode exposes a Traditional Chinese reason', () => {
+test('board traps unlock only after level ten is completed', () => {
+  assert.equal(
+    isPuzzlePlayModeUnlocked(progressWithCompletedLevels([1, 2, 3, 4, 5, 6, 7, 8, 9]), 'trap-board'),
+    false
+  );
+  assert.equal(
+    isPuzzlePlayModeUnlocked(progressWithCompletedLevels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), 'trap-board'),
+    true
+  );
+});
+
+test('stubborn traps remain unavailable throughout phase two', () => {
+  const completedFifteen = progressWithCompletedLevels([
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+  ]);
+  assert.equal(isPuzzlePlayModeUnlocked(completedFifteen, 'trap-stubborn'), false);
+  assert.equal(
+    getPuzzlePlayModeLockReason(completedFifteen, 'trap-stubborn'),
+    '頑固伏字尚未開放。'
+  );
+});
+
+test('locked modes expose Traditional Chinese reasons', () => {
   assert.equal(
     getPuzzlePlayModeLockReason(progressWithCompletedLevels([]), 'trap-candidates'),
     '完成第 5 關後解鎖候選偽字。'
+  );
+  assert.equal(
+    getPuzzlePlayModeLockReason(progressWithCompletedLevels([]), 'trap-board'),
+    '完成第 10 關後解鎖盤面伏字。'
   );
 });
