@@ -56,16 +56,27 @@ test('successful tile placement notifies both trap systems with the next puzzle 
   assert.match(handler, /recordValidBoardPlacement\(result\.session\)/);
 });
 
-test('state-changing hint remove and clear notify board actions while selection and shuffle do not', async () => {
+test('only effective hint remove and clear actions advance board reveal progress', async () => {
   const source = await read('src/app/use-puzzle-game.ts');
-  for (const handlerName of ['removeSelected', 'hint', 'clear']) {
-    const start = source.indexOf(`const ${handlerName}`);
-    const end = source.indexOf('\n  const ', start + 1);
-    assert.notEqual(start, -1, handlerName);
-    const handler = source.slice(start, end === -1 ? undefined : end);
-    assert.match(handler, /recordBoardPuzzleAction/);
-    assert.match(handler, /next !== current|result\.session !== current/);
-  }
+
+  const removeStart = source.indexOf('const removeSelected');
+  const removeEnd = source.indexOf('\n  const hint', removeStart);
+  const removeHandler = source.slice(removeStart, removeEnd);
+  assert.match(removeHandler, /current\.values\[current\.selectedCellKey\] !== undefined/);
+  assert.match(removeHandler, /recordBoardPuzzleAction\(next\)/);
+
+  const hintStart = source.indexOf('const hint');
+  const hintEnd = source.indexOf('\n  const clear', hintStart);
+  const hintHandler = source.slice(hintStart, hintEnd);
+  assert.match(hintHandler, /result\.hintedCellKey !== null/);
+  assert.match(hintHandler, /recordBoardPuzzleAction\(result\.session\)/);
+
+  const clearStart = source.indexOf('const clear');
+  const clearEnd = source.indexOf('\n  const shuffleTiles', clearStart);
+  const clearHandler = source.slice(clearStart, clearEnd);
+  assert.match(clearHandler, /Object\.keys\(current\.values\)\.length > 0/);
+  assert.match(clearHandler, /recordBoardPuzzleAction\(next\)/);
+
   for (const handlerName of ['selectCell', 'shuffleTiles']) {
     const start = source.indexOf(`const ${handlerName}`);
     const end = source.indexOf('\n  const ', start + 1);
