@@ -34,6 +34,19 @@ A card cannot become Approved while any Blocking item fails.
 - [ ] Source is one small line at the bottom
 - [ ] Text is readable on a mobile-sized card
 
+## SSR v2.7 badge
+
+Apply this section only when `rarity === 'SSR'`.
+
+- [ ] Upper-left badge uses the legendary iridescent golden-dragon design
+- [ ] Large dimensional gold `SSR` lettering is present
+- [ ] Purple-blue-magenta nebula gemstone core is present
+- [ ] Purple diamond main gemstone anchors the lower badge
+- [ ] Badge differs clearly from SR in silhouette, material, light effects, and main gemstone
+- [ ] Badge does not cover the title, Zhuyin, Pinyin, or subtitle
+- [ ] Iridescent treatment does not recolor the outer frame, difficulty panel, main artwork, story panel, theme badge, or motto plaque
+- [ ] N／R／SR cards do not use the SSR v2.7 badge
+
 ## Quality and rights
 
 - [ ] No fake text, Simplified Chinese, overflow, or cropped required fields
@@ -44,7 +57,7 @@ A card cannot become Approved while any Blocking item fails.
 
 ## Workflow evidence
 
-- [ ] Review filename follows the current `v2.6` convention
+- [ ] Filename follows the latest standard: SSR uses `v2.7`; N／R／SR use their latest approved version
 - [ ] Actual PNG dimensions were verified after generation
 - [ ] `current-batch.json` matches the actual card status
 - [ ] Drive File ID is present only after confirmed upload
