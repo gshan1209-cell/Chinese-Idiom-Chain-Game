@@ -49,6 +49,8 @@ const ACQUISITION_METHODS = new Set<CardAcquisitionMethod>([
 
 const BOPOMOFO_PATTERN = /^[\u3105-\u312f\u02d9\u02ca\u02c7\u02cb]+$/u;
 const PINYIN_PATTERN = /^[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹḿ]+$/u;
+const PINYIN_TONE_MARK_PATTERN = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹḿ]/u;
+const ISO_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u;
 const HAN_PATTERN = /^\p{Script=Han}$/u;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -80,7 +82,9 @@ function isValidBopomofo(value: unknown): value is [string, string, string, stri
 }
 
 function isValidPinyin(value: unknown): value is [string, string, string, string] {
-  return hasExactlyFourStrings(value) && value.every((entry) => PINYIN_PATTERN.test(entry));
+  return hasExactlyFourStrings(value) && value.every((entry) =>
+    PINYIN_PATTERN.test(entry) && PINYIN_TONE_MARK_PATTERN.test(entry)
+  );
 }
 
 function freezeFourStrings(
@@ -110,12 +114,14 @@ function isLocalCardAsset(value: unknown): value is string {
     !value.startsWith('blob:');
 }
 
+function isIsoTimestamp(value: unknown): value is string {
+  return typeof value === 'string' &&
+    ISO_TIMESTAMP_PATTERN.test(value) &&
+    Number.isFinite(Date.parse(value));
+}
+
 function isIsoOrNull(value: unknown): value is string | null {
-  return value === null || (
-    typeof value === 'string' &&
-    value.trim() !== '' &&
-    Number.isFinite(Date.parse(value))
-  );
+  return value === null || isIsoTimestamp(value);
 }
 
 function cloneDefinition(record: Record<string, unknown>): IdiomCardDefinition {
@@ -230,8 +236,7 @@ export function validateIdiomCardDefinitions(
     });
   }
 
-  const atMs = Date.parse(at);
-  if (!Number.isFinite(atMs)) {
+  if (!isIsoTimestamp(at)) {
     return Object.freeze({
       validDefinitions: Object.freeze([]),
       findings: Object.freeze([
@@ -239,6 +244,7 @@ export function validateIdiomCardDefinitions(
       ])
     });
   }
+  const atMs = Date.parse(at);
 
   const idiomById = new Map(activeIdioms.map((idiom) => [idiom.id, idiom.text]));
   const idCounts = new Map<string, number>();
