@@ -91,7 +91,6 @@ export function reducePlaybackState(
       return freezeState({
         ...state,
         activeSource: null,
-        activeItemId: null,
         radioPlaying: false,
         youtubePlaying: false
       });
