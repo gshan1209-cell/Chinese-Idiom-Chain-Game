@@ -109,6 +109,7 @@ npm install
 - 修正上一批、審核或上傳圖卡
 - 圖卡元件、模板、renderer 或 PNG 輸出
 - 稀有度、稀有度外框或難易度
+- Drive 圖卡素材盤點、搬移、改名、歸檔或漂移修復
 - 每十關免費贈卡
 - 收藏頁或卡池
 - 圖卡購買或卡包
@@ -126,9 +127,9 @@ npm install
 docs/card-prompts/state/current-batch.json
 ```
 
-當使用者只說「繼續產圖」、「下一批」、「修正上一批」、「審核圖卡」或「上傳素材」時，Agent 必須先依狀態檔接續，不得要求使用者重新貼完整規格。
+當使用者只說「繼續產圖」、「下一批」、「修正上一批」、「審核圖卡」、「上傳素材」或「繼續整理 Drive」時，Agent 必須先依狀態檔、Drive Registry、active migration ledger 與 drift report 接續，不得要求使用者重新貼完整規格。
 
-若狀態檔與 Drive／Manifest 不一致，必須先回報漂移，不得猜測已完成。
+若狀態檔與 Drive／Manifest／Registry 不一致，必須先回報漂移，不得猜測已完成。
 
 圖卡規格依序閱讀：
 
@@ -142,12 +143,13 @@ docs/card-prompts/state/current-batch.json
 7. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
 8. docs/superpowers/specs/2026-08-06-card-rarity-frame-system-amendment.md
 9. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
-10. docs/card-prompts/PROJECT_PROMPT.md
+10. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
+11. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；四階外框規格定義 N／R／SR／SSR 的 frame-skin 與 effect-overlay；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工。
+v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；四階外框規格定義 N／R／SR／SSR 的 frame-skin 與 effect-overlay；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工；Drive 素材治理規格定義 type-first 結構、生命週期、Registry、Migration Ledger 與 drift Gate。
 
-發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、來源、授權或核准證據。
+發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、Registry、來源、授權或核准證據。
 
 永久規則：
 
@@ -190,7 +192,7 @@ GitHub 存放：
 - 技術規格與 Implementation Plan
 - 圖卡技能、批次狀態、定義、元件註冊表與 render plan
 - 稀有度理由與審核紀錄
-- Drive File ID、SHA-256 與版本參照
+- Drive File ID、Folder ID、SHA-256、版本、Migration Ledger 與 drift report
 - Approved master 產生的 PWA runtime derivative 與追溯 manifest
 
 Drive 存放：
@@ -203,19 +205,32 @@ Drive 存放：
 - 實機測試證據
 - 發布交付物
 
-圖卡素材路徑：
+成語圖卡目標結構：
 
 ```text
-80_Inbox/Idiom_Cards/Artworks
-80_Inbox/Idiom_Cards/Components
-80_Inbox/Idiom_Cards/Composites
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Artworks
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Components
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Composites
-90_Archive/Idiom_Cards
+80_Inbox/Idiom_Cards/<BatchId>/
+
+02_UI_UX_And_Visuals/Idiom_Cards/
+├─ 01_Artworks/{10_Review,20_Approved}
+├─ 02_Components/<ComponentType>/{10_Review,20_Approved}
+├─ 03_Templates/{10_Review,20_Approved}
+├─ 04_Composites/{10_Review,20_Approved}
+└─ 05_Reference_Only
+
+90_Archive/Idiom_Cards/
 ```
 
-新素材先進 Inbox；核准後移入 Approved；舊版移入 Archive。
+Drive 永久 Gate：
+
+- 固定頂層 `00`～`05`、`80_Inbox`、`90_Archive` 不重新命名。
+- Inbox 只作 intake，不得直接進 Approved。
+- 同一 `assetType + identity` 最多只有一個 current Approved master。
+- Published 只記錄 metadata，不複製第二份 source master。
+- 搬移前必須有 Asset Registry、Folder Registry、Migration Ledger 與 rollback path。
+- 搬移時必須保留 File ID，不得以同名重新上傳模擬 move。
+- 搬移後驗證 parent Folder ID、File ID、checksum、大小、MIME type 與 webViewLink。
+- 舊版移入 Archive，不永久刪除。
+- Blocking drift 未解決時，不得核准、發布、打包或開始下一批搬移。
 
 四階外框元件註冊表：
 
@@ -246,7 +261,7 @@ test/<驗證>
 - 關閉 TypeScript strict
 - 大範圍關閉 ESLint
 
-規格 PR 保持 docs-only，不得順便加入 production code。
+規格 PR 保持 docs-only，不得順便加入 production code 或直接搬動 Drive 素材。
 
 PR 合併前必須確認：
 
