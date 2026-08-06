@@ -4,7 +4,7 @@
   "phase": "phase1",
   "createdAt": "2026-08-07T05:55:00+08:00",
   "sourceCommit": "9bc0094d6b0ada2a3de005ca66c17d99afeff6f4",
-  "status": "planned",
+  "status": "verified",
   "entries": [
     {
       "resourceKind": "folder",
@@ -35,7 +35,7 @@
         "sha256": null,
         "webViewLink": "https://drive.google.com/drive/folders/1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -67,7 +67,7 @@
         "sha256": null,
         "webViewLink": "https://drive.google.com/drive/folders/1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -99,7 +99,7 @@
         "sha256": null,
         "webViewLink": "https://drive.google.com/drive/folders/1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -131,7 +131,7 @@
         "sha256": null,
         "webViewLink": "https://drive.google.com/drive/folders/1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -163,7 +163,7 @@
         "sha256": "1e0f12baaf9e245ecdad7e2735b9240454b54f9ee363d279f6b0cbc6fbeabc10",
         "webViewLink": "https://drive.google.com/file/d/1azohQXFHLVP5scplRQuJa33h2pUU8qq4/view"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -195,7 +195,7 @@
         "sha256": "7b5723a15d755ad4baebc62a3928cf76d2bbf7328866611cc02f26edf648175e",
         "webViewLink": "https://drive.google.com/file/d/1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd/view"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -227,7 +227,7 @@
         "sha256": "48e8bf0281c0c4ad9525595fd1eff1b15ba898635bb2b486c44f032d4cd07603",
         "webViewLink": "https://drive.google.com/file/d/1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2/view"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -259,7 +259,7 @@
         "sha256": "e5b11b757c1e74068a8af3241ba1c85dbb180bfc2692c7205abddf5945143905",
         "webViewLink": "https://drive.google.com/file/d/1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51/view"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     },
     {
@@ -291,7 +291,7 @@
         "sha256": "cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785",
         "webViewLink": "https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view"
       },
-      "status": "planned",
+      "status": "verified",
       "blockingReason": null
     }
   ]
