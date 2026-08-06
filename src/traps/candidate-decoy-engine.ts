@@ -3,6 +3,7 @@ import type { PuzzleBoard } from '../domain/puzzle.js';
 import type {
   CandidateDecoy,
   CandidateDecoySession,
+  CandidateDecoyStatus,
   PuzzlePlayMode
 } from '../domain/trap.js';
 
@@ -127,4 +128,70 @@ export function createCandidateDecoySession(
     validPlacements,
     decoys: Object.freeze(decoys)
   });
+}
+
+export function recordValidCandidatePlacement(
+  session: CandidateDecoySession
+): CandidateDecoySession {
+  if (session.mode === 'standard') return session;
+
+  const validPlacements = session.validPlacements + 1;
+  const decoys = session.decoys.map((decoy) => {
+    if (
+      decoy.status === 'scheduled' &&
+      decoy.activationAfterValidPlacements <= validPlacements
+    ) {
+      return Object.freeze({ ...decoy, status: 'active' as const });
+    }
+    return decoy;
+  });
+
+  return Object.freeze({
+    ...session,
+    validPlacements,
+    decoys: Object.freeze(decoys)
+  });
+}
+
+function transitionCandidateDecoy(
+  session: CandidateDecoySession,
+  id: string,
+  from: CandidateDecoyStatus,
+  to: CandidateDecoyStatus
+): CandidateDecoySession {
+  const index = session.decoys.findIndex(
+    (decoy) => decoy.id === id && decoy.status === from
+  );
+  if (index < 0) return session;
+
+  const decoys = session.decoys.map((decoy, decoyIndex) =>
+    decoyIndex === index
+      ? Object.freeze({ ...decoy, status: to })
+      : decoy
+  );
+  return Object.freeze({ ...session, decoys: Object.freeze(decoys) });
+}
+
+export function beginCandidateDecoyEjection(
+  session: CandidateDecoySession,
+  id: string
+): CandidateDecoySession {
+  return transitionCandidateDecoy(session, id, 'active', 'ejecting');
+}
+
+export function completeCandidateDecoyEjection(
+  session: CandidateDecoySession,
+  id: string
+): CandidateDecoySession {
+  return transitionCandidateDecoy(session, id, 'ejecting', 'removed');
+}
+
+export function getVisibleCandidateDecoys(
+  session: CandidateDecoySession
+): readonly CandidateDecoy[] {
+  return Object.freeze(
+    session.decoys.filter(
+      (decoy) => decoy.status === 'active' || decoy.status === 'ejecting'
+    )
+  );
 }
