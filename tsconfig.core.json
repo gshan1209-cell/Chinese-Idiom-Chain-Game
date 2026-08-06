@@ -21,6 +21,7 @@
     "src/puzzle/**/*.ts",
     "src/progress/**/*.ts",
     "src/media/**/*.ts",
+    "src/cards/**/*.ts",
     "src/traps/**/*.ts"
   ],
   "exclude": [
