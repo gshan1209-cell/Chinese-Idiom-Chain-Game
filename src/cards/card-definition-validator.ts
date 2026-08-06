@@ -38,17 +38,6 @@ const ALLOWED_KEYS = new Set([
 
 const RARITIES = new Set<CardRarity>(['N', 'R', 'SR', 'SSR', 'UR']);
 const DIFFICULTIES = new Set<IdiomDifficultyGrade>(['E', 'D', 'C', 'B', 'A', 'S']);
-const APPROVAL_STATUSES = new Set<CardApprovalStatus>([
-  'Approved',
-  'Review',
-  'Legacy',
-  'Rejected'
-]);
-const SOURCE_STATUSES = new Set<CardSourceStatus>([
-  'Approved',
-  'NeedsReview',
-  'Rejected'
-]);
 const ACQUISITION_METHODS = new Set<CardAcquisitionMethod>([
   'milestone-reward',
   'achievement-reward',
@@ -94,6 +83,12 @@ function isValidPinyin(value: unknown): value is [string, string, string, string
   return hasExactlyFourStrings(value) && value.every((entry) => PINYIN_PATTERN.test(entry));
 }
 
+function freezeFourStrings(
+  value: [string, string, string, string]
+): readonly [string, string, string, string] {
+  return Object.freeze([value[0], value[1], value[2], value[3]]);
+}
+
 function isFourHanCharacters(value: unknown): value is string {
   return typeof value === 'string' &&
     Array.from(value).length === 4 &&
@@ -128,8 +123,8 @@ function cloneDefinition(record: Record<string, unknown>): IdiomCardDefinition {
     id: record.id as string,
     idiomId: record.idiomId as string,
     title: record.title as string,
-    bopomofo: Object.freeze([...(record.bopomofo as [string, string, string, string])]) as readonly [string, string, string, string],
-    pinyin: Object.freeze([...(record.pinyin as [string, string, string, string])]) as readonly [string, string, string, string],
+    bopomofo: freezeFourStrings(record.bopomofo as [string, string, string, string]),
+    pinyin: freezeFourStrings(record.pinyin as [string, string, string, string]),
     subtitle: record.subtitle as string,
     rarity: record.rarity as CardRarity,
     difficulty: record.difficulty as IdiomDifficultyGrade,
@@ -190,8 +185,8 @@ function validateRecord(
   if (!isNonEmptyString(record.storySource)) add('invalid-story-source', '典故來源不可為空。');
   if (!isNonEmptyString(record.motto)) add('invalid-motto', '卡牌箴言不可為空。');
   if (record.enabled !== true) add('disabled-card', '正式卡必須啟用。');
-  if (record.approvalStatus !== 'Approved' || !APPROVAL_STATUSES.has(record.approvalStatus as CardApprovalStatus)) add('unapproved-asset', '只有 Approved 素材可進正式卡池。');
-  if (record.sourceStatus !== 'Approved' || !SOURCE_STATUSES.has(record.sourceStatus as CardSourceStatus)) add('unapproved-source', '成語來源必須通過校訂。');
+  if (record.approvalStatus !== 'Approved') add('unapproved-asset', '只有 Approved 素材可進正式卡池。');
+  if (record.sourceStatus !== 'Approved') add('unapproved-source', '成語來源必須通過校訂。');
   if (record.rarityApproved !== true) add('unapproved-rarity', '稀有度必須通過人工複核。');
   if (!Number.isInteger(record.releaseOrder) || (record.releaseOrder as number) < 0) add('invalid-release-order', 'releaseOrder 必須是非負整數。');
   if (!isIsoOrNull(record.startsAt) || !isIsoOrNull(record.endsAt)) add('invalid-release-window', '發布期間必須是 null 或合法 ISO-8601。');
