@@ -135,10 +135,11 @@ docs/card-prompts/state/current-batch.json
 4. docs/superpowers/specs/2026-08-06-idiom-card-collection-data-integrity-amendment.md
 5. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
 6. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-7. docs/card-prompts/PROJECT_PROMPT.md
+7. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
+8. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-v2.1 保留為歷史版面基礎；v2.6 明確覆寫其尺寸、比例、注音位置與禁止羅馬拼音條款。
+v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準。
 
 發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、來源、授權或核准證據。
 
@@ -151,9 +152,13 @@ v2.1 保留為歷史版面基礎；v2.6 明確覆寫其尺寸、比例、注音�
 - UR 只保留給取得正式授權的外部 IP 聯名。
 - 未取得可稽核授權前，不得製作、發布、發放或販售正式 UR 聯名卡。
 - Review、Rejected、Deprecated、來源未校訂或權利不清的卡不得進入正式卡池。
-- v2.6 正式圖卡固定為 `1024 × 2000 px`。
+- 正式圖卡固定為 `1024 × 2000 px`。
 - 上方資訊區固定 `360 px`、中央主圖區固定 `1200 px`、下方內容區固定 `440 px`。
 - 四字主標下方第一列為四組逐字對齊注音；第二列為小寫、帶聲調符號的漢語拼音。
+- 新產 SSR 圖卡必須使用 v2.7 傳奇級虹彩金龍徽章：大型立體金色 SSR、紫藍洋紅星雲核心與紫色菱形主寶石。
+- SSR 徽章必須與 SR 在輪廓、材質、光效與主寶石上明顯區隔；只改文字、亮度或飽和度視為 Blocking failure。
+- SSR 虹彩只限左上徽章，不得全面染色外框、難易度框、主圖、典故區、主題徽章或箴言牌匾。
+- N／R／SR 不得套用 v2.7 SSR 徽章。
 - 圖卡必須使用繁體中文、人物情境與最下方單行典故來源。
 - 使用者要求正式產圖時，應使用可用的圖片生成工具，不得只回傳 Prompt 代替成品。
 - 產製 Agent 不得自行把自己的輸出直接標記為最終 Approved。

@@ -1,45 +1,53 @@
-# CICG 稀有度徽章模板：SSR v2.1
+# CICG 稀有度徽章模板：SSR（歷史相容入口）
 
-## 引用規則
+## 狀態
 
-- `../shared/card-master-prompt.md`
-- `../shared/negative-constraints.md`
+- historicalPromptVersion: v2.1
+- currentStandardVersion: v2.7
+- assetStatus: Superseded
+- currentPrompt: `CICG_CardTemplate_Rarity_SSR_v2.7_Prompt.md`
 
-## 模板資料
+本檔名因既有 Manifest 與歷史單卡 Prompt 參照而保留。新產 SSR 圖卡不得依本文件舊版 `2:3`、v2.1 徽章或舊 Drive 圖片產製。
 
-- rarity: SSR
-- difficulty: A
-- themeCategory: military
-- themeLabel: 軍事
-- assetStatus: Approved
-- driveImageUrl: https://drive.google.com/file/d/1noFuTsoAENq1Z-n5uOOpq7whhxJEHlz8/view
+## 必讀規格
 
-## 唯一稀有度差異
+依序讀取：
 
-左上稀有度徽章採：**虹彩金底、帶筆觸感的 SSR 字、局部虹彩寶石光。**
+1. `../../superpowers/specs/2026-08-06-idiom-card-rarity-standard-design.md`
+2. `../../superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md`
+3. `../../superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md`
+4. `CICG_CardTemplate_Rarity_SSR_v2.7_Prompt.md`
+5. `../shared/card-master-prompt.md`
+6. `../shared/negative-constraints.md`
 
-外框不因稀有度改色。主圖、難易度框、典故區、箴言牌匾與「軍事」主題徽章也不因稀有度改色。
+## 目前正式模板
 
-## 固定卡面文字
+```text
+CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png
+Drive File ID：1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV
+尺寸：1024 × 2000 px
+上方資訊區：360 px
+中央主圖：1200 px
+下方內容區：440 px
+檔案大小：3,427,910 bytes
+SHA-256：cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785
+```
 
-- 主標題：`成語標題`
-- 副標題：`一句白話解釋`
-- 右上：`難易度`＋`A`
-- 左下：深緋紅 `#8E1E24` 軍事徽章，圖示為劍與軍旗，標籤為 `軍事`
-- 典故佔位：`此處放置成語典故摘要、人物、事件與寓意。`
-- 箴言佔位：`守志不移，／穩步前行，／終有所成。`
-- 來源佔位：`典故來源：朝代・作者《典籍名稱・卷次》`
+## 永久規則
 
-## 正式產圖提示語
+- SSR 使用傳奇級虹彩金龍徽章。
+- 金龍環抱大型立體金色 SSR 字樣。
+- 核心使用紫、藍、洋紅星雲寶石光。
+- 下端配置紫色菱形主寶石。
+- 必須與 SR 在輪廓、材質、光效與主寶石上明顯不同。
+- SSR 虹彩只限左上徽章，不得全面染色卡面。
+- 稀有度仍由成語正面意義與精神象徵決定，不能由徽章華麗度反推。
+- 正式圖片固定 `1024 × 2000 px`；中央主圖固定 `1200 px`。
 
-生成一張直式 2:3 的 CICG 成語卡牌模板。使用固定深色金框與高質感韓日動漫遊戲卡牌風格。左上顯示 SSR 稀有度徽章，徽章為虹彩金底、帶筆觸感的 SSR 字與局部虹彩寶石光；其餘卡面不得套用此色系。上方中央顯示大字繁體中文「成語標題」，下方顯示「一句白話解釋」。右上固定顯示「難易度」與大字母 A。中央主插圖使用中性自然色的古代幻想戰場與城塞遠景，一名有動作的武者俯瞰城市，插圖不得因稀有度染色。左下使用固定深緋紅軍事徽章，金色劍與軍旗圖示，徽章下方清楚標示「軍事」。下方設置「典故」文字區，右下放置窄版深色金框直式箴言牌匾，最下方放來源格式小字。所有文字為繁體中文，資訊清楚、手機可讀。
+## 禁止事項
 
-## 驗收清單
-
-- [ ] 直式 2:3。
-- [ ] 左上只以徽章表現 SSR。
-- [ ] 外框不因稀有度改色。
-- [ ] 主插圖未被稀有度染色。
-- [ ] 右上只顯示「難易度」與 A。
-- [ ] 左下軍事徽章維持深緋紅固定色。
-- [ ] 典故、直式箴言與來源皆存在。
+- 禁止使用本檔舊版 `2:3` 產圖提示語。
+- 禁止使用舊 v2.1 Drive 圖片作為新產 SSR 標準。
+- 禁止只把 SR 字樣改成 SSR。
+- 禁止用亮度或飽和度差異冒充 v2.7 升級。
+- 禁止把 SSR 虹彩色套到外框、主圖、難易度框、典故區或主題徽章。
