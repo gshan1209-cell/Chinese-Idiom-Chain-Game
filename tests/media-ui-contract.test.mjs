@@ -61,6 +61,15 @@ test('reserves a visible 16:9 player and mobile safe-area space', () => {
   assert.match(css, /env\(safe-area-inset-bottom/);
 });
 
+test('adds content padding only while the persistent dock is visible', () => {
+  const css = readSource('src/app/media/media.css');
+  assert.match(css, /body:has\(\.media-dock\) \.app-shell/);
+  assert.match(
+    css,
+    /padding-bottom:\s*max\([^;]*env\(safe-area-inset-bottom\)[^;]*\)/
+  );
+});
+
 test('provider owns one audio element and IndexedDB fallback behavior', () => {
   const source = readSource('src/app/media/MediaProvider.tsx');
   assert.match(source, /new Audio\(\)/);
