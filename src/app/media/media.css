@@ -3,6 +3,10 @@
   margin-top: 1rem;
 }
 
+body:has(.media-dock) .app-shell {
+  padding-bottom: max(10rem, calc(9rem + env(safe-area-inset-bottom)));
+}
+
 .media-dock {
   position: fixed;
   z-index: 80;
