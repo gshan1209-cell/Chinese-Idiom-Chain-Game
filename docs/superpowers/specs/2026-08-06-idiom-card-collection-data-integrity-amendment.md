@@ -3,11 +3,11 @@
 日期：2026-08-06  
 狀態：Approved  
 適用規格：`2026-08-06-idiom-card-collection-design.md`  
-優先級：本增補與圖卡稀有度標準、圖卡審核治理規格共同覆寫較早且衝突的收藏規格敘述
+優先級：本增補與圖卡稀有度標準、圖卡審核治理規格及 v2.6 模板增補共同覆寫較早且衝突的收藏規格敘述
 
-## 1. 圖卡定義必須包含逐字注音
+## 1. 圖卡定義必須包含逐字注音與漢語拼音
 
-`IdiomCardDefinition` 必須新增可驗證的注音資料：
+v2.6 正式卡面需要四筆逐字注音及四筆帶聲調漢語拼音。後續 production implementation 的 `IdiomCardDefinition` 應使用可驗證資料：
 
 ```ts
 export interface IdiomCardDefinition {
@@ -15,6 +15,7 @@ export interface IdiomCardDefinition {
   readonly idiomId: string;
   readonly title: string;
   readonly bopomofo: readonly [string, string, string, string];
+  readonly pinyin: readonly [string, string, string, string];
   // 其餘欄位沿用收藏規格
 }
 ```
@@ -23,10 +24,12 @@ export interface IdiomCardDefinition {
 
 - `title` 必須是四個繁體中文字。
 - `bopomofo` 必須恰好四筆，依序對應四個國字。
-- 每筆注音不得為空，正式發布前須完成校訂。
-- 收藏頁詳細畫面與正式卡面都必須使用逐字直立注音。
-- 資料模型、卡面、收藏頁與匯出資料不得保存或顯示漢語拼音、英文拼音或其他羅馬拼音欄位。
-- 未完成注音校訂的圖卡不得標記 `Approved`，不得進入免費卡池、正式收藏頁或未來商店。
+- `pinyin` 必須恰好四筆，依序對應四個國字。
+- 每筆注音與拼音不得為空，正式發布前須完成校訂。
+- 拼音必須使用小寫漢語拼音與聲調符號，例如 `yú`、`gōng`；禁止數字聲調，例如 `yu2`。
+- v2.6 卡面與收藏頁詳細畫面依序顯示：四字主標、注音橫列、拼音橫列。
+- 未完成注音或拼音校訂的圖卡不得標記 `Approved`，不得進入免費卡池、正式收藏頁或未來商店。
+- 本文件只定義後續資料契約；本次文件任務不得直接修改既有 IndexedDB 進度 Schema。
 
 ## 2. 里程碑獎勵必須先保存再揭示
 
@@ -67,10 +70,11 @@ export interface IdiomCardDefinition {
 後續 production implementation 至少必須先建立下列失敗測試：
 
 1. 四字圖卡缺少任一注音時驗證失敗。
-2. 含羅馬拼音欄位的正式圖卡資料被拒絕。
-3. pending grant 解析後先持久化，再允許進入 reveal 狀態。
-4. 保存失敗時不顯示已取得圖卡。
-5. 同一 rewardId 重放不重新抽卡或重複增加 ownedCount。
-6. 多分頁或重複完成事件只產生一筆里程碑 grant。
-7. 空卡池保持 pending 且不建立虛假收藏項目。
-8. NeedsReview、Legacy、Review 或未核准稀有度的卡片不進入正式卡池。
+2. 四字圖卡缺少任一拼音時驗證失敗。
+3. 拼音使用數字聲調或缺少正式聲調符號時驗證失敗。
+4. pending grant 解析後先持久化，再允許進入 reveal 狀態。
+5. 保存失敗時不顯示已取得圖卡。
+6. 同一 rewardId 重放不重新抽卡或重複增加 ownedCount。
+7. 多分頁或重複完成事件只產生一筆里程碑 grant。
+8. 空卡池保持 pending 且不建立虛假收藏項目。
+9. NeedsReview、Legacy、Review 或未核准稀有度的卡片不進入正式卡池。
