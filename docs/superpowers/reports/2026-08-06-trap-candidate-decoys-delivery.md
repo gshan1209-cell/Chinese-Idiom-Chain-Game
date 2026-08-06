@@ -17,6 +17,7 @@
 - 重玩同一關時，偽字進度、已移除狀態與合法放字計數全部重設。
 - 支援 reduced-motion 無位移淡出替代效果。
 - 玩家主動點擊時提供 best-effort Web Audio 短促回饋；瀏覽器拒絕時靜默降級。
+- 未實作的盤面伏字與頑固伏字目前保持完全惰性，不會誤用候選偽字引擎。
 
 ## 2. 架構
 
@@ -82,24 +83,25 @@ clamp(ceil(fillableCellCount × 0.18), 1, 4)
 | React 控制層 | CI #171 | CI #173 功能與型別通過但測試 Lint 失敗；CI #174 通過 |
 | 玩家模式與偽字 UI | CI #181 | CI #182 |
 | 同關重玩重設 | CI #183 | CI #184 |
+| Phase 2／3 邊界隔離 | CI #187、CI #189 | CI #190 |
 
 每一個 production 行為均先建立失敗測試；失敗原因確認後才加入最小實作。
 
-## 5. CI #184 驗證結果
+## 5. CI #190 驗證結果
 
 GitHub Actions 在 PR 合併樹執行 `./scripts/verify.sh`：
 
 - Node.js：22.16.0
 - 成語資料建置：70 筆，checksum `1601ec3c7424...`
-- 完整 Node 測試：166 項通過、0 失敗
-- Trap：22 項通過、0 失敗
+- 完整 Node 測試：168 項通過、0 失敗
+- Trap：24 項通過、0 失敗
 - Puzzle：37 項通過、0 失敗
 - Media：39 項通過、0 失敗
 - TypeScript strict：通過
 - ESLint：通過
 - Vite production build：通過
 - PWA Service Worker：成功產生
-- PWA precache：12 entries，364.19 KiB
+- PWA precache：12 entries，364.20 KiB
 - npm audit：419 packages，0 vulnerabilities
 
 ## 6. 範圍審核
