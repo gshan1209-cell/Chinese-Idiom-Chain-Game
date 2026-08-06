@@ -34,6 +34,30 @@ test('puzzle coordinator reserves candidate then board resources before stubborn
   assert.match(source, /findNextPuzzleCell/);
 });
 
+test('removed lower-layer traps keep their planned resources reserved for the round', async () => {
+  const candidateSource = await read('src/app/use-candidate-decoys.ts');
+  const candidateReservation = candidateSource.slice(
+    candidateSource.indexOf('const reservedCharacters'),
+    candidateSource.indexOf('return {', candidateSource.indexOf('const reservedCharacters'))
+  );
+  assert.match(candidateReservation, /state\.session\.decoys\.map/);
+  assert.equal(candidateReservation.includes("status !== 'removed'"), false);
+
+  const puzzleSource = await read('src/app/use-puzzle-game.ts');
+  const boardCharacters = puzzleSource.slice(
+    puzzleSource.indexOf('const boardReservedCharacters'),
+    puzzleSource.indexOf('const boardReservedTargetCellKeys')
+  );
+  const boardTargets = puzzleSource.slice(
+    puzzleSource.indexOf('const boardReservedTargetCellKeys'),
+    puzzleSource.indexOf('const stubbornExcludedCharacters')
+  );
+  assert.match(boardCharacters, /boardIntruderSession\.intruders\.map/);
+  assert.match(boardTargets, /boardIntruderSession\.intruders\.map/);
+  assert.equal(boardCharacters.includes("status !== 'removed'"), false);
+  assert.equal(boardTargets.includes("status !== 'removed'"), false);
+});
+
 test('blocked stubborn targets stop normal tile placement before puzzle engine runs', async () => {
   const source = await read('src/app/use-puzzle-game.ts');
   const chooseTile = source.slice(
