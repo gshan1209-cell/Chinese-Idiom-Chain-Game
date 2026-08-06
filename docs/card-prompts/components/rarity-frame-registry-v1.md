@@ -21,6 +21,24 @@ Footer：440 px
 | SR | `frame-sr-v1.0-royal-violet` | `CICG_CardFrame_Rarity_SR_v1.0_Approved.png` | `1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40` | `4976cd5ead7042edc24808183ea2415de1491ddd1d9d95b18d889fb0e95de073` | 皇家紫晶、有限藍紫微光 |
 | SSR | `frame-ssr-v2.8-rainbow-neon` | `CICG_CardTemplate_Rarity_SSR_v2.8_Approved.png` | `1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz` | `8bf608d7ba64b1efe787b8f6e0939c55a7d7623d5d9a791e5a260a144a9b328e` | 完整虹彩霓虹包框、最高光效 |
 
+## Governed Drive location
+
+四張 current Approved masters 已於 Batch 1 原地搬移至：
+
+```text
+02_UI_UX_And_Visuals/
+└─ Idiom_Cards/
+   └─ 02_Components/
+      └─ 01_Card_Frames/
+         └─ 20_Approved/
+```
+
+Registry key：`idiom-cards.components.card-frames.approved`  
+Drive Folder ID：`1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj`  
+Migration Ledger：`data/drive-assets/migrations/2026-08-07-phase1-batch1-approved-rarity-frames.json`
+
+搬移保留原 Drive File ID、檔名、MIME、size、SHA-256 與 webViewLink；沒有重新上傳或複製第二份 master。
+
 ## Renderer contract
 
 - `frameSkinId` 與 `effectOverlayId` 必須獨立於 `artworkAssetId`。
