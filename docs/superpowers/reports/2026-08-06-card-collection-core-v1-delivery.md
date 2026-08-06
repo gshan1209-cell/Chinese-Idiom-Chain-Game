@@ -87,23 +87,30 @@ Key：chapter-1
 | IndexedDB 原子交易 | CI #327 | CI #329 |
 | 收藏服務與闖關保存順序 | CI #332 | CI #335 |
 | 空卡池離線與已解析 Grant 修復 | CI #338 | CI #339 |
-| 文件最新 HEAD | — | CI #342 |
+| 文件樹完整驗證 | — | CI #342 |
+| 最新 PR 合併樹完整驗證 | — | CI #343 |
 
 每個 RED 均先確認既有測試保持綠色，新失敗只指向尚未實作或刻意補強的行為。
 
 ## 5. 最終驗證
 
-CI #342 已在包含 README、規格索引與本交付報告的最新文件樹成功執行完整 Repository Gate。
+CI #343 已在 PR #22 最新合併樹 `54841b1ffd073cf846c62c160b35025b1937b597` 成功執行完整 Repository Gate。
 
+- Node.js：22.16.0。
 - Card tests：50／50 通過。
 - 完整 Node 測試：289 項通過、0 失敗；由既有 239 項測試群組與新增 50 項 Card 群組加總。
+- Puzzle：37／37 通過。
+- Progress：17／17 通過。
+- Media：39／39 通過。
+- Trap：95／95 通過。
 - TypeScript strict：通過。
 - ESLint：通過。
 - Vite production build：通過。
 - PWA Service Worker：成功產生。
-- npm install audit：0 vulnerabilities。
+- PWA precache：12 entries，402.57 KiB。
+- npm install audit：419 packages，0 vulnerabilities。
 
-最終合併仍須確認 `behind_by = 0`、最新 HEAD 未移動與 review threads 為 0。
+PR #22 合併前已確認 `behind_by = 0`、最新 HEAD 未移動且 unresolved review threads 為 0。
 
 ## 6. GitHub／Drive 狀態
 
