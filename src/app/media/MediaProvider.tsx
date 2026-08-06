@@ -78,10 +78,20 @@ function updatePreferences(
 
 function mergePersistedState(persisted: MediaState): MediaState {
   const customItems = persisted.library.filter((item) => item.origin === 'custom');
+  const library = mergeMediaLibraries(BUILT_IN_LIBRARY, customItems);
+  const requestedItemId = persisted.preferences.lastSelectedItemId;
+  const lastSelectedItemId =
+    requestedItemId !== null && library.some((item) => item.id === requestedItemId)
+      ? requestedItemId
+      : null;
+
   return cloneMediaState({
-    library: mergeMediaLibraries(BUILT_IN_LIBRARY, customItems),
+    library,
     favoriteIds: persisted.favoriteIds,
-    preferences: persisted.preferences
+    preferences: {
+      ...persisted.preferences,
+      lastSelectedItemId
+    }
   });
 }
 
@@ -136,6 +146,10 @@ export function MediaProvider({ children, bonusActive }: MediaProviderProps) {
           dispatchPlayback({
             type: 'SET_MUTED',
             muted: next.preferences.muted
+          });
+          dispatchPlayback({
+            type: 'SET_SELECTED_ITEM',
+            itemId: next.preferences.lastSelectedItemId
           });
         }
         setHydrated(true);
@@ -230,7 +244,10 @@ export function MediaProvider({ children, bonusActive }: MediaProviderProps) {
 
   const removeItem = useCallback(
     (itemId: string) => {
-      if (playback.activeItemId === itemId) pauseAll();
+      if (playback.activeItemId === itemId) {
+        audioRef.current?.pause();
+        dispatchPlayback({ type: 'SET_SELECTED_ITEM', itemId: null });
+      }
       setState((current) =>
         cloneMediaState({
           ...current,
@@ -246,7 +263,7 @@ export function MediaProvider({ children, bonusActive }: MediaProviderProps) {
         })
       );
     },
-    [pauseAll, playback.activeItemId]
+    [playback.activeItemId]
   );
 
   const toggleFavorite = useCallback((itemId: string) => {
@@ -376,6 +393,7 @@ export function MediaProvider({ children, bonusActive }: MediaProviderProps) {
   const importBackup = useCallback(
     (json: string): MediaImportSummary => {
       const result = importMediaBackup(json, state);
+      audioRef.current?.pause();
       setState(result.state);
       dispatchPlayback({
         type: 'SET_BASE_VOLUME',
@@ -384,6 +402,10 @@ export function MediaProvider({ children, bonusActive }: MediaProviderProps) {
       dispatchPlayback({
         type: 'SET_MUTED',
         muted: result.state.preferences.muted
+      });
+      dispatchPlayback({
+        type: 'SET_SELECTED_ITEM',
+        itemId: result.state.preferences.lastSelectedItemId
       });
       setNotice(
         `匯入完成：新增 ${result.summary.added}、略過 ${result.summary.skipped}、失敗 ${result.summary.failed}。`
