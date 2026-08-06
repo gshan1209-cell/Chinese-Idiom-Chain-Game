@@ -1,89 +1,227 @@
-# Drive Phase 1 Migration Report
+# Drive Phase 1 Migration And Drift Audit Report
 
 日期：2026-08-07  
-Batch：`phase1-batch1-approved-rarity-frames`  
-狀態：**VERIFIED**
+範圍：成語圖卡 Drive Phase 1  
+狀態：**實體遷移完成；最新完整 CI 驗證待確認**
 
-## 1. 範圍
+## 1. Phase 1 結果總覽
 
-本批次只處理四張已在 GitHub Registry 納管、已具 PR #32 核准證據及 SHA-256 的 N／R／SR／SSR rarity frame masters。
+| 項目 | 結果 |
+|---|---:|
+| Folder Registry | 60 folders |
+| Phase 1 required folder keys | 43 / 43 |
+| 新建立資料夾 | 38 |
+| 沿用既有正式 archive root | 1 |
+| Asset Registry | 9 assets |
+| Current Approved masters | 4 |
+| Review assets | 1 |
+| Quarantined file assets | 4 |
+| Batch 1 verified migration entries | 4 |
+| Batch 2 verified migration entries | 9 |
+| 未驗證 applied migrations | 0 |
+| Missing rollback snapshots | 0 |
+| Duplicate current Approved | 0 |
+| Unregistered files in Approved | 0 |
 
-未包含：
-
-- Difficulty badge reference
-- Review cards
-- Legacy templates
-- 未驗證檔名含 `Approved` 的其他素材
-- Artwork、Composite 或其他 component 類型
-
-## 2. 搬移路徑
-
-來源：
+所有機器可讀真實狀態以以下路徑為準：
 
 ```text
-02_UI_UX_And_Visuals
+data/drive-assets/drive-folders.json
+data/drive-assets/idiom-card-assets.json
+data/drive-assets/migrations/
+data/drive-assets/physical-audit-2026-08-07.json
 ```
 
-目的：
+文件不得複製完整 Folder ID 表；Folder Registry 是唯一 canonical mapping。
+
+## 2. 正式拓樸
 
 ```text
 02_UI_UX_And_Visuals/
 └─ Idiom_Cards/
-   └─ 02_Components/
-      └─ 01_Card_Frames/
-         └─ 20_Approved
+   ├─ 00_Readme_And_Shortcuts/
+   ├─ 01_Artworks/{10_Review,20_Approved}/
+   ├─ 02_Components/
+   │  ├─ 01_Card_Frames/{10_Review,20_Approved}/
+   │  ├─ 02_Rarity_Badges/{10_Review,20_Approved}/
+   │  ├─ 03_Difficulty_Badges/{10_Review,20_Approved}/
+   │  ├─ 04_Theme_Badges/{10_Review,20_Approved}/
+   │  ├─ 05_Motto_Plaques/{10_Review,20_Approved}/
+   │  └─ 06_Effect_Overlays/{10_Review,20_Approved}/
+   ├─ 03_Templates/{10_Review,20_Approved}/
+   ├─ 04_Composites/{10_Review,20_Approved}/
+   └─ 05_Reference_Only/
+
+80_Inbox/
+└─ Idiom_Cards/
+
+90_Archive/
+└─ Idiom_Cards/
+   ├─ 01_Artworks/
+   ├─ 02_Components/
+   ├─ 03_Templates/
+   ├─ 04_Composites/
+   ├─ 05_Legacy_Flat_Cards/
+   └─ 06_Rejected_And_Unverifiable/
 ```
 
-目的 Registry key：`idiom-cards.components.card-frames.approved`  
-目的 Drive Folder ID：`1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj`
+既有 `90_Archive/Idiom_Cards` 名稱與 parent 已符合正式用途，因此保留原 Folder ID，沒有建立同名重複 archive root。
 
-## 3. 驗證結果
+## 3. Batch 1：Approved Rarity Frames
 
-| Rarity | Drive File ID | Size | SHA-256 | 結果 |
-|---|---|---:|---|---|
-| N | `1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8` | 2,285,281 | `17e6a6798e491ad2bad12b5746e7c3414078e456b83838db2e75aa0a7352ae65` | Verified |
-| R | `18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR` | 2,191,391 | `3620f4408b31055d0e6ea185fa08dd5be13a33687321191035ac0ba30b9fdf2d` | Verified |
-| SR | `1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40` | 2,454,266 | `4976cd5ead7042edc24808183ea2415de1491ddd1d9d95b18d889fb0e95de073` | Verified |
-| SSR | `1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz` | 3,480,599 | `8bf608d7ba64b1efe787b8f6e0939c55a7d7623d5d9a791e5a260a144a9b328e` | Verified |
+Ledger：
 
-每張檔案均依序完成：
+```text
+data/drive-assets/migrations/
+2026-08-07-phase1-batch1-approved-rarity-frames.json
+```
 
-1. Pre-move metadata snapshot。
-2. 原 File ID 原地 move。
-3. Parent、name、MIME、size 與 webViewLink 驗證。
-4. 重新下載原始檔並計算 SHA-256。
-5. 通過後才處理下一張。
+目的地：
 
-四張檔案均保持：
+```text
+idiom-cards.components.card-frames.approved
+```
 
-- Drive File ID 不變
-- 檔名不變
-- MIME `image/png` 不變
-- size 不變
-- SHA-256 不變
-- webViewLink 不變
-- 未重新上傳
-- 未建立第二份 current master
+| Rarity | Canonical filename | Drive File ID | Size | SHA-256 |
+|---|---|---|---:|---|
+| N | `CICG_Component_RarityFrame_N_v1.0_Approved.png` | `1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8` | 2,285,281 | `17e6a6798e491ad2bad12b5746e7c3414078e456b83838db2e75aa0a7352ae65` |
+| R | `CICG_Component_RarityFrame_R_v1.0_Approved.png` | `18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR` | 2,191,391 | `3620f4408b31055d0e6ea185fa08dd5be13a33687321191035ac0ba30b9fdf2d` |
+| SR | `CICG_Component_RarityFrame_SR_v1.0_Approved.png` | `1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40` | 2,454,266 | `4976cd5ead7042edc24808183ea2415de1491ddd1d9d95b18d889fb0e95de073` |
+| SSR | `CICG_Component_RarityFrame_SSR_v2.8_Approved.png` | `1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz` | 3,480,599 | `8bf608d7ba64b1efe787b8f6e0939c55a7d7623d5d9a791e5a260a144a9b328e` |
 
-## 4. GitHub 同步
+四張檔案均以原 File ID 完成 move-and-rename；搬移與重新命名後重新下載原始檔，MIME、size、SHA-256 與 webViewLink 均保持不變。
 
-已更新：
+## 4. Batch 2：Review 與 Legacy 隔離
 
-- `data/drive-assets/idiom-card-assets.json`
-- `data/drive-assets/migrations/2026-08-07-phase1-batch1-approved-rarity-frames.json`
-- `docs/card-prompts/components/rarity-frame-registry-v1.md`
-- `tests/card-drive-approved-frame-migration.test.mjs`
+Ledger：
 
-Migration Ledger 保留完整 `before`、`after` 與 `rollback` snapshot，ledger 與四個 entries 均為 `verified`。
+```text
+data/drive-assets/migrations/
+2026-08-07-phase1-batch2-review-and-legacy.json
+```
 
-## 5. 後續 Gate
+共 9 個 verified entries：
 
-本批次成功不代表其他素材可以直接搬移。下一批仍須先完成：
+### 正式 Review
 
-- 資產分類與 checksum
-- 檔案角色判定
-- Review／Approved／Archive 目的地
-- 核准或 unverifiable 證據
-- 完整 rollback Ledger
+- `CICG_Component_DifficultyBadge_E-S_v1.0_Review.jpeg`
+  - status：`review`
+  - currentApproved：`false`
+  - 403,355 bytes
+  - SHA-256：`1e0f12baaf9e245ecdad7e2735b9240454b54f9ee363d279f6b0cbc6fbeabc10`
+- `CICG_Card_Templates_v2.6_Review`
+  - 以原 Folder ID 移入 Templates Review
+  - 直接子項數量搬移前後均為 0
 
-不得只依檔名中的 `Approved`、版本字樣或所在舊資料夾判定正式狀態。
+### Inbox 隔離
+
+以下缺少足以升格或歸檔的完整證據，因此只移入 governed Inbox：
+
+- `CICG_Idiom_Cards_Pending_Review_2026-08-06`
+- `CICG_Legacy_Card_Assets_Backup`
+- `CICG_Card_Templates_v2.1_Approved`
+- N／R／SR／SSR 四張 v2.7 template files
+
+四張 v2.7 檔案雖保留舊檔名中的 `Approved`，Registry 狀態明確為：
+
+```text
+status = quarantined
+currentApproved = false
+parentFolderKey = idiom-cards.inbox
+```
+
+不得由檔名反推正式核准狀態。
+
+## 5. Live Drive Drift Audit
+
+2026-08-07 重新掃描結果：
+
+### Visuals root
+
+`02_UI_UX_And_Visuals` 直接子項只剩：
+
+```text
+Idiom_Cards
+```
+
+舊模板、Review、Legacy Backup、難易度標籤及 v2.7 templates 均已離開未治理根目錄。
+
+### Approved folders
+
+- Card Frames Approved：正好 4 張已登錄 canonical masters。
+- Artworks Approved：空。
+- Rarity Badges Approved：空。
+- Difficulty Badges Approved：空。
+- Theme Badges Approved：空。
+- Motto Plaques Approved：空。
+- Effect Overlays Approved：空。
+- Templates Approved：空。
+- Composites Approved：空。
+
+因此：
+
+```text
+Unregistered files in Approved = 0
+Duplicate current Approved = 0
+```
+
+### Review folders
+
+- Difficulty Badges Review：正好 1 張已登錄 Review asset。
+- Templates Review：正好 1 個已登錄 v2.6 Review container。
+
+### Governed Inbox
+
+直接子項正好 7 個：
+
+- 3 個隔離容器
+- 4 張 quarantined v2.7 template files
+
+與 Asset／Folder Registries 一致。
+
+## 6. 尚待逐檔治理的素材
+
+以下資產已被安全隔離或保留於 Archive，但尚未逐檔 checksum、分類與判定：
+
+- Pending Review：3 批 × 10 張，共 30 張。
+- Legacy Backup：7 個直接子項，包含 badge references、drafts、experiments 與舊 master。
+- v2.1 container：6 個直接子項。
+- Archive `Templates_v2.5`：4 張。
+- Archive `Templates_v2.2`：3 張。
+
+它們不在任何 Approved folder，因此目前不構成正式發布漂移；後續仍必須逐批建立 Ledger，不得整批直接升格或永久刪除。
+
+## 7. 永久驗證 Gate
+
+`./scripts/verify.sh` 已執行：
+
+```bash
+npm run validate:drive-assets
+```
+
+CLI 使用 `readdir(migrationsPath)` 自動發現並驗證 `data/drive-assets/migrations/` 下所有 JSON Ledgers，不依賴手動維護單一檔名。
+
+Physical audit regression test 會核對：
+
+- 60 個 folders
+- 9 個 assets
+- 4 個 current Approved masters
+- 1 個 Review asset
+- 4 個 quarantined assets
+- Batch 0／1／2 三份 Ledgers
+- Batch 1 共 4 個 verified entries
+- Batch 2 共 9 個 verified entries
+- Visuals root、Approved、Review 與 Inbox 的 audited state
+
+## 8. 完成條件狀態
+
+| Gate | 狀態 |
+|---|---|
+| Blocking drift = 0 | PASS |
+| Duplicate current Approved = 0 | PASS |
+| Unverified applied migrations = 0 | PASS |
+| Missing rollback snapshots = 0 | PASS |
+| Unregistered files in Approved = 0 | PASS |
+| Latest full repository verify | **PENDING** |
+
+在最新 commit 的完整 CI／repository verify 證據出現前，不宣稱 Phase 1 PR 可合併，也不把 Phase 2 Ready 設為 true。
