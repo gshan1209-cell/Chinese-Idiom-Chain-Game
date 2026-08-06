@@ -65,13 +65,13 @@ test('mute overrides ducking and volume is clamped to zero through one', () => {
   assert.equal(state.effectiveVolume, 0);
 });
 
-test('pause clears active playback without losing preferences', () => {
+test('pause stops playback but keeps the selected item available to resume', () => {
   let state = createInitialPlaybackState({ volume: 0.6, muted: true });
   state = reducePlaybackState(state, { type: 'PLAY_YOUTUBE', itemId: 'y1' });
   state = reducePlaybackState(state, { type: 'PAUSE_ALL' });
 
   assert.equal(state.activeSource, null);
-  assert.equal(state.activeItemId, null);
+  assert.equal(state.activeItemId, 'y1');
   assert.equal(state.radioPlaying, false);
   assert.equal(state.youtubePlaying, false);
   assert.equal(state.baseVolume, 0.6);
