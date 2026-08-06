@@ -13,7 +13,7 @@ test('requires the complete Phase 1 folder graph', () => {
     folders: [],
   });
 
-  assert.equal(REQUIRED_PHASE1_FOLDER_KEYS.length, 42);
+  assert.equal(REQUIRED_PHASE1_FOLDER_KEYS.length, 43);
   assert.ok(issues.some(({ code }) => code === 'missing-required-folder'));
 });
 
