@@ -109,7 +109,7 @@ data/media/default-library.json = []
 | 恢復上次選取 | CI #137：reducer 與 hydration 兩項失敗 | CI #139 通過 |
 | Dock 安全空間 | CI #140：缺少內容底部留白 | CI #141 通過 |
 
-## 5. 最終驗證
+## 5. 完整驗證基線
 
 GitHub Actions CI Run #141 成功執行：
 
@@ -130,6 +130,8 @@ npm install
 - PWA Service Worker：成功產生
 - PWA precache：12 entries，355.44 KiB
 - npm audit：419 packages，0 vulnerabilities
+
+README、規格狀態與本交付報告提交後，PR 仍須以最新 HEAD 再執行一次同樹 CI；只有該 CI 成功且 `behind_by = 0` 才可合併。
 
 非阻擋警告：GitHub Actions runner 將 `actions/checkout@v4` 與 `actions/setup-node@v4` 從內部 Node 20 強制執行於 Node 24；專案驗證本身使用 Node 22.16.0 並成功。
 
