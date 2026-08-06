@@ -41,7 +41,7 @@ Generate only Review assets unless an independent human approval is explicitly r
 
 ## Permanent Gates
 
-- v2.6 exact canvas `1024 × 2000 px`.
+- Exact canvas `1024 × 2000 px`.
 - Header `y = 0–359`, height `360 px`.
 - Main artwork `y = 360–1559`, height `1200 px`.
 - Footer `y = 1560–1999`, height `440 px`.
@@ -50,6 +50,10 @@ Generate only Review assets unless an independent human approval is explicitly r
 - Second row below Zhuyin: lowercase tone-marked Hanyu Pinyin.
 - No numbered tones and no missing tone marks in Approved assets.
 - Rarity at upper left; difficulty at upper right; never mix them.
+- New SSR cards use the v2.7 legendary iridescent golden-dragon badge: large dimensional gold `SSR`, purple-blue-magenta nebula core, and a purple diamond main gemstone.
+- The SSR badge must differ clearly from SR in silhouette, material, light effects, and main gemstone; changing only letters, brightness, or saturation is a Blocking failure.
+- SSR iridescence remains confined to the upper-left badge and must not recolor the whole card.
+- N／R／SR must not use the v2.7 SSR badge.
 - At least one person actively expresses the idiom.
 - Full theme badge at lower left.
 - Section label is `典故`, not `典故說明`.
@@ -75,6 +79,7 @@ Report only evidence-backed facts:
 - generated filenames
 - actual image size and main-art height
 - Zhuyin and Pinyin review status
+- SSR v2.7 badge review status when applicable
 - Drive File IDs actually returned
 - Manifest/state updates actually committed
 - findings and exact next action
