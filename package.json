@@ -17,6 +17,8 @@
     "test:data": "node --test scripts/build-idioms.test.mjs",
     "test:index": "npm run compile:core && node --test tests/idiom-index.test.mjs",
     "compile:core": "tsc -p tsconfig.core.json",
+    "validate:drive-assets": "npm run compile:core && node scripts/validate-drive-assets.mjs",
+    "test:drive-assets": "npm run compile:core && node --test tests/card-drive-*.test.mjs",
     "verify": "./scripts/verify.sh",
     "test:game": "npm run compile:core && node --test tests/game-engine.test.mjs",
     "test:loader": "npm run compile:core && node --test tests/load-dictionary.test.mjs",
