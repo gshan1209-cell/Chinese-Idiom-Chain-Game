@@ -5,9 +5,14 @@ import { buildPuzzleBoard } from '../.test-dist/src/puzzle/puzzle-board.js';
 import { createPuzzleSession } from '../.test-dist/src/puzzle/puzzle-engine.js';
 import { getPuzzleLevel } from '../.test-dist/src/puzzle/levels.js';
 import {
+  activateNextDueStubbornIntruder,
+  completeStubbornEjection,
   createStubbornIntruderSession,
   getStubbornIntruderAtCell,
   getVisibleStubbornIntruders,
+  hitStubbornIntruder,
+  recordStubbornPuzzleAction,
+  recordStubbornValidPlacement,
   stubbornIntruderCount
 } from '../.test-dist/src/traps/stubborn-intruder-engine.js';
 
@@ -61,6 +66,12 @@ function createSession(overrides = {}) {
     orderCellKeys: (keys) => keys,
     ...overrides
   });
+}
+
+function activeSession() {
+  const session = createSession({ validPlacements: 100 });
+  assert.equal(getVisibleStubbornIntruders(session).length, 1);
+  return session;
 }
 
 test('uses the fixed six-percent count with a one-to-two clamp', () => {
@@ -215,4 +226,93 @@ test('visible and target queries include active and ejecting only', () => {
   );
   assert.equal(getStubbornIntruderAtCell(session, '0:1')?.id, 'active');
   assert.equal(getStubbornIntruderAtCell(session, '0:0'), null);
+});
+
+test('valid placements advance counters and activate at most one due intruder', () => {
+  const initial = createSession();
+  assert.ok(initial.intruders.length > 0);
+  const threshold = initial.intruders[0].activationAfterValidPlacements;
+  let current = initial;
+  for (let count = 0; count < threshold; count += 1) {
+    current = recordStubbornValidPlacement(current);
+  }
+
+  assert.equal(current.validPlacements, threshold);
+  assert.equal(current.actionCount, threshold);
+  assert.equal(getVisibleStubbornIntruders(current).length, 1);
+  assert.equal(current.intruders[0].status, 'active');
+});
+
+test('hit timing accepts 80ms and 700ms boundaries while ignoring faster taps', () => {
+  const initial = activeSession();
+  const id = initial.intruders[0].id;
+  const first = hitStubbornIntruder(initial, id, 1_000);
+  assert.equal(first.intruders[0].currentHitStreak, 1);
+  assert.equal(first.intruders[0].lastAcceptedHitAtMs, 1_000);
+
+  const ignored = hitStubbornIntruder(first, id, 1_079);
+  assert.strictEqual(ignored, first);
+
+  const second = hitStubbornIntruder(first, id, 1_080);
+  assert.equal(second.intruders[0].currentHitStreak, 2);
+  assert.equal(second.intruders[0].lastAcceptedHitAtMs, 1_080);
+
+  const third = hitStubbornIntruder(second, id, 1_780);
+  assert.equal(third.intruders[0].currentHitStreak, 3);
+  assert.equal(third.intruders[0].status, 'ejecting');
+});
+
+test('a tap after 701ms starts a new one-hit streak', () => {
+  const initial = activeSession();
+  const id = initial.intruders[0].id;
+  const first = hitStubbornIntruder(initial, id, 2_000);
+  const reset = hitStubbornIntruder(first, id, 2_701);
+
+  assert.equal(reset.intruders[0].currentHitStreak, 1);
+  assert.equal(reset.intruders[0].lastAcceptedHitAtMs, 2_701);
+  assert.equal(reset.intruders[0].status, 'active');
+});
+
+test('ejection completion and repeated invalid hits are idempotent', () => {
+  const initial = activeSession();
+  const id = initial.intruders[0].id;
+  const first = hitStubbornIntruder(initial, id, 100);
+  const second = hitStubbornIntruder(first, id, 200);
+  const ejecting = hitStubbornIntruder(second, id, 300);
+
+  assert.strictEqual(hitStubbornIntruder(ejecting, id, 400), ejecting);
+  assert.strictEqual(hitStubbornIntruder(ejecting, 'missing', 400), ejecting);
+
+  const removed = completeStubbornEjection(ejecting, id);
+  assert.equal(removed.intruders[0].status, 'removed');
+  assert.equal(removed.intruders[0].currentHitStreak, 0);
+  assert.equal(removed.intruders[0].lastAcceptedHitAtMs, null);
+  assert.strictEqual(completeStubbornEjection(removed, id), removed);
+});
+
+test('ordinary puzzle actions reset partial streaks without removing intruders', () => {
+  const initial = activeSession();
+  const id = initial.intruders[0].id;
+  const hit = hitStubbornIntruder(initial, id, 500);
+  const reset = recordStubbornPuzzleAction(hit);
+
+  assert.equal(reset.actionCount, initial.actionCount + 1);
+  assert.equal(reset.intruders[0].status, 'active');
+  assert.equal(reset.intruders[0].currentHitStreak, 0);
+  assert.equal(reset.intruders[0].lastAcceptedHitAtMs, null);
+});
+
+test('removing the visible intruder allows one due scheduled intruder to activate', () => {
+  const initial = activeSession();
+  assert.ok(initial.intruders.length >= 2);
+  const id = initial.intruders[0].id;
+  const first = hitStubbornIntruder(initial, id, 1_000);
+  const second = hitStubbornIntruder(first, id, 1_100);
+  const ejecting = hitStubbornIntruder(second, id, 1_200);
+  const removed = completeStubbornEjection(ejecting, id);
+
+  assert.equal(getVisibleStubbornIntruders(removed).length, 0);
+  const activated = activateNextDueStubbornIntruder(removed);
+  assert.equal(getVisibleStubbornIntruders(activated).length, 1);
+  assert.equal(activated.intruders[1].status, 'active');
 });
