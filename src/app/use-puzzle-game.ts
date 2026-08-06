@@ -121,17 +121,13 @@ export function usePuzzleGame(
   });
   const boardReservedCharacters = useMemo(
     () => Object.freeze(
-      boardIntruderSession.intruders
-        .filter((intruder) => intruder.status !== 'removed')
-        .map((intruder) => intruder.character)
+      boardIntruderSession.intruders.map((intruder) => intruder.character)
     ),
     [boardIntruderSession]
   );
   const boardReservedTargetCellKeys = useMemo(
     () => Object.freeze(
-      boardIntruderSession.intruders
-        .filter((intruder) => intruder.status !== 'removed')
-        .map((intruder) => intruder.targetCellKey)
+      boardIntruderSession.intruders.map((intruder) => intruder.targetCellKey)
     ),
     [boardIntruderSession]
   );
