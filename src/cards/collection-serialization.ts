@@ -4,6 +4,13 @@ import type {
   CardMilestoneGrant,
   PlayerCardInventoryItem
 } from './card-types.js';
+import {
+  milestoneAcquisitionId,
+  milestoneRewardId
+} from './milestone-grants.js';
+
+const ISO_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u;
+const MILESTONE_REWARD_PATTERN = /^card-grant:main-levels:(\d+)$/u;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -14,7 +21,20 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 function isTimestamp(value: unknown): value is string {
-  return isNonEmptyString(value) && Number.isFinite(Date.parse(value));
+  return isNonEmptyString(value) &&
+    ISO_TIMESTAMP_PATTERN.test(value) &&
+    Number.isFinite(Date.parse(value));
+}
+
+function milestoneLevelCountFromRewardId(rewardId: string): number | null {
+  const match = MILESTONE_REWARD_PATTERN.exec(rewardId);
+  if (match === null) return null;
+  const milestoneLevelCount = Number(match[1]);
+  if (!Number.isInteger(milestoneLevelCount) ||
+      milestoneLevelCount <= 0 ||
+      milestoneLevelCount % 10 !== 0 ||
+      milestoneRewardId(milestoneLevelCount) !== rewardId) return null;
+  return milestoneLevelCount;
 }
 
 function freezeAcquisition(
@@ -65,11 +85,13 @@ function parseGrant(value: unknown): CardMilestoneGrant | null {
   if (!Number.isInteger(value.milestoneLevelCount) ||
       (value.milestoneLevelCount as number) <= 0 ||
       (value.milestoneLevelCount as number) % 10 !== 0) return null;
+  const milestoneLevelCount = value.milestoneLevelCount as number;
+  if (value.rewardId !== milestoneRewardId(milestoneLevelCount)) return null;
   if (!isTimestamp(value.createdAt)) return null;
 
   const base = {
     rewardId: value.rewardId,
-    milestoneLevelCount: value.milestoneLevelCount as number,
+    milestoneLevelCount,
     createdAt: value.createdAt
   };
 
@@ -91,7 +113,8 @@ function parseGrant(value: unknown): CardMilestoneGrant | null {
   if (value.status !== 'resolved' && value.status !== 'revealed') return null;
   if (!isTimestamp(value.resolvedAt) ||
       !isNonEmptyString(value.resolvedCardId) ||
-      !isNonEmptyString(value.acquisitionId)) return null;
+      !isNonEmptyString(value.acquisitionId) ||
+      value.acquisitionId !== milestoneAcquisitionId(value.rewardId)) return null;
 
   if (value.status === 'resolved') {
     if (value.revealedAt !== null) return null;
@@ -121,7 +144,9 @@ function parseAcquisition(value: unknown): CardAcquisitionRecord | null {
   if (!isNonEmptyString(value.acquisitionId) ||
       value.method !== 'milestone-reward' ||
       !isTimestamp(value.acquiredAt) ||
-      !isNonEmptyString(value.sourceReference)) return null;
+      !isNonEmptyString(value.sourceReference) ||
+      milestoneLevelCountFromRewardId(value.sourceReference) === null ||
+      value.acquisitionId !== milestoneAcquisitionId(value.sourceReference)) return null;
   return freezeAcquisition({
     acquisitionId: value.acquisitionId,
     method: 'milestone-reward',
