@@ -7,14 +7,16 @@ async function read(path) {
   return readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 }
 
-test('level map renders the level-ten board trap without exposing stubborn mode', async () => {
+test('level map retains board mode and exposes the level-fifteen stubborn mode', async () => {
   const source = await read('src/app/LevelMap.tsx');
   assert.match(source, /isPuzzlePlayModeUnlocked\(progress, 'trap-board'\)/);
   assert.match(source, /getPuzzlePlayModeLockReason\(progress, 'trap-board'\)/);
   assert.match(source, /chooseMode\('trap-board'\)/);
   assert.match(source, />盤面伏字</);
-  assert.equal(source.includes("chooseMode('trap-stubborn')"), false);
-  assert.equal(source.includes('>頑固伏字<'), false);
+  assert.match(source, /isPuzzlePlayModeUnlocked\(progress, 'trap-stubborn'\)/);
+  assert.match(source, /getPuzzlePlayModeLockReason\(progress, 'trap-stubborn'\)/);
+  assert.match(source, /chooseMode\('trap-stubborn'\)/);
+  assert.match(source, />頑固伏字</);
 });
 
 test('puzzle board renders one overlay slot per real cell and maps intruders by target', async () => {
