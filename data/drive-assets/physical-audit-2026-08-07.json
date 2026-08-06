@@ -82,7 +82,7 @@
   "migrationLedgers": [
     {
       "filename": "2026-08-06-phase1-batch0-inventory.json",
-      "status": "planned",
+      "status": "verified",
       "entryCount": 0
     },
     {
