@@ -1,4 +1,4 @@
-export function playCandidateDecoyEjectFeedback(): void {
+export function playTrapEjectFeedback(): void {
   try {
     const context = new AudioContext();
     const oscillator = context.createOscillator();
