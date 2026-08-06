@@ -125,3 +125,49 @@ test('accepts a consistent resolved grant and rejects impossible state combinati
   assert.equal(valid.grants[0].status, 'resolved');
   assert.equal(invalid.grants.length, 0);
 });
+
+test('rejects milestone grants whose reward id does not match the milestone', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingGrant({
+      rewardId: 'card-grant:main-levels:20',
+      milestoneLevelCount: 10
+    })],
+    inventory: [],
+    metadata: { schemaVersion: 1, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
+
+test('rejects resolved grants and inventory with mismatched acquisition ids', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingGrant({
+      status: 'resolved',
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId: 'card-acquisition:card-grant:main-levels:20'
+    })],
+    inventory: [inventoryItem({
+      acquisitionHistory: [{
+        acquisitionId: 'card-acquisition:card-grant:main-levels:20',
+        method: 'milestone-reward',
+        acquiredAt: NOW,
+        sourceReference: 'card-grant:main-levels:10'
+      }]
+    })],
+    metadata: { schemaVersion: 1, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+  assert.equal(state.inventory.length, 0);
+});
+
+test('rejects human-readable timestamps that are not ISO-8601', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingGrant({ createdAt: 'August 6, 2026 13:00 UTC' })],
+    inventory: [],
+    metadata: { schemaVersion: 1, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
