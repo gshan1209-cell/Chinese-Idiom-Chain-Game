@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   DRIVE_ASSET_STATUSES,
@@ -43,7 +44,7 @@ const approved = Object.freeze({
   version: '1.0',
   status: 'approved',
   currentApproved: true,
-  filename: 'CICG_Component_RarityFrame_N_v1.0_Approved.png',
+  filename: 'CICG_CardFrame_Rarity_N_v1.0_Approved.png',
   driveFileId: '1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8',
   parentFolderKey: 'idiom-cards.components.card-frames.approved',
   mimeType: 'image/png',
@@ -141,4 +142,41 @@ test('requires bidirectional supersession links', () => {
     },
   ]);
   assert.ok(issues.some(({ code }) => code === 'broken-supersession'));
+});
+
+test('registers Drive schema and CLI validation contracts', async () => {
+  const packageJson = JSON.parse(await readFile(
+    new URL('../package.json', import.meta.url),
+    'utf8',
+  ));
+
+  assert.equal(
+    packageJson.scripts['validate:drive-assets'],
+    'npm run compile:core && node scripts/validate-drive-assets.mjs',
+  );
+  assert.equal(
+    packageJson.scripts['test:drive-assets'],
+    'npm run compile:core && node --test tests/card-drive-*.test.mjs',
+  );
+
+  for (const filename of [
+    'drive-asset.schema.json',
+    'drive-folder.schema.json',
+    'drive-migration.schema.json',
+  ]) {
+    const schema = JSON.parse(await readFile(
+      new URL(`../data/drive-assets/${filename}`, import.meta.url),
+      'utf8',
+    ));
+    assert.equal(schema.additionalProperties, false);
+    assert.equal(schema.properties.schemaVersion.const, 1);
+  }
+
+  const cli = await readFile(
+    new URL('../scripts/validate-drive-assets.mjs', import.meta.url),
+    'utf8',
+  );
+  assert.match(cli, /\.test-dist\/src\/cards\/drive-assets\/index\.js/u);
+  assert.match(cli, /drive-folders\.json/u);
+  assert.match(cli, /idiom-card-assets\.json/u);
 });
