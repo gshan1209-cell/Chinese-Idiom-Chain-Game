@@ -4,8 +4,9 @@ import type { LevelCompletionResult } from '../domain/progress';
 import { cellKey } from '../domain/puzzle';
 import type { PuzzlePlayMode } from '../domain/trap';
 import { calculateStars } from '../progress/progress-engine';
+import { BoardIntruder } from './BoardIntruder';
 import { CandidateDecoyTile } from './CandidateDecoyTile';
-import { playCandidateDecoyEjectFeedback } from './trap-feedback';
+import { playTrapEjectFeedback } from './trap-feedback';
 import { usePuzzleGame } from './use-puzzle-game';
 import './PuzzleGame.css';
 
@@ -17,6 +18,13 @@ export interface PuzzleGameProps {
   readonly onLevelCompleted: (result: LevelCompletionResult) => void;
   readonly onOpenNextLevel: (levelNumber: number) => void;
 }
+
+const PLAY_MODE_LABELS: Readonly<Record<PuzzlePlayMode, string>> = Object.freeze({
+  standard: '標準模式',
+  'trap-candidates': '候選偽字模式',
+  'trap-board': '盤面伏字模式',
+  'trap-stubborn': '頑固伏字模式'
+});
 
 function starText(stars: number): string {
   return `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`;
@@ -33,6 +41,9 @@ export function PuzzleGame({
   const game = usePuzzleGame(initialLevelNumber, playMode);
   const { board } = game.session;
   const cells = [];
+  const boardIntruderByCell = new Map(
+    game.boardIntruders.map((intruder) => [intruder.targetCellKey, intruder])
+  );
   const reportedLevelRef = useRef<string | null>(null);
   const completionResult: LevelCompletionResult = {
     levelId: game.level.id,
@@ -80,24 +91,37 @@ export function PuzzleGame({
       const selected = game.session.selectedCellKey === key;
       const correct = value !== '' && value === cell.answer;
       const wrong = value !== '' && value !== cell.answer;
+      const boardIntruder = boardIntruderByCell.get(key);
       cells.push(
-        <button
-          className={`puzzle-cell ${cell.fixed ? 'fixed' : ''} ${selected ? 'selected' : ''} ${correct ? 'correct' : ''} ${wrong ? 'wrong' : ''}`}
-          type="button"
-          key={key}
-          disabled={cell.fixed || game.session.status === 'completed'}
-          aria-label={`第 ${row + 1} 列第 ${column + 1} 格${value ? `，目前是${value}` : '，尚未填字'}`}
-          aria-pressed={selected}
-          onClick={() => game.selectCell(key)}
-        >
-          {value || '　'}
-        </button>
+        <div className="puzzle-cell-slot" key={key}>
+          <button
+            className={`puzzle-cell ${cell.fixed ? 'fixed' : ''} ${selected ? 'selected' : ''} ${correct ? 'correct' : ''} ${wrong ? 'wrong' : ''}`}
+            type="button"
+            disabled={cell.fixed || game.session.status === 'completed'}
+            aria-label={`第 ${row + 1} 列第 ${column + 1} 格${value ? `，目前是${value}` : '，尚未填字'}`}
+            aria-pressed={selected}
+            onClick={() => game.selectCell(key)}
+          >
+            {value || '　'}
+          </button>
+          {boardIntruder === undefined ? null : (
+            <BoardIntruder
+              intruder={boardIntruder}
+              onChoose={(id) => {
+                playTrapEjectFeedback();
+                game.chooseBoardIntruder(id);
+              }}
+              onRevealComplete={(id) => game.finishBoardIntruderReveal(id)}
+              onEjectionComplete={(id) => game.finishBoardIntruderEjection(id)}
+            />
+          )}
+        </div>
       );
     }
   }
 
   const finalLevel = game.level.levelNumber === game.totalLevels;
-  const modeLabel = playMode === 'trap-candidates' ? '候選偽字模式' : '標準模式';
+  const modeLabel = PLAY_MODE_LABELS[playMode];
 
   return (
     <main className="app-shell puzzle-shell">
@@ -110,7 +134,7 @@ export function PuzzleGame({
         <button className="text-action" type="button" onClick={() => game.restartLevel()}>重玩</button>
       </header>
 
-      <p className={`puzzle-mode-badge ${playMode === 'trap-candidates' ? 'trap' : 'standard'}`}>
+      <p className={`puzzle-mode-badge ${playMode === 'standard' ? 'standard' : 'trap'}`}>
         {modeLabel}
       </p>
 
@@ -183,7 +207,7 @@ export function PuzzleGame({
                 key={decoy.id}
                 decoy={decoy}
                 onChoose={(id) => {
-                  playCandidateDecoyEjectFeedback();
+                  playTrapEjectFeedback();
                   game.chooseCandidateDecoy(id);
                 }}
                 onEjectionComplete={(id) => game.finishCandidateDecoyEjection(id)}

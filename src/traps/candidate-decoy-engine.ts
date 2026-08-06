@@ -6,6 +6,8 @@ import type {
   CandidateDecoyStatus,
   PuzzlePlayMode
 } from '../domain/trap.js';
+import { usesCandidateDecoys } from './trap-mode.js';
+import { buildSafeTrapCharacters } from './trap-safe-characters.js';
 
 const THRESHOLD_RATIOS = Object.freeze({
   1: Object.freeze([0.25]),
@@ -50,23 +52,6 @@ export function candidateDecoyActivationThresholds(
   );
 }
 
-function safeCharacters(
-  board: PuzzleBoard,
-  idioms: readonly Idiom[]
-): readonly string[] {
-  const forbidden = new Set<string>(board.candidateCharacters);
-  for (const cell of board.cells.values()) forbidden.add(cell.answer);
-
-  const safe = new Set<string>();
-  for (const idiom of idioms) {
-    if (!idiom.enabled) continue;
-    for (const character of idiom.text) {
-      if (!forbidden.has(character)) safe.add(character);
-    }
-  }
-  return Object.freeze([...safe]);
-}
-
 function validateOrderedCharacters(
   safe: readonly string[],
   ordered: readonly string[]
@@ -90,7 +75,7 @@ export function createCandidateDecoySession(
     ? options.validPlacements ?? 0
     : 0;
 
-  if (options.mode !== 'trap-candidates') {
+  if (!usesCandidateDecoys(options.mode)) {
     return Object.freeze({
       levelId: options.board.level.id,
       mode: options.mode,
@@ -99,7 +84,7 @@ export function createCandidateDecoySession(
     });
   }
 
-  const safe = safeCharacters(options.board, options.idioms);
+  const safe = buildSafeTrapCharacters(options.board, options.idioms);
   const ordered = Object.freeze([...options.orderCharacters(safe)]);
   validateOrderedCharacters(safe, ordered);
 
@@ -133,7 +118,7 @@ export function createCandidateDecoySession(
 export function recordValidCandidatePlacement(
   session: CandidateDecoySession
 ): CandidateDecoySession {
-  if (session.mode !== 'trap-candidates') return session;
+  if (!usesCandidateDecoys(session.mode)) return session;
 
   const validPlacements = session.validPlacements + 1;
   const decoys = session.decoys.map((decoy) => {
