@@ -60,3 +60,46 @@ export interface CardDefinitionValidationResult {
   readonly validDefinitions: readonly IdiomCardDefinition[];
   readonly findings: readonly CardDefinitionFinding[];
 }
+
+export type CardGrantStatus = 'pending' | 'resolved' | 'revealed';
+
+export interface CardMilestoneGrant {
+  readonly rewardId: string;
+  readonly milestoneLevelCount: number;
+  readonly status: CardGrantStatus;
+  readonly createdAt: string;
+  readonly resolvedAt: string | null;
+  readonly revealedAt: string | null;
+  readonly resolvedCardId: string | null;
+  readonly acquisitionId: string | null;
+}
+
+export interface CardAcquisitionRecord {
+  readonly acquisitionId: string;
+  readonly method: 'milestone-reward';
+  readonly acquiredAt: string;
+  readonly sourceReference: string;
+}
+
+export interface PlayerCardInventoryItem {
+  readonly cardId: string;
+  readonly ownedCount: number;
+  readonly firstOwnedAt: string;
+  readonly lastOwnedAt: string;
+  readonly acquisitionHistory: readonly CardAcquisitionRecord[];
+}
+
+export interface RandomSource {
+  next(): number;
+}
+
+export interface MilestoneCardPoolEntry {
+  readonly id: string;
+  readonly weight: number;
+}
+
+export interface CardRewardResolution {
+  readonly grant: CardMilestoneGrant;
+  readonly acquisition: CardAcquisitionRecord | null;
+  readonly error: 'invalid-random-value' | null;
+}
