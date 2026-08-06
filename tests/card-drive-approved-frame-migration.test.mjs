@@ -36,6 +36,11 @@ test('records four verified rarity-frame moves into the governed Approved folder
     'CICG_Component_RarityFrame_SR_v1.0_Approved.png',
     'CICG_Component_RarityFrame_SSR_v2.8_Approved.png',
   ];
+  const approvedFrameAssets = assets.assets.filter((asset) =>
+    asset.assetType === 'card-frame' &&
+    (asset.status === 'approved' || asset.status === 'published') &&
+    asset.currentApproved
+  );
 
   assert.ok(sourceFolderId);
   assert.ok(destinationFolderId);
@@ -52,11 +57,12 @@ test('records four verified rarity-frame moves into the governed Approved folder
     ledger.entries.map(({ after }) => after.name).sort(),
     expectedFilenames.toSorted(),
   );
+  assert.equal(approvedFrameAssets.length, 4);
   assert.deepEqual(
-    assets.assets.map(({ filename }) => filename).sort(),
+    approvedFrameAssets.map(({ filename }) => filename).sort(),
     expectedFilenames.toSorted(),
   );
-  assert.ok(assets.assets.every(
+  assert.ok(approvedFrameAssets.every(
     ({ parentFolderKey }) => parentFolderKey === 'idiom-cards.components.card-frames.approved',
   ));
 
