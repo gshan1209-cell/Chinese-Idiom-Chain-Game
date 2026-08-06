@@ -98,6 +98,18 @@ function replaceIntruders(
   return Object.freeze({ ...session, intruders: frozen });
 }
 
+function resetIntruder(
+  intruder: StubbornIntruder,
+  status: StubbornIntruderStatus
+): StubbornIntruder {
+  return Object.freeze({
+    ...intruder,
+    status,
+    currentHitStreak: 0,
+    lastAcceptedHitAtMs: null
+  });
+}
+
 function resetPartialHitStreaks(
   session: StubbornIntruderSession
 ): StubbornIntruderSession {
@@ -110,11 +122,7 @@ function resetPartialHitStreaks(
       ) {
         return intruder;
       }
-      return Object.freeze({
-        ...intruder,
-        currentHitStreak: 0,
-        lastAcceptedHitAtMs: null
-      });
+      return resetIntruder(intruder, 'active');
     })
   );
 }
@@ -265,14 +273,7 @@ export function activateNextDueStubbornIntruder(
   return replaceIntruders(
     session,
     session.intruders.map((intruder, intruderIndex) =>
-      intruderIndex === index
-        ? Object.freeze({
-            ...intruder,
-            status: 'active' as const,
-            currentHitStreak: 0,
-            lastAcceptedHitAtMs: null
-          })
-        : intruder
+      intruderIndex === index ? resetIntruder(intruder, 'active') : intruder
     )
   );
 }
@@ -350,13 +351,59 @@ export function completeStubbornEjection(
   return replaceIntruders(
     session,
     session.intruders.map((intruder, intruderIndex) =>
-      intruderIndex === index
-        ? Object.freeze({
-            ...intruder,
-            status: 'removed' as const,
-            currentHitStreak: 0,
-            lastAcceptedHitAtMs: null
-          })
+      intruderIndex === index ? resetIntruder(intruder, 'removed') : intruder
+    )
+  );
+}
+
+export function reconcileStubbornIntruders(
+  session: StubbornIntruderSession,
+  puzzleSession: PuzzleSession,
+  excludedScheduledTargetCellKeys: readonly string[] = []
+): StubbornIntruderSession {
+  const excluded = new Set(excludedScheduledTargetCellKeys);
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder) => {
+      if (intruder.status === 'removed') return intruder;
+      if (puzzleSession.status === 'completed') {
+        return resetIntruder(intruder, 'removed');
+      }
+
+      const targetFilled = !isCellEmpty(puzzleSession, intruder.targetCellKey);
+      if (targetFilled) {
+        return intruder.status === 'scheduled'
+          ? resetIntruder(intruder, 'removed')
+          : resetIntruder(intruder, 'ejecting');
+      }
+      if (intruder.status === 'scheduled' && excluded.has(intruder.targetCellKey)) {
+        return resetIntruder(intruder, 'removed');
+      }
+      return intruder;
+    })
+  );
+}
+
+export function isStubbornTargetBlocked(
+  session: StubbornIntruderSession,
+  targetCellKey: string
+): boolean {
+  return session.intruders.some(
+    (intruder) =>
+      intruder.targetCellKey === targetCellKey &&
+      isVisibleStatus(intruder.status)
+  );
+}
+
+export function clearStubbornIntruderForHint(
+  session: StubbornIntruderSession,
+  targetCellKey: string
+): StubbornIntruderSession {
+  return replaceIntruders(
+    session,
+    session.intruders.map((intruder) =>
+      intruder.targetCellKey === targetCellKey && intruder.status !== 'removed'
+        ? resetIntruder(intruder, 'removed')
         : intruder
     )
   );
