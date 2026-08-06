@@ -52,6 +52,13 @@ test('collection storage failure is isolated from already completed campaign sta
   assert.match(collectionHook, /setStorageWarning\(COLLECTION_STORAGE_WARNING\)/u);
 });
 
+test('empty official definitions create pending grants without dictionary loading and failed loads can retry', async () => {
+  const collectionHook = await readFile(collectionHookUrl, 'utf8');
+
+  assert.match(collectionHook, /IDIOM_CARD_DEFINITIONS\.length === 0/u);
+  assert.match(collectionHook, /dictionaryPromiseRef\.current = null/u);
+});
+
 test('existing campaign IndexedDB remains version one and card-free', async () => {
   const repository = await readFile(progressRepositoryUrl, 'utf8');
 
