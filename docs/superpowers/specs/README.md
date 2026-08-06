@@ -28,7 +28,8 @@ GitHub main
 8. 2026-08-06-card-template-v2.7-ssr-badge-amendment.md
 9. 2026-08-06-card-rarity-frame-system-amendment.md
 10. 2026-08-06-idiom-card-modularization-design.md
-11. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+11. 2026-08-06-drive-asset-governance-design.md
+12. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 跨聊天產圖、審核、上傳或批次接續時，另須先使用：
@@ -52,6 +53,7 @@ docs/card-prompts/state/current-batch.json
 | `card-template-v2.7-ssr-badge-amendment` | SSR 傳奇級虹彩金龍徽章 |
 | `card-rarity-frame-system-amendment` | N 深翡翠、R 霜藍鋼銀、SR 皇家紫晶、SSR v2.8 虹彩霓虹外框 |
 | `idiom-card-modularization-design` | artwork、component、data、render plan 與 PNG 輸出 |
+| `drive-asset-governance-design` | Drive 資產分層、生命週期、Registry、Migration Ledger 與漂移 Gate |
 
 ## 規範優先序
 
@@ -66,6 +68,7 @@ GitHub main 與最新 Approved 規格
 → 四階稀有度外框系統
 → v2.6 尺寸與發音
 → 元件化架構
+→ Drive 素材治理
 → v2.1 歷史版面
 → Repository-local skill 與批次狀態
 → 個別卡片企劃與 Prompt
@@ -110,16 +113,38 @@ GitHub main 與最新 Approved 規格
 - 只有 Approved 圖卡可以進正式收藏頁、免費卡池或未來商店。
 - 產製 Agent 不得自行把自己的輸出標記為最終 Approved。
 
-## 素材治理
+## Drive 素材治理永久 Gate
+
+- 固定頂層 `00`～`05`、`80_Inbox`、`90_Archive` 不重新命名。
+- 成語圖卡採 type-first：Artwork、Component、Template、Composite 分類後，各自設 `10_Review` 與 `20_Approved`。
+- 所有新素材先進 `80_Inbox/Idiom_Cards/<BatchId>`，不得直接進 Approved。
+- 舊版、Rejected、Unverifiable 與 Legacy 移入 `90_Archive/Idiom_Cards`，不永久刪除。
+- 同一 `assetType + identity` 最多只有一個 `isCurrent = true` 的 Approved master。
+- Drive move 必須保留原 File ID；不得以同名重新上傳假裝搬移。
+- 搬移前必須有 Asset Registry、Folder Registry、Migration Ledger 與 rollback path。
+- 搬移後必須驗證 parent Folder ID、File ID、checksum、大小、MIME type 與 webViewLink。
+- Published 只記錄在 GitHub metadata；不得為發布狀態複製第二份 source master。
+- Blocking drift 未解決時，不得核准新 composite、打包進 PWA 或啟動下一批搬移。
+
+目標結構摘要：
 
 ```text
-80_Inbox/Idiom_Cards/Artworks
-80_Inbox/Idiom_Cards/Components
-80_Inbox/Idiom_Cards/Composites
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Artworks
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Components
-02_UI_UX_And_Visuals/Idiom_Cards/Approved/Composites
-90_Archive/Idiom_Cards
+80_Inbox/Idiom_Cards/<BatchId>/
+
+02_UI_UX_And_Visuals/Idiom_Cards/
+├─ 01_Artworks/{10_Review,20_Approved}
+├─ 02_Components/<ComponentType>/{10_Review,20_Approved}
+├─ 03_Templates/{10_Review,20_Approved}
+├─ 04_Composites/{10_Review,20_Approved}
+└─ 05_Reference_Only
+
+90_Archive/Idiom_Cards/
+```
+
+完整結構、生命週期與搬移 Gate：
+
+```text
+docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
 ```
 
 核准四階外框 master：
@@ -146,7 +171,7 @@ docs/card-prompts/components/rarity-frame-registry-v1.md
 
 ## 禁止事項
 
-- 未讀規格就自行定義稀有度、卡池、產圖或組卡流程。
+- 未讀規格就自行定義稀有度、卡池、產圖、組卡或 Drive 搬移流程。
 - 把 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。
 - 把未授權聯名概念升級為 UR 正式卡。
 - 使用數字聲調、缺少注音／拼音，或輸出舊尺寸。
@@ -155,6 +180,7 @@ docs/card-prompts/components/rarity-frame-registry-v1.md
 - 依稀有度外框自動改寫難易度。
 - 先播放獎勵動畫，再保存抽取與收藏結果。
 - 在圖卡文件 PR 中順便修改主玩法或進度 schema。
+- 沒有 Migration Ledger 就移動、改名、歸檔或重新上傳受管 Drive 素材。
 
 新增或覆寫永久規則時，必須更新本索引與 `AGENTS.md`，並將規格、Implementation Plan 與交付報告分別放在：
 
