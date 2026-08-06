@@ -30,16 +30,32 @@ test('records four verified rarity-frame moves into the governed Approved folder
   const destinationFolderId = folderByKey.get(
     'idiom-cards.components.card-frames.approved',
   )?.driveFolderId;
+  const expectedFilenames = [
+    'CICG_Component_RarityFrame_N_v1.0_Approved.png',
+    'CICG_Component_RarityFrame_R_v1.0_Approved.png',
+    'CICG_Component_RarityFrame_SR_v1.0_Approved.png',
+    'CICG_Component_RarityFrame_SSR_v2.8_Approved.png',
+  ];
 
   assert.ok(sourceFolderId);
   assert.ok(destinationFolderId);
   assert.equal(ledger.status, 'verified');
   assert.equal(ledger.entries.length, 4);
   assert.ok(ledger.entries.every(({ status }) => status === 'verified'));
-  assert.ok(ledger.entries.every(({ operation }) => operation === 'move'));
+  assert.ok(ledger.entries.every(
+    ({ operation }) => operation === 'move-and-rename',
+  ));
   assert.ok(ledger.entries.every(({ before }) => before.parentFolderId === sourceFolderId));
   assert.ok(ledger.entries.every(({ rollback }) => rollback.parentFolderId === sourceFolderId));
   assert.ok(ledger.entries.every(({ after }) => after.parentFolderId === destinationFolderId));
+  assert.deepEqual(
+    ledger.entries.map(({ after }) => after.name).sort(),
+    expectedFilenames.toSorted(),
+  );
+  assert.deepEqual(
+    assets.assets.map(({ filename }) => filename).sort(),
+    expectedFilenames.toSorted(),
+  );
   assert.ok(assets.assets.every(
     ({ parentFolderKey }) => parentFolderKey === 'idiom-cards.components.card-frames.approved',
   ));
