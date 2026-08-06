@@ -74,6 +74,37 @@ function activeSession() {
   return session;
 }
 
+function twoIntruderSession() {
+  return Object.freeze({
+    levelId: 'level-test',
+    mode: 'trap-stubborn',
+    validPlacements: 20,
+    actionCount: 20,
+    intruders: Object.freeze([
+      Object.freeze({
+        id: 'stubborn-1',
+        character: '甲',
+        targetCellKey: '0:0',
+        activationAfterValidPlacements: 5,
+        requiredHitCount: 3,
+        currentHitStreak: 0,
+        lastAcceptedHitAtMs: null,
+        status: 'active'
+      }),
+      Object.freeze({
+        id: 'stubborn-2',
+        character: '乙',
+        targetCellKey: '0:1',
+        activationAfterValidPlacements: 10,
+        requiredHitCount: 3,
+        currentHitStreak: 0,
+        lastAcceptedHitAtMs: null,
+        status: 'scheduled'
+      })
+    ])
+  });
+}
+
 test('uses the fixed six-percent count with a one-to-two clamp', () => {
   assert.equal(stubbornIntruderCount(0), 0);
   assert.equal(stubbornIntruderCount(1), 1);
@@ -303,8 +334,7 @@ test('ordinary puzzle actions reset partial streaks without removing intruders',
 });
 
 test('removing the visible intruder allows one due scheduled intruder to activate', () => {
-  const initial = activeSession();
-  assert.ok(initial.intruders.length >= 2);
+  const initial = twoIntruderSession();
   const id = initial.intruders[0].id;
   const first = hitStubbornIntruder(initial, id, 1_000);
   const second = hitStubbornIntruder(first, id, 1_100);
