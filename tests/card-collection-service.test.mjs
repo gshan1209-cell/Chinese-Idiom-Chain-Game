@@ -123,6 +123,40 @@ test('replaying a resolved reward consumes no random input and never increments 
   assert.equal(replay.state.inventory[0].ownedCount, 1);
 });
 
+test('repairs a resolved grant missing inventory without rerolling the card', async () => {
+  const rewardId = 'card-grant:main-levels:10';
+  const acquisitionId = `card-acquisition:${rewardId}`;
+  const repository = createMemoryCardCollectionRepository(NOW, {
+    grants: [{
+      rewardId,
+      milestoneLevelCount: 10,
+      status: 'resolved',
+      createdAt: NOW,
+      resolvedAt: NOW,
+      revealedAt: null,
+      resolvedCardId: 'card-water-drops-stone',
+      acquisitionId
+    }],
+    inventory: [],
+    metadata: { schemaVersion: 1, updatedAt: NOW }
+  });
+  let calls = 0;
+
+  const result = await syncCardCollectionMilestones(input(repository, 10, {
+    definitions: [approvedCard()],
+    random: { next: () => { calls += 1; return 0.9; } },
+    now: '2026-08-07T13:30:00.000Z'
+  }));
+
+  assert.equal(calls, 0);
+  assert.equal(result.createdGrantCount, 0);
+  assert.equal(result.resolvedGrantCount, 0);
+  assert.equal(result.state.grants[0].resolvedCardId, 'card-water-drops-stone');
+  assert.equal(result.state.inventory[0].cardId, 'card-water-drops-stone');
+  assert.equal(result.state.inventory[0].ownedCount, 1);
+  assert.equal(result.state.inventory[0].acquisitionHistory[0].acquisitionId, acquisitionId);
+});
+
 test('invalid card definitions are reported and never used to fake a reward', async () => {
   const repository = createMemoryCardCollectionRepository(NOW);
   const result = await syncCardCollectionMilestones(input(repository, 10, {
