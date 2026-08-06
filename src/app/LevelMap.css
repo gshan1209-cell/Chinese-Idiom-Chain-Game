@@ -67,6 +67,74 @@
   font-size: clamp(1.5rem, 6vw, 2.2rem);
 }
 
+.play-mode-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1rem, 3vw, 1.4rem);
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 1.2rem;
+}
+
+.play-mode-panel .eyebrow,
+.play-mode-panel h2 {
+  margin: 0;
+  text-align: center;
+}
+
+.play-mode-panel h2 {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+}
+
+.play-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.play-mode-card {
+  display: grid;
+  min-height: 6.5rem;
+  align-content: center;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  color: var(--ink);
+  background: #fffdf8;
+  border: 3px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 0.22rem 0 rgba(124, 45, 18, 0.18);
+}
+
+.play-mode-card strong {
+  font-size: clamp(1.25rem, 4vw, 1.65rem);
+}
+
+.play-mode-card span {
+  font-size: var(--font-supporting);
+  color: var(--muted);
+}
+
+.play-mode-card.selected {
+  background: #fffbeb;
+  border-color: #d97706;
+  outline: 3px solid #fcd34d;
+  outline-offset: 2px;
+}
+
+.play-mode-card.trap-mode.selected {
+  background: #f5f3ff;
+  border-color: #7c3aed;
+  outline-color: #c4b5fd;
+}
+
+.play-mode-card:disabled {
+  color: #78716c;
+  background: #e7e5e4;
+  border-color: #a8a29e;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
 .continue-action {
   justify-self: center;
 }
@@ -168,7 +236,8 @@
     grid-row: 2;
   }
 
-  .chapter-summary {
+  .chapter-summary,
+  .play-mode-grid {
     grid-template-columns: 1fr;
   }
 
