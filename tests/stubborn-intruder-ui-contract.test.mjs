@@ -49,10 +49,9 @@ test('blocked stubborn targets stop normal tile placement before puzzle engine r
 
 test('successful placements and effective actions notify stubborn engine only after puzzle changes', async () => {
   const source = await read('src/app/use-puzzle-game.ts');
-  assert.match(source, /recordValidStubbornPlacement\(result\.session\)/);
-  assert.match(source, /recordStubbornPuzzleAction\(next\)/);
-  assert.match(source, /recordStubbornPuzzleAction\(result\.session\)/);
-  assert.match(source, /recordStubbornPuzzleAction\(next\)/);
+  assert.match(source, /recordValidStubbornPlacement\(result\.session,/);
+  assert.match(source, /recordStubbornPuzzleAction\(next,/);
+  assert.match(source, /recordStubbornPuzzleAction\(result\.session,/);
 });
 
 test('hint clears its stubborn target before committing the filled puzzle session', async () => {
