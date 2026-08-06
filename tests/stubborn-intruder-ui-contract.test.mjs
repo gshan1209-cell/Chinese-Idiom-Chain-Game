@@ -76,3 +76,53 @@ test('stubborn handlers never call puzzle placement or selection functions', asy
   assert.equal(handlers.includes('placePuzzleTile('), false);
   assert.equal(handlers.includes('selectPuzzleCell('), false);
 });
+
+test('level map exposes stubborn mode with level fifteen unlock messaging', async () => {
+  const source = await read('src/app/LevelMap.tsx');
+  assert.match(source, /isPuzzlePlayModeUnlocked\(progress, 'trap-stubborn'\)/);
+  assert.match(source, /getPuzzlePlayModeLockReason\(progress, 'trap-stubborn'\)/);
+  assert.match(source, /chooseMode\('trap-stubborn'\)/);
+  assert.match(source, /頑固伏字/);
+  assert.match(source, /連點三次拔除/);
+});
+
+test('stubborn intruder uses pointer timing, accessible progress and animation completion', async () => {
+  const source = await read('src/app/StubbornIntruder.tsx');
+  assert.match(source, /onPointerDown/);
+  assert.match(source, /event\.stopPropagation\(\)/);
+  assert.match(source, /event\.preventDefault\(\)/);
+  assert.match(source, /performance\.now\(\)/);
+  assert.match(source, /已拔除.*\/3/);
+  assert.match(source, /onAnimationEnd/);
+  assert.match(source, /currentHitStreak/);
+});
+
+test('puzzle board renders stubborn overlays in their real cell slots', async () => {
+  const source = await read('src/app/PuzzleGame.tsx');
+  assert.match(source, /import \{ StubbornIntruder \}/);
+  assert.match(source, /stubbornIntruderByCell/);
+  assert.match(source, /game\.stubbornIntruders/);
+  assert.match(source, /game\.hitStubborn/);
+  assert.match(source, /game\.finishStubbornEjection/);
+});
+
+test('stubborn styling guarantees touch size, hit stages and reduced motion', async () => {
+  const source = await read('src/app/PuzzleGame.css');
+  assert.match(source, /\.stubborn-intruder/);
+  assert.match(source, /min-width:\s*44px/);
+  assert.match(source, /min-height:\s*44px/);
+  assert.match(source, /\.hit-1/);
+  assert.match(source, /\.hit-2/);
+  assert.match(source, /\.stubborn-intruder\.ejecting/);
+  const reduced = source.slice(source.indexOf('@media (prefers-reduced-motion: reduce)'));
+  assert.match(reduced, /\.stubborn-intruder/);
+  assert.match(reduced, /transform:\s*none/);
+});
+
+test('stubborn feedback remains best effort inside player gestures', async () => {
+  const source = await read('src/app/trap-feedback.ts');
+  assert.match(source, /playStubbornHitFeedback/);
+  assert.match(source, /navigator\.vibrate/);
+  assert.match(source, /try \{/);
+  assert.match(source, /catch \{/);
+});
