@@ -98,6 +98,17 @@ test('rejects human-readable release dates that are not ISO-8601', () => {
   assert.ok(result.findings.some((finding) => finding.code === 'invalid-release-window'));
 });
 
+test('rejects a validation clock that is not ISO-8601', () => {
+  const result = validateIdiomCardDefinitions(
+    [validCard()],
+    ACTIVE_IDIOMS,
+    NON_ISO_RELEASE_DATE
+  );
+
+  assert.equal(result.validDefinitions.length, 0);
+  assert.ok(result.findings.some((finding) => finding.code === 'invalid-validation-time'));
+});
+
 test('requires the title to match an enabled source idiom', () => {
   const wrongText = validate([validCard({ title: '破釜沉舟' })]);
   const missingIdiom = validate([validCard({ idiomId: 'missing-idiom' })]);
