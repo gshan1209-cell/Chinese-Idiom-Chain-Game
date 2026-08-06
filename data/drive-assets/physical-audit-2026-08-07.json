@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-08-07T06:05:00+08:00",
+  "driveRootId": "1uF6Gzt8RnLkGAk02e_PXhnMcTHQQ72Nw",
+  "visualsRoot": {
+    "driveFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+    "directChildren": [
+      {
+        "id": "1VorW6bO2jZCDxhjC83qJf2l1TQuhauFm",
+        "name": "Idiom_Cards",
+        "kind": "folder"
+      }
+    ]
+  },
+  "approvedCardFrames": {
+    "folderKey": "idiom-cards.components.card-frames.approved",
+    "driveFolderId": "1RtNhgm93m0EXq3fNJlvuVuIwbWQhL4mj",
+    "files": [
+      {
+        "id": "1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8",
+        "name": "CICG_Component_RarityFrame_N_v1.0_Approved.png",
+        "sizeBytes": 2285281
+      },
+      {
+        "id": "18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR",
+        "name": "CICG_Component_RarityFrame_R_v1.0_Approved.png",
+        "sizeBytes": 2191391
+      },
+      {
+        "id": "1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40",
+        "name": "CICG_Component_RarityFrame_SR_v1.0_Approved.png",
+        "sizeBytes": 2454266
+      },
+      {
+        "id": "1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz",
+        "name": "CICG_Component_RarityFrame_SSR_v2.8_Approved.png",
+        "sizeBytes": 3480599
+      }
+    ]
+  },
+  "reviewAssets": [
+    {
+      "folderKey": "idiom-cards.components.difficulty-badges.review",
+      "driveFolderId": "1EULAzoGG-Adnwha8A6HTFRBfiLPs8d4F",
+      "resourceId": "1azohQXFHLVP5scplRQuJa33h2pUU8qq4",
+      "name": "CICG_Component_DifficultyBadge_E-S_v1.0_Review.jpeg",
+      "kind": "file",
+      "sizeBytes": 403355
+    },
+    {
+      "folderKey": "idiom-cards.templates.review",
+      "driveFolderId": "1z948HUCJA4EY6QkR4sMd9PYGwo0UbCgC",
+      "resourceId": "1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_",
+      "name": "CICG_Card_Templates_v2.6_Review",
+      "kind": "folder",
+      "directChildCount": 0
+    }
+  ],
+  "inbox": {
+    "folderKey": "idiom-cards.inbox",
+    "driveFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+    "directResourceIds": [
+      "1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP",
+      "1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO",
+      "1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB",
+      "1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd",
+      "1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2",
+      "1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51",
+      "1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV"
+    ]
+  },
+  "emptyApprovedFolderKeys": [
+    "idiom-cards.artworks.approved",
+    "idiom-cards.components.rarity-badges.approved",
+    "idiom-cards.components.difficulty-badges.approved",
+    "idiom-cards.components.theme-badges.approved",
+    "idiom-cards.components.motto-plaques.approved",
+    "idiom-cards.components.effect-overlays.approved",
+    "idiom-cards.templates.approved",
+    "idiom-cards.composites.approved"
+  ],
+  "migrationLedgers": [
+    {
+      "filename": "2026-08-06-phase1-batch0-inventory.json",
+      "status": "planned",
+      "entryCount": 0
+    },
+    {
+      "filename": "2026-08-07-phase1-batch1-approved-rarity-frames.json",
+      "status": "verified",
+      "entryCount": 4
+    },
+    {
+      "filename": "2026-08-07-phase1-batch2-review-and-legacy.json",
+      "status": "verified",
+      "entryCount": 9
+    }
+  ]
+}
