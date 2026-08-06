@@ -88,7 +88,7 @@
 
 .play-mode-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
@@ -125,6 +125,12 @@
   background: #f5f3ff;
   border-color: #7c3aed;
   outline-color: #c4b5fd;
+}
+
+.play-mode-card.board-trap-mode.selected {
+  background: #ecfeff;
+  border-color: #0f766e;
+  outline-color: #5eead4;
 }
 
 .play-mode-card:disabled {
@@ -211,6 +217,10 @@
 }
 
 @media (max-width: 50rem) {
+  .play-mode-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .level-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
