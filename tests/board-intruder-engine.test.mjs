@@ -74,9 +74,9 @@ test('uses fixed progressive activation thresholds', () => {
   assert.deepEqual(boardIntruderActivationThresholds(3, 20), [4, 10, 15]);
 });
 
-test('only board mode creates board intruders', () => {
+test('board and stubborn modes create board intruders', () => {
   const { board, puzzleSession } = boardContext();
-  for (const mode of ['standard', 'trap-candidates', 'trap-stubborn']) {
+  for (const mode of ['standard', 'trap-candidates']) {
     const session = createBoardIntruderSession({
       board,
       puzzleSession,
@@ -87,7 +87,9 @@ test('only board mode creates board intruders', () => {
     });
     assert.deepEqual(session.intruders, []);
   }
+
   assert.ok(createSession().intruders.length > 0);
+  assert.ok(createSession({ mode: 'trap-stubborn' }).intruders.length > 0);
 });
 
 test('creates unique safe characters on unique empty fillable targets', () => {
