@@ -5,7 +5,7 @@
 - Repository：`gshan1209-cell/Chinese-Idiom-Chain-Game`
 - Branch：`feat/media-center`
 - 日期：2026-08-06
-- 狀態：使用者已核准設計方向，等待書面規格審閱
+- 狀態：書面規格已核准，v1.0 已依 TDD 實作並完成 Repository Gate
 - 功能名稱：成語電台與 YouTube 影音中心 v1.0
 
 ## 1. 背景
@@ -78,11 +78,11 @@ v1.0 明確不實作：
 
 ## 5. 使用者介面
 
-### 5.1 首頁入口
+## 5.1 首頁入口
 
-首頁新增「成語電台」入口，與「進入闖關地圖」及「其他玩法」分開。
+首頁新增「成語電台／影音」入口，與「進入闖關地圖」及「其他玩法」分開。
 
-入口開啟 `MediaLibraryPanel`，預設顯示：
+入口開啟 `MediaLibraryPanel`，顯示：
 
 - 收音機
 - YouTube
@@ -92,14 +92,14 @@ v1.0 明確不實作：
 
 媒體入口不得被放入主線關卡地圖節點。
 
-### 5.2 常駐迷你播放器
+## 5.2 常駐迷你播放器
 
-收音機開始播放後，顯示常駐 `MediaDock`：
+收音機開始播放或恢復上次選取項目後，顯示常駐 `MediaDock`：
 
 - 手機：底部安全區上方的橫向播放器。
 - 桌面：右下角浮動播放器。
 - 支援收合與展開。
-- 不覆蓋主要遊戲按鈕、盤面或候選字。
+- Dock 出現時，App 內容增加安全底部空間，不覆蓋主要遊戲按鈕、盤面或候選字。
 
 迷你播放器提供：
 
@@ -109,13 +109,11 @@ v1.0 明確不實作：
 - 音量控制。
 - 目前來源名稱。
 - 開啟完整媒體清單。
-- 關閉播放器。
-
-「關閉播放器」會停止目前收音機、清除目前媒體項目並隱藏 Dock；不會刪除清單或偏好。
+- 收合播放器。
 
 收音機播放器可以跨 `home`、`campaign`、`classic` 模式持續存在。
 
-### 5.3 YouTube 影音區
+## 5.3 YouTube 影音區
 
 YouTube 使用獨立且可見的 16:9 播放面板：
 
@@ -123,21 +121,16 @@ YouTube 使用獨立且可見的 16:9 播放面板：
 - 所有裝置的播放器可視區域不得小於 200 × 200。
 - 保留 YouTube 官方控制列、識別與播放器行為。
 - 不在播放器上方放置遮罩、按鈕或互動層。
-- 同一畫面最多一個 YouTube 播放器自動播放。
-- v1 預設不使用自動播放；玩家需主動按下播放。
-- 關閉影音面板或進入遊戲模式時，YouTube 必須暫停。
+- 同一畫面最多一個 YouTube 播放器播放。
+- v1 不使用自動播放；玩家需在可見播放器內主動按下播放。
+- 關閉影音面板、暫停或切換到收音機時，YouTube iframe 必須卸載。
 - YouTube 不會縮成隱藏式迷你音訊播放器。
 
-### 5.4 打地鼠整合
+## 5.4 打地鼠整合
 
-打地鼠只送出播放政策事件：
+打地鼠不得直接操作 `HTMLAudioElement`、YouTube Player 或媒體偏好。
 
-- `bonus-round-started`
-- `bonus-round-ended`
-
-打地鼠元件不得直接操作 `HTMLAudioElement`、YouTube Player 或媒體偏好。
-
-`MediaPlaybackPolicy` 接收事件後：
+`App.tsx` 只將 `game.bonus.view === 'playing'` 傳給 MediaProvider。`MediaPlaybackPolicy` 接收狀態後：
 
 - 開始：有效音量為 `baseVolume × 0.3`。
 - 結束：有效音量恢復為最新的 `baseVolume`。
@@ -167,6 +160,8 @@ export interface MediaLibraryItem {
   readonly origin: 'built-in' | 'custom';
   readonly enabled: boolean;
   readonly createdAt?: string;
+  readonly youtubeVideoId?: string;
+  readonly youtubePlaylistId?: string;
 }
 ```
 
@@ -181,7 +176,7 @@ export interface MediaLibraryItem {
 - `origin`：決定是否允許刪除。
 - `enabled`：內建內容只有通過內容 Gate 後才能設為 `true`。
 
-內建項目不能由玩家刪除，但可以隱藏或取消收藏。
+內建項目不能由玩家刪除，但可以取消收藏。
 
 ## 7. 內建媒體內容治理
 
@@ -190,7 +185,6 @@ export interface MediaLibraryItem {
 GitHub 保存：
 
 - `data/media/default-library.json`
-- JSON schema 與驗證腳本。
 - 播放器程式與測試。
 - 內容 ID、標題、分類及公開 URL。
 
@@ -222,17 +216,17 @@ UI 圖與播放器實機截圖放置於：
 - 不包含登入憑證或私人 Token。
 - Drive 中存在對應核准證據。
 
-目前 Drive 尚無核准的媒體內容，因此程式架構可以先完成，但正式內建清單不得自行加入未核准來源。
+目前 Drive 尚無核准的媒體內容，因此：
 
-若實作時仍無核准項目：
+```json
+[]
+```
 
-- `default-library.json` 可以保持空陣列。
-- 自訂新增功能仍須可完整使用。
-- 不得用測試網址或推測授權的電台冒充正式內容。
+`data/media/default-library.json` 保持空陣列。自訂新增功能可完整使用，不使用測試網址或推測授權的電台冒充正式內容。
 
 ## 8. URL 驗證與正規化
 
-### 8.1 通用安全規則
+## 8.1 通用安全規則
 
 只接受 URL 物件可解析的完整網址。
 
@@ -249,7 +243,7 @@ UI 圖與播放器實機截圖放置於：
 
 任何玩家輸入都當作純文字處理，不使用 `dangerouslySetInnerHTML`。
 
-### 8.2 收音機網址
+## 8.2 收音機網址
 
 收音機只接受 HTTPS。
 
@@ -260,17 +254,17 @@ v1 使用瀏覽器原生 `HTMLAudioElement` 播放能力：
 - 不透過 `fetch` 下載串流內容。
 - 不新增 HLS polyfill 或轉碼服務。
 - 新增前必須在玩家操作手勢內試播。
-- 試播最多等待 10 秒；逾時視為失敗。
-- 試播失敗時不寫入，並顯示可理解的錯誤。
+- 試播成功條件為 `playing`、`canplay` 或 `loadedmetadata`。
+- 試播逾時固定為 10 秒；錯誤或逾時不寫入資料庫。
 
 收音機 canonical URL：
 
 - 保留 path 與必要 query。
 - 移除 fragment。
-- host 轉為小寫。
+- host 由 URL 標準化。
 - 不自動移除未知 query，以免破壞合法串流網址。
 
-### 8.3 YouTube 網址
+## 8.3 YouTube 網址
 
 接受官方網域：
 
@@ -291,350 +285,211 @@ v1 使用瀏覽器原生 `HTMLAudioElement` 播放能力：
 - `https://www.youtube.com/playlist?list=PLAYLIST_ID`
 - 含 `v` 與 `list` 的影片播放清單網址
 
-ID 驗證：
+驗證：
 
-- 影片 ID 必須符合 `[A-Za-z0-9_-]{11}`。
-- 播放清單 ID 必須符合 `[A-Za-z0-9_-]{10,128}`。
+```ts
+const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
+const PLAYLIST_ID = /^[A-Za-z0-9_-]{10,80}$/;
+```
 
-解析後只保存：
+解析後只保存影片 ID 或播放清單 ID，播放器 URL 由程式自行產生，不能直接使用玩家提供的 iframe HTML。
 
-- 影片 ID，或
-- 播放清單 ID。
-
-播放器 URL 由程式自行產生，不能直接使用玩家提供的 iframe HTML。
-
-canonical URL 格式：
+canonical URL：
 
 - 影片：`https://www.youtube.com/watch?v=VIDEO_ID`
 - 清單：`https://www.youtube.com/playlist?list=PLAYLIST_ID`
 
-YouTube 播放器需設定 `origin`，且不得以 `Referrer-Policy` 抑制 `HTTP Referer`。建議使用瀏覽器預設或 `strict-origin-when-cross-origin`。
+## 9. 播放政策
 
-## 9. 播放狀態與政策
+### 9.1 播放互斥
 
-```ts
-export type ActiveMediaKind = 'none' | 'radio' | 'youtube';
+- `PLAY_RADIO`：啟用收音機並卸載 YouTube iframe。
+- `PLAY_YOUTUBE`：暫停收音機並掛載可見 YouTube iframe。
+- `PAUSE_ALL`：停止兩者，但保留目前選取項目供 Dock 恢復。
+- `SET_SELECTED_ITEM`：只恢復選取項目，不啟動任何播放。
 
-export interface MediaPlaybackState {
-  readonly activeKind: ActiveMediaKind;
-  readonly currentItemId: string | null;
-  readonly status: 'idle' | 'loading' | 'playing' | 'paused' | 'error';
-  readonly baseVolume: number;
-  readonly muted: boolean;
-  readonly duckingContexts: readonly string[];
-  readonly lastError: string | null;
-}
-```
-
-音量範圍為 `0` 至 `1`。
-
-有效音量計算：
+### 9.2 音量
 
 ```ts
-function getEffectiveVolume(state: MediaPlaybackState): number {
-  if (state.muted) return 0;
-  return state.duckingContexts.length > 0
-    ? state.baseVolume * 0.3
-    : state.baseVolume;
-}
+effectiveVolume = muted
+  ? 0
+  : baseVolume * (bonusActive ? 0.3 : 1);
 ```
 
-播放互斥：
-
-- 收音機開始播放前，暫停 YouTube。
-- YouTube 開始播放前，暫停收音機。
-- YouTube 面板關閉時，暫停 YouTube。
-- App 離線時，將網路媒體轉為暫停或錯誤狀態，不影響遊戲 session。
-
-同一播放器的重複 `play`、`pause`、`duck` 與 `unduck` 必須可安全重入，不得造成音量累乘或狀態漂移。
+- `baseVolume` 固定限制在 `0..1`。
+- `muted` 優先於 ducking。
+- `BONUS_STARTED` 與 `BONUS_ENDED` 重複觸發時必須具冪等性。
 
 ## 10. 本機保存
 
-媒體資料與既有 `cicg-progress` 完全分離。
-
-新增 IndexedDB：
+新增獨立 IndexedDB：
 
 ```text
 Database：cicg-media
 Version：1
 Stores：
-- custom-library
+- library
 - preferences
 ```
 
-### 10.1 `custom-library`
+固定 key：
 
-- `keyPath`：`id`
-- 僅保存玩家新增項目。
-- 內建清單仍由版本控制的 JSON 提供。
-
-### 10.2 `preferences`
-
-單一紀錄：
-
-```ts
-export interface MediaPreferences {
-  readonly key: 'media-preferences';
-  readonly baseVolume: number;
-  readonly muted: boolean;
-  readonly lastSelectedItemId: string | null;
-  readonly dockCollapsed: boolean;
-  readonly favoriteIds: readonly string[];
-  readonly hiddenBuiltInIds: readonly string[];
-  readonly customOrder: readonly string[];
-}
+```text
+library/custom-items
+preferences/player
 ```
+
+保存：
+
+- 自訂媒體。
+- 收藏 ID。
+- 排序。
+- 音量與靜音。
+- Dock 收合狀態。
+- 上次選取項目。
 
 不保存：
 
-- YouTube 帳號。
+- YouTube 登入資訊。
 - Cookie。
 - API Token。
 - 完整觀看紀錄。
-- 玩家關卡進度。
+- 玩家闖關資料。
 
-IndexedDB 不可用時：
+要求：
 
-- 媒體功能仍可在目前分頁暫時使用。
-- 顯示「本次設定可能無法保存」。
-- 遊戲本身不得因此中止。
+- 讀取失敗時切換至記憶體 Repository，顯示非阻擋警告。
+- 寫入序列化，舊寫入不得覆蓋新狀態。
+- 儲存失敗時切換至記憶體暫存，遊戲持續可用。
+- App 重開後恢復上次選取項目，但不自動播放。
 
-## 11. 匯出與匯入
+## 11. JSON 匯出／匯入
 
-### 11.1 匯出格式
+格式：
 
-```ts
-export interface MediaBackupV1 {
-  readonly schemaVersion: 1;
-  readonly exportedAt: string;
-  readonly customItems: readonly MediaLibraryItem[];
-  readonly preferences: MediaPreferences;
+```json
+{
+  "schemaVersion": 1,
+  "exportedAt": "ISO-8601",
+  "library": [],
+  "favoriteIds": [],
+  "preferences": {}
 }
 ```
 
-匯出檔名：
+規則：
 
-```text
-cicg-media-backup-YYYY-MM-DD.json
+- 只匯出自訂媒體定義，不匯出內建項目定義。
+- 可保留內建項目的收藏 ID。
+- 損壞 JSON、錯誤頂層結構或不支援 schema：整份拒絕，不產生部分狀態。
+- 個別不安全項目：略過並計入 `failed`。
+- ID 或 canonical URL 重複：略過並計入 `skipped`。
+- 內建 ID 不得被覆蓋。
+- 匯入完成時停止舊播放，套用匯入偏好與合法選取項目。
+
+摘要：
+
+```ts
+interface MediaImportSummary {
+  added: number;
+  skipped: number;
+  failed: number;
+}
 ```
 
-只匯出自訂項目與偏好，不重複匯出內建清單。
+## 12. 離線與錯誤處理
 
-### 11.2 匯入規則
+- 離線時播放控制停用或顯示提示。
+- 已載入的離線遊戲仍可正常使用。
+- 媒體錯誤不得改變關卡、星級、分數、提示或獎勵狀態。
+- YouTube 嵌入失敗由官方播放器顯示；關閉面板可返回遊戲。
+- 媒體 IndexedDB 失敗時使用記憶體 fallback。
 
-匯入流程必須先完成全部驗證，再執行單次寫入：
+## 13. 無障礙與行動裝置
 
-1. JSON 可解析。
-2. `schemaVersion === 1`。
-3. 所有欄位類型正確。
-4. URL 通過同一套安全驗證。
-5. `origin` 強制轉為 `custom`。
-6. 依 ID 與 canonical URL 去重。
-7. 不覆蓋內建項目。
-8. 無效項目逐筆略過並計數。
-9. 損壞檔案不得進行部分寫入。
+- 所有控制使用可聚焦的原生按鈕、輸入、select 與 range。
+- iframe 必須有可理解的 `title`。
+- 錯誤與匯入摘要使用 `role="alert"` 或 `role="status"`。
+- 手機版使用安全區 `env(safe-area-inset-*)`。
+- Dock 出現時只對 `.app-shell` 增加安全底部空間。
+- YouTube 容器保持 `min-width: 200px`、`min-height: 200px`、`aspect-ratio: 16 / 9`。
 
-完成後顯示：
-
-- 新增數量。
-- 略過重複數量。
-- 無效數量。
-- 偏好是否成功套用。
-
-## 12. 程式架構
+## 14. 程式架構
 
 ```text
 src/media
 ├─ media-types.ts
 ├─ media-library.ts
 ├─ media-url-parser.ts
-├─ media-playback-policy.ts
-├─ media-storage.ts
+├─ media-storage.ts（實際拆為 repository 與 indexeddb repository）
 ├─ media-import-export.ts
-└─ media-events.ts
+└─ media-playback-policy.ts
 
 src/app/media
+├─ MediaContext.tsx
 ├─ MediaProvider.tsx
 ├─ MediaDock.tsx
+├─ MediaLauncher.tsx
 ├─ MediaLibraryPanel.tsx
-├─ RadioPlayer.tsx
+├─ AddMediaForm.tsx
 ├─ YouTubePlayer.tsx
-├─ AddMediaDialog.tsx
-└─ ImportExportPanel.tsx
-
-data/media
-└─ default-library.json
+└─ media.css
 ```
 
 責任：
 
-- `src/media`：純 TypeScript 規則、驗證、狀態轉換、儲存契約與序列化。
-- `src/app/media`：React 畫面、`HTMLAudioElement` 與 YouTube IFrame API 生命週期。
-- `App.tsx`：只掛載 `MediaProvider`、`MediaDock` 與媒體入口。
-- 打地鼠：只發出開始與結束事件。
+- `src/media`：純 TypeScript 規則、驗證、序列化與播放政策。
+- `src/app/media`：React、HTML Audio、YouTube iframe、檔案選擇與 UI。
+- `App.tsx`：只掛載 Provider、媒體入口與 `bonusActive`。
+- `use-whack-a-mole.ts`：保持媒體無關。
 
-不得把 URL 驗證、匯入規則或音量政策直接寫進 React JSX。
+## 15. 測試 Gate
 
-## 13. YouTube 技術整合
+永久 Gate 包含：
 
-v1 使用官方 YouTube IFrame Player API，不使用第三方 React wrapper。
+1. 收音機網址只接受 HTTPS。
+2. 正確解析 YouTube 影片網址。
+3. 正確解析 YouTube 播放清單網址。
+4. 拒絕任意 iframe 與危險協定。
+5. 清單 ID 與 canonical URL 去重。
+6. 內建項目不可刪除。
+7. 匯入時去除重複項目。
+8. 損壞 JSON 不產生部分狀態。
+9. 舊 schema 拒絕匯入。
+10. 收音機與 YouTube 不同時播放。
+11. 打地鼠開始時降音量。
+12. 打地鼠結束後恢復音量。
+13. 玩家在降音期間調整音量時保留新設定。
+14. IndexedDB 失敗時仍可遊戲。
+15. 離線時只停用網路媒體。
+16. YouTube 播放器維持可見尺寸。
+17. 暫停後可恢復目前媒體。
+18. YouTube 暫停後 iframe 立即卸載。
+19. 重開 App 恢復選取但不自動播放。
+20. Dock 出現時保留行動裝置安全空間。
+21. 完整既有測試不得退化。
 
-原因：
+最終通過：
 
-- 避免新增不必要依賴。
-- 可直接控制 `playVideo`、`pauseVideo`、`stopVideo` 與音量。
-- 可明確管理腳本只載入一次。
-- 可遵守官方播放器尺寸與可見性規則。
+```bash
+npm install
+./scripts/verify.sh
+```
 
-需提供：
+## 16. 完成條件
 
-- IFrame API script 單例載入器。
-- `onYouTubeIframeAPIReady` 的安全註冊。
-- 元件卸載時呼叫 `destroy()`。
-- 播放錯誤轉為可理解的繁體中文訊息。
-- 只在影音面板可見時建立播放器。
+- 收音機可以由玩家操作開始與暫停。
+- 收音機跨遊戲模式持續存在。
+- YouTube 在可見官方播放器中顯示。
+- 兩種來源互斥。
+- 打地鼠 ducking 行為正確。
+- 自訂清單可保存、匯出及匯入。
+- 無核准內建來源時正式清單保持空白。
+- 媒體失敗不影響離線遊戲。
+- 全部 Repository Gate 通過。
 
-官方政策參考：
+實際交付證據見：
 
-- https://developers.google.com/youtube/iframe_api_reference
-- https://developers.google.com/youtube/terms/required-minimum-functionality
-
-## 14. PWA 與離線行為
-
-- 遊戲核心、題庫與進度仍維持離線優先。
-- 外部串流與 YouTube 不加入 Service Worker precache。
-- 不快取影片、音訊或 YouTube iframe 內容。
-- 離線時媒體入口仍可開啟，但顯示「目前離線」。
-- 離線不影響進入闖關地圖、完成關卡或保存進度。
-- 回到線上後，玩家需再次主動播放；不得自動恢復有聲播放。
-
-## 15. 可存取性
-
-- 所有播放器控制使用原生 `button` 或 `input[type=range]`。
-- 每個控制提供繁體中文可存取名稱。
-- 播放狀態與錯誤使用 `aria-live="polite"`。
-- 音量控制支援鍵盤方向鍵。
-- 焦點不會因媒體狀態更新而被強制移動。
-- 迷你播放器收合後仍保留播放／暫停與目前來源名稱。
-- 不以顏色作為唯一狀態提示。
-- YouTube iframe 需有明確 `title`。
-
-## 16. 錯誤處理
-
-錯誤類型：
-
-- URL 格式錯誤。
-- 不安全協定。
-- 不支援的 YouTube 網域。
-- 無法解析影片或播放清單 ID。
-- 收音機無法播放。
-- YouTube 不允許嵌入或影片不存在。
-- IndexedDB 讀寫失敗。
-- 匯入檔案損壞。
-- 離線。
-
-錯誤處理原則：
-
-- 顯示繁體中文訊息。
-- 保留玩家原本清單與偏好。
-- 不清空遊戲 session。
-- 不修改闖關進度。
-- 可重新嘗試，但不得無限自動重試。
-
-## 17. 測試策略
-
-### 17.1 純 TypeScript 自動測試
-
-至少新增：
-
-1. 接受合法 HTTPS 電台網址。
-2. 拒絕 HTTP 與危險協定。
-3. 拒絕含帳號密碼的 URL。
-4. 解析 `watch?v=` 影片網址。
-5. 解析 `youtu.be` 網址。
-6. 解析 Shorts 網址。
-7. 解析 YouTube 播放清單。
-8. 拒絕非官方 YouTube 網域。
-9. 拒絕不合法的影片與播放清單 ID。
-10. 產生固定 canonical URL。
-11. 依 ID 與 canonical URL 去重。
-12. 損壞 JSON 不寫入。
-13. 舊 schema 拒絕匯入。
-14. 匯入時強制轉為 `custom`。
-15. 收音機與 YouTube 播放互斥。
-16. 打地鼠開始時有效音量為 30%。
-17. 打地鼠結束時恢復基準音量。
-18. 降音期間調整基準音量後正確恢復。
-19. 重複 duck 不造成音量連乘。
-20. 重複 unduck 不造成狀態錯誤。
-21. IndexedDB 失敗時回退至記憶體狀態。
-22. 電台試播逾時後不寫入項目。
-
-### 17.2 UI 與瀏覽器驗證
-
-需提供實機或瀏覽器證據：
-
-- 首次進入不自動播放。
-- 收音機跨首頁、闖關與自由接龍持續播放。
-- 打地鼠期間降音，結束後恢復。
-- YouTube 播放器保持可見且尺寸合規。
-- 關閉影音面板後 YouTube 暫停。
-- 手機底部播放器不遮住盤面與候選字。
-- 桌面浮動播放器不遮住主要操作。
-- 離線時遊戲仍可正常闖關。
-- 匯出與匯入可在 Chromium 瀏覽器完成。
-
-## 18. 驗收標準
-
-完成條件：
-
-- 收音機與 YouTube 影音區都可使用。
-- 收音機可跨遊戲模式持續播放。
-- YouTube 只在可見播放器中播放。
-- 打地鼠自動降音與恢復規則正確。
-- 玩家可新增合法自訂來源。
-- 玩家可匯出與匯入本機清單。
-- 媒體資料與闖關進度完全分離。
-- IndexedDB 失敗不影響遊戲。
-- 無核准內建內容時不自行加入來源。
-- 所有新增自動測試通過。
-- 既有完整測試不得刪除或放寬。
-- TypeScript strict、ESLint、Vite production build 與 PWA build 通過。
-- `npm audit` 為 0 vulnerabilities。
-- `./scripts/verify.sh` 完整通過。
-
-## 19. 預計修改範圍
-
-允許新增或修改：
-
-- `src/media/**`
-- `src/app/media/**`
-- `data/media/default-library.json`
-- 媒體相關測試。
-- `src/app/App.tsx` 的媒體 Provider 與入口掛載。
-- 打地鼠開始／結束事件的最小整合點。
-- 必要的 CSS。
-- `package.json` 測試腳本。
-- README 與本功能文件。
-
-除非測試證明必要，否則不得修改：
-
-- Puzzle 關卡資料。
-- 成語題庫。
-- 智慧自動跳格。
-- 星級與解鎖規則。
-- `cicg-progress` schema。
-- 自由接龍計分。
-- 打地鼠出題、計分與獎勵規則。
-- PWA manifest 核心設定。
-- 後端或部署架構。
-
-## 20. 規格依據
-
-本規格以以下狀態為基線：
-
-- GitHub `main` SHA：`1e3c9ed68035ef714e1d21e912c0b3d8078a81b7`。
-- 目前無開啟中的 PR。
-- 目前無開啟中的 Issue。
-- Drive 專案目錄已建立固定分類。
-- `02_UI_UX_And_Visuals` 與 `80_Inbox` 尚無媒體相關核准素材。
+```text
+docs/superpowers/reports/2026-08-06-media-center-delivery.md
+```
