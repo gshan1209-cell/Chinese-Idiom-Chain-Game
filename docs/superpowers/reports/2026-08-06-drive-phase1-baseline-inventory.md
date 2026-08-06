@@ -1,41 +1,94 @@
-# Drive Phase 1 Baseline Inventory Report
+# Drive Phase 1 Baseline Inventory And Topology Report
 
-日期：2026-08-06  
-模式：Read-only inventory  
-狀態：**BLOCKED — 尚不可執行 Phase 1 move**
+日期：2026-08-07  
+模式：Baseline inventory + governed folder topology establishment  
+狀態：**TOPOLOGY READY — 素材搬移仍需 Migration Ledger Gate**
 
-## 1. 掃描範圍
+## 1. 執行範圍
 
-本次只讀掃描涵蓋：
+本次延續唯讀 baseline，建立成語圖卡 Phase 1 的正式 Drive 資料夾拓樸，並將真實 Folder IDs 回寫 GitHub Registry。
 
-- 專案根目錄 `Chinese-Idiom-Chain-Game`
-- `02_UI_UX_And_Visuals`
-- `80_Inbox`
-- `90_Archive`
-- 上述目錄內已知的圖卡、模板、待審批次與歷史備份容器
+本次 Drive mutation 僅限建立空資料夾：
 
-本次沒有建立、移動、重新命名、複製、刪除或改變任何 Drive 權限。
+- 沒有移動或重新命名任何檔案。
+- 沒有複製、重新上傳或刪除素材。
+- 沒有修改分享權限。
+- 沒有把未驗證素材升格為 Approved。
 
-## 2. Baseline 統計
+## 2. Topology 結果
 
 | 項目 | 數量 | 說明 |
 |---|---:|---|
-| 已發現資料夾 | 22 | 全部使用真實 Drive Folder ID 登錄 |
-| 已發現檔案 | 118 | 涵蓋目前指定圖卡素材樹 |
-| 根目錄直接視覺檔 | 9 | N／R／SR／SSR 正式外框及舊版模板等 |
-| Legacy backup 內檔案 | 66 | 4 個直接檔案、2 個 badge reference、1 個 draft、59 個 template experiment |
-| v2.1 容器內檔案 | 6 | 舊命名容器，尚未因資料夾名稱自動升格 |
-| Pending Review 圖卡 | 30 | Batch 01～03，各 10 張 |
-| Archive 內模板 | 7 | Templates v2.5 與 v2.2 |
-| 檔名含 `Approved` | 24 | 檔名不是正式核准證據 |
-| 已完成 checksum 與 PR 證據核對 | 4 | N／R／SR／SSR 外框 master |
+| Registry 資料夾總數 | 60 | 43 個正式 Phase 1 keys + 17 個既有 legacy／專案容器 |
 | Phase 1 必要資料夾 | 43 | Validator 固定要求 |
-| 已存在的必要資料夾 | 4 | `project.root`、`project.visuals`、`project.inbox`、`project.archive` |
-| 尚未建立的必要資料夾 | 39 | 因此 move gate 必須維持 BLOCKED |
+| 已滿足的必要資料夾 | 43 | 全部使用真實 Drive Folder ID |
+| 新建立資料夾 | 38 | 正式視覺樹、Inbox root、Archive 分類 |
+| 沿用既有正式位置 | 1 | `90_Archive/Idiom_Cards` 保留原 Folder ID |
+| missing-required-folder | 0 | Topology Gate 已解除 |
+| 已驗證 Approved masters | 4 | N／R／SR／SSR 外框，尚未搬移 |
+| 檔案搬移紀錄 | 0 | 第一個 move batch 尚未開始 |
 
-## 3. 已驗證 Approved Masters
+原 baseline 判定 39 個 required keys 尚未登錄。執行前發現既有 `90_Archive/Idiom_Cards` 的名稱與 parent 已完全符合正式 archive root，因此採保留 File／Folder ID 的安全方案：
 
-以下四張已下載進唯讀 sandbox 計算 SHA-256，結果與 `docs/card-prompts/components/rarity-frame-registry-v1.md` 完全一致：
+- 不建立第二個同名 archive root。
+- 將原 `legacy.archive.idiom-cards` Registry key 升格為 `idiom-cards.archive`。
+- 其下既有 `Templates_v2.5` 與 `Templates_v2.2` 保持原位，改由正式 archive root 管理。
+- 實際新增 38 個資料夾，另 1 個 required key 由既有資料夾納管。
+
+## 3. 正式 Phase 1 結構
+
+```text
+02_UI_UX_And_Visuals/
+└─ Idiom_Cards/
+   ├─ 00_Readme_And_Shortcuts/
+   ├─ 01_Artworks/
+   │  ├─ 10_Review/
+   │  └─ 20_Approved/
+   ├─ 02_Components/
+   │  ├─ 01_Card_Frames/
+   │  │  ├─ 10_Review/
+   │  │  └─ 20_Approved/
+   │  ├─ 02_Rarity_Badges/
+   │  │  ├─ 10_Review/
+   │  │  └─ 20_Approved/
+   │  ├─ 03_Difficulty_Badges/
+   │  │  ├─ 10_Review/
+   │  │  └─ 20_Approved/
+   │  ├─ 04_Theme_Badges/
+   │  │  ├─ 10_Review/
+   │  │  └─ 20_Approved/
+   │  ├─ 05_Motto_Plaques/
+   │  │  ├─ 10_Review/
+   │  │  └─ 20_Approved/
+   │  └─ 06_Effect_Overlays/
+   │     ├─ 10_Review/
+   │     └─ 20_Approved/
+   ├─ 03_Templates/
+   │  ├─ 10_Review/
+   │  └─ 20_Approved/
+   ├─ 04_Composites/
+   │  ├─ 10_Review/
+   │  └─ 20_Approved/
+   └─ 05_Reference_Only/
+
+80_Inbox/
+└─ Idiom_Cards/
+
+90_Archive/
+└─ Idiom_Cards/
+   ├─ 01_Artworks/
+   ├─ 02_Components/
+   ├─ 03_Templates/
+   ├─ 04_Composites/
+   ├─ 05_Legacy_Flat_Cards/
+   └─ 06_Rejected_And_Unverifiable/
+```
+
+完整 Folder ID 對應以 `data/drive-assets/drive-folders.json` 為唯一機器可讀 Registry。
+
+## 4. 已驗證 Approved Masters
+
+以下四張仍位於 `02_UI_UX_And_Visuals` 根目錄。其 SHA-256、size 與 PR #32 核准表已核對，但尚未執行搬移：
 
 | Rarity | Drive File ID | Size | SHA-256 | 尺寸 |
 |---|---|---:|---|---|
@@ -44,60 +97,46 @@
 | SR | `1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40` | 2,454,266 | `4976cd5ead7042edc24808183ea2415de1491ddd1d9d95b18d889fb0e95de073` | 1024 × 2000 |
 | SSR | `1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz` | 3,480,599 | `8bf608d7ba64b1efe787b8f6e0939c55a7d7623d5d9a791e5a260a144a9b328e` | 1024 × 2000 |
 
-Registry 暫時記錄其實際 parent 為 `project.visuals`。Task 7 建立正式 `idiom-cards.components.card-frames.approved` 後，才可依 Migration Ledger 搬移並更新 parent key。
-
-## 4. 漂移與風險
-
-### 4.1 正式拓樸尚未存在
-
-43 個 Phase 1 folder keys 中只有 4 個真實存在。不得以假 ID 或 placeholder 讓 CI 假性通過。
-
-### 4.2 檔名不是核准證據
-
-目前有 24 個檔名包含 `Approved`，但除上述四張外，尚未完成 checksum、版本、來源與核准證據核對。其餘檔案不得直接登錄為 current Approved master。
-
-### 4.3 重複檔名
-
-`CICG_CardTemplate_Rarity_SSR_v2.2_Approved.png` 在 Legacy backup 中存在兩個不同 Drive File ID，必須在後續分類時比較 checksum 與內容，不得只依檔名去重。
-
-### 4.4 歷史容器混合多種生命週期
-
-`02_UI_UX_And_Visuals` 同時包含正式外框、舊版模板、難易度標籤、Legacy backup 與 Review folder。未完成 Folder Topology 前不執行批次 move。
-
-## 5. Validator 與 CI 狀態
-
-已建立：
-
-- 三份 JSON Schema
-- `npm run test:drive-assets`
-- `npm run validate:drive-assets`
-- Folder／Asset／Migration validators
-- Baseline Registry 與 read-only inventory ledger
-
-目前 baseline 測試應確認：
+正式目的地：
 
 ```text
-folders = 22
+02_UI_UX_And_Visuals/Idiom_Cards/02_Components/01_Card_Frames/20_Approved
+```
+
+在搬移前仍必須建立 batch ledger、before／after／rollback snapshot，並確認原 File ID、size、checksum 與 webViewLink 不變。
+
+## 5. Validator 與永久 CI Gate
+
+目前已建立並啟用：
+
+- 三份 JSON Schema。
+- Asset／Folder／Migration validators。
+- `npm run test:drive-assets`。
+- `npm run validate:drive-assets`。
+- `scripts/verify.sh` 永久執行 `npm run validate:drive-assets`。
+- Baseline／topology regression test 要求：
+
+```text
+folders = 60
 assets = 4
 migration entries = 0
-missing-required-folder = 39
-other folder issues = 0
+missing-required-folder = 0
+folder issues = 0
 asset issues = 0
 migration issues = 0
 ```
 
-`npm run validate:drive-assets` 在 Task 7 建立 39 個真實資料夾前，應以 `missing-required-folder` 返回非零狀態。這是安全 Gate，不是測試故障。
+任何 required folder 被刪除、ID 重複、parent 錯誤、生命週期 role 錯誤或 Registry 漂移，都會讓 CI 失敗。
 
-因此 `scripts/verify.sh` 暫不加入強制 `validate:drive-assets`。Task 7 完成正式 topology、更新 Registry 並驗證 43／43 後，才啟用永久 CI Gate。
+## 6. Remaining Gate
 
-## 6. 下一步 Gate
+Folder topology 已完成，但素材搬移仍維持 **BLOCKED**，直到下一批完成：
 
-Task 7 必須依序完成：
+1. 建立 `2026-08-07-phase1-batch1-approved-rarity-frames.json`。
+2. 對四張 Approved rarity frames 記錄完整 pre-move snapshot 與 rollback path。
+3. 小批次原地 move，保留原 Drive File ID。
+4. 驗證 parent、name、MIME、size、SHA-256 與 webViewLink。
+5. 更新 Asset Registry 的 `parentFolderKey`。
+6. 任一驗證失敗立即 rollback，不開始下一批。
 
-1. 建立 39 個尚缺的真實資料夾。
-2. 將真實 Folder IDs 寫回 `drive-folders.json`。
-3. 確認 `missing-required-folder = 0`。
-4. 把 `npm run validate:drive-assets` 加入 `scripts/verify.sh`。
-5. Registry、Ledger、rollback snapshot 全部通過後，才開始第一個小批次 move。
-
-在上述條件完成前，Drive mutation gate 維持 **BLOCKED**。
+Review、legacy 與未驗證檔案仍不得在 Batch 1 中混入。
