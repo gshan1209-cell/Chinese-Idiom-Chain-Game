@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "project": "Chinese-Idiom-Chain-Game",
+  "activeBatchId": null,
+  "workflowStatus": "ready",
+  "nextAction": "Select or confirm the next batch of idiom cards.",
+  "lastUpdatedAt": "2026-08-06T08:00:00+08:00",
+  "cards": []
+}

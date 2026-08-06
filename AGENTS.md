@@ -102,22 +102,42 @@ npm install
 凡涉及下列任一工作：
 
 - 圖卡企劃、Prompt 或素材產製
+- 產生成語圖卡、繼續產圖或下一批
+- 修正上一批、審核或上傳圖卡
 - 稀有度或難易度
-- 圖卡審核
 - 每十關免費贈卡
 - 收藏頁或卡池
 - 圖卡購買或卡包
 - UR 或外部 IP 聯名
 
-必須依序閱讀：
+必須先使用 Repository-local skill：
+
+```text
+.agents/skills/generating-cicg-idiom-cards/SKILL.md
+```
+
+接著讀取跨聊天狀態：
+
+```text
+docs/card-prompts/state/current-batch.json
+```
+
+當使用者只說「繼續產圖」、「下一批」、「修正上一批」、「審核圖卡」或「上傳素材」時，Agent 必須先依狀態檔接續，不得要求使用者重新貼完整規格。
+
+若狀態檔與 Drive／Manifest 不一致，必須先回報漂移，不得猜測已完成。
+
+圖卡規格依序閱讀：
 
 ```text
 1. docs/superpowers/specs/2026-08-06-idiom-card-rarity-standard-design.md
 2. docs/superpowers/specs/2026-08-06-idiom-card-review-governance-design.md
 3. docs/superpowers/specs/2026-08-06-idiom-card-collection-design.md
+4. docs/superpowers/specs/2026-08-06-idiom-card-collection-data-integrity-amendment.md
+5. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
+6. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-發生衝突時，以上順序即為規範優先序。
+發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、來源、授權或核准證據。
 
 永久規則：
 
@@ -129,8 +149,9 @@ npm install
 - 未取得可稽核授權前，不得製作、發布、發放或販售正式 UR 聯名卡。
 - Review、Rejected、Deprecated、來源未校訂或權利不清的卡不得進入正式卡池。
 - 圖卡必須符合 Approved 模板、直式 `2:3`、繁體中文、人物情境與最下方單行典故來源。
-
-Agent 不得自行把自己產製的圖卡直接標記為最終 Approved。
+- 使用者要求正式產圖時，應使用可用的圖片生成工具，不得只回傳 Prompt 代替成品。
+- 產製 Agent 不得自行把自己的輸出直接標記為最終 Approved。
+- 產圖、審核、上傳或批次狀態改變後，必須更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 Manifest。
 
 ---
 
@@ -141,7 +162,7 @@ GitHub 存放：
 - 程式碼、測試與 CI
 - CSV、JSON、Schema
 - 技術規格與 Implementation Plan
-- 圖卡定義、稀有度理由與審核紀錄
+- 圖卡技能、批次狀態、定義、稀有度理由與審核紀錄
 - Drive File ID、SHA-256 與版本參照
 
 Drive 存放：
