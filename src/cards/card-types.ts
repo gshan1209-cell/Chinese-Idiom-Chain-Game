@@ -103,3 +103,29 @@ export interface CardRewardResolution {
   readonly acquisition: CardAcquisitionRecord | null;
   readonly error: 'invalid-random-value' | null;
 }
+
+export interface CardCollectionMetadata {
+  readonly schemaVersion: 1;
+  readonly updatedAt: string;
+}
+
+export interface CardCollectionState {
+  readonly grants: readonly CardMilestoneGrant[];
+  readonly inventory: readonly PlayerCardInventoryItem[];
+  readonly metadata: CardCollectionMetadata;
+}
+
+export interface CardCollectionTransactionResult<T> {
+  readonly state: CardCollectionState;
+  readonly value: T;
+}
+
+export interface CardCollectionRepository {
+  load(): Promise<CardCollectionState>;
+  transact<T>(
+    operation: (
+      current: CardCollectionState
+    ) => CardCollectionTransactionResult<T>
+  ): Promise<T>;
+  clear(now: string): Promise<void>;
+}
