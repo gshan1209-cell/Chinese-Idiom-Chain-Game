@@ -1,12 +1,20 @@
 import './bonus/bonus.css';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import {
+  useState,
+  type ChangeEvent,
+  type Dispatch,
+  type FormEvent,
+  type SetStateAction
+} from 'react';
 
 import { BonusResult } from './bonus/BonusResult';
 import { EnergyMeter } from './bonus/EnergyMeter';
 import { RewardSelector } from './bonus/RewardSelector';
 import { WhackAMoleBoard } from './bonus/WhackAMoleBoard';
 import { CampaignGame } from './CampaignGame';
+import { MediaLauncher } from './media/MediaLauncher';
+import { MediaProvider } from './media/MediaProvider';
 import { PwaInstallCard } from './PwaInstallCard';
 import { useClassicGame } from './use-classic-game';
 
@@ -17,11 +25,15 @@ const featureCards = [
 ] as const;
 
 type AppMode = 'home' | 'campaign' | 'classic';
+type ClassicGameController = ReturnType<typeof useClassicGame>;
 
-export function App() {
-  const [mode, setMode] = useState<AppMode>('home');
-  const game = useClassicGame();
+interface AppContentProps {
+  readonly mode: AppMode;
+  readonly setMode: Dispatch<SetStateAction<AppMode>>;
+  readonly game: ClassicGameController;
+}
 
+function AppContent({ mode, setMode, game }: AppContentProps) {
   if (mode === 'campaign') {
     return <CampaignGame onExit={() => setMode('home')} />;
   }
@@ -193,6 +205,7 @@ export function App() {
         >
           {game.loading ? '自由接龍載入中…' : '其他玩法：自由接龍＋打地鼠'}
         </button>
+        <MediaLauncher>成語電台／影音</MediaLauncher>
         {game.loadError !== null ? (
           <button className="text-action" type="button" onClick={() => game.retryLoad()}>
             重新載入成語字典
@@ -214,8 +227,19 @@ export function App() {
       </section>
 
       <footer className="site-footer">
-        <p>目前使用本機成語資料，不使用 AI Token，也不會上傳玩家操作。</p>
+        <p>成語遊戲可離線使用；電台與 YouTube 為選用的網路功能。</p>
       </footer>
     </main>
+  );
+}
+
+export function App() {
+  const [mode, setMode] = useState<AppMode>('home');
+  const game = useClassicGame();
+
+  return (
+    <MediaProvider bonusActive={game.bonus.view === 'playing'}>
+      <AppContent mode={mode} setMode={setMode} game={game} />
+    </MediaProvider>
   );
 }

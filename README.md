@@ -2,7 +2,7 @@
 
 **中文成語填填字（CICG）**是一款大字體、離線優先、可安裝至手機主畫面的繁體中文成語填字闖關 PWA。
 
-目前完成 PWA 基礎、離線成語資料、第一章 20 關填字闖關、關卡地圖、星級與 IndexedDB 本機進度保存；自由接龍保留為附加模式，並加入可自行啟動的 15 秒成語打地鼠獎勵關卡。
+目前完成 PWA 基礎、離線成語資料、第一章 20 關填字闖關、關卡地圖、星級與 IndexedDB 本機進度保存；自由接龍保留為附加模式，並加入可自行啟動的 15 秒成語打地鼠獎勵關卡，以及選用的網路收音機與 YouTube 影音中心。
 
 ## 目前完成範圍
 
@@ -18,14 +18,18 @@
 - 自由接龍趣味獎勵：能量槽、自選獎勵、15 秒補最後一字打地鼠。
 - 提示券、失誤護盾、雙倍分數，以及後續限時模式可使用的加時資源。
 - 打地鼠 6／9 洞位、數字鍵 1～9、四級難度、單題輪替與背景暫停防護。
+- 成語電台：HTTPS 網路收音機、跨遊戲畫面播放、音量、靜音、收藏與排序。
+- YouTube 影音區：官方可見 iframe、影片與播放清單連結、播放互斥與安全網址解析。
+- 媒體清單本機保存、JSON 匯出／匯入，以及 IndexedDB 失敗時的記憶體 fallback。
 - Android／Chromium 安裝提示、iPhone／iPad 加入主畫面教學與離線更新提示。
 
 ## 尚未實作
 
 - 第二章與更多關卡。
-- 登入、雲端備份與跨裝置同步。
+- 登入、雲端備份與跨裝置自動同步。
 - 60 秒限時模式與選擇題模式。
 - 成語小冊、發音輔助與完整設定頁。
+- 核准後的正式內建電台／YouTube 清單。
 - Lighthouse、瀏覽器 E2E、Android／iOS 實機與完整離線 PWA 驗收。
 
 ## 快速啟動
@@ -115,6 +119,43 @@
 | 挑戰 | 1.7 秒 | 扣 50 分並減少 1 秒 |
 | 極限 | 1.5 秒 | 減少 1 秒，連擊歸零 |
 
+## 成語電台與 YouTube 影音中心
+
+媒體功能是選用的網路功能，不影響離線成語闖關。
+
+### 播放規則
+
+- 首次開啟 App 不會自動發聲，必須由玩家主動按下播放。
+- HTTPS 收音機開始後，可跨首頁、闖關地圖、關卡與自由接龍持續播放。
+- 打地鼠開始時，收音機有效音量自動降為最新基準音量的 30%；結束後恢復最新基準音量。
+- 收音機與 YouTube 互斥播放；開啟一方會暫停另一方。
+- 暫停後保留目前選取項目，可直接由常駐播放器恢復。
+- 重新開啟 App 時只恢復上次選取項目與偏好，不會自動播放。
+- 離線或網路來源失敗時只停用媒體播放，遊戲仍可正常使用。
+
+### 自訂內容與安全
+
+- 收音機只接受完整 HTTPS URL；拒絕 HTTP、危險協定、帳密網址與 iframe HTML。
+- 新增收音機前會在玩家操作手勢內試播最多 10 秒，成功後才保存。
+- YouTube 只接受官方網域的影片或播放清單網址。
+- YouTube 使用可見的官方 16:9 iframe，最小可視尺寸 200 × 200，不抽取或下載音訊。
+- 目前 Drive 尚無核准的正式媒體來源，因此 `data/media/default-library.json` 保持空陣列；玩家仍可新增自己的連結。
+
+### 本機保存與備份
+
+媒體資料與闖關進度完全分離：
+
+```text
+Database：cicg-media
+Version：1
+Stores：library、preferences
+```
+
+- 保存自訂清單、收藏、排序、音量、靜音、播放器收合狀態與上次選取項目。
+- IndexedDB 不可用或寫入失敗時改用記憶體暫存，不阻擋遊戲。
+- JSON 匯出／匯入只包含自訂媒體、收藏與播放器偏好。
+- 不保存 YouTube 登入資訊、Cookie、API Token 或闖關進度。
+
 ## 成語資料
 
 人工來源：`data/idioms.source.csv`
@@ -135,7 +176,9 @@ src/puzzle       填字關卡、盤面與 session 引擎
 src/progress     星級、解鎖、IndexedDB 與寫入佇列
 src/game         自由接龍引擎
 src/game/bonus   能量、出題、打地鼠回合與獎勵引擎
+src/media        媒體 URL、清單、備份、播放政策與 IndexedDB
 src/app          React UI 與瀏覽器事件 Hook
+src/app/media    收音機、YouTube、媒體面板與常駐播放器
 src/pwa          PWA 安裝與裝置判斷
 ```
 
@@ -145,6 +188,7 @@ src/pwa          PWA 安裝與裝置判斷
 
 - Pull Request CI 會執行 `./scripts/verify.sh`，包含資料建置、全部 Node 測試、TypeScript strict、ESLint 與 production PWA build。
 - 第一章永久 Gate 驗證 20 關、61 個 placement、61 個唯一 `idiomId`、61 個唯一成語文字、來源字典一致性、交叉鏈與逐關可完成性。
+- 媒體永久 Gate 驗證 URL 安全、YouTube ID、清單去重、JSON 匯入匯出、播放互斥、打地鼠降音、本機保存、可見 iframe、選取恢復與行動裝置安全空間。
 
 ## 文件
 
@@ -157,3 +201,6 @@ src/pwa          PWA 安裝與裝置判斷
 - [成語打地鼠交付報告](docs/superpowers/reports/2026-08-05-whack-a-mole-bonus-delivery.md)
 - [第一章成語不重複設計規格](docs/superpowers/specs/2026-08-06-chapter-one-unique-idioms-design.md)
 - [第一章成語不重複實作計畫](docs/superpowers/plans/2026-08-06-chapter-one-unique-idioms.md)
+- [成語電台與 YouTube 影音中心設計規格](docs/superpowers/specs/2026-08-06-media-center-design.md)
+- [成語電台與 YouTube 影音中心實作計畫](docs/superpowers/plans/2026-08-06-media-center.md)
+- [成語電台與 YouTube 影音中心交付報告](docs/superpowers/reports/2026-08-06-media-center-delivery.md)
