@@ -52,13 +52,14 @@ test('campaign defaults to standard and passes the selected mode to map and puzz
   assert.match(source, /playMode=\{playMode\}/);
 });
 
-test('level map exposes phase two modes with unlock protection', async () => {
+test('level map exposes all phase three modes with unlock protection', async () => {
   const source = await read('src/app/LevelMap.tsx');
   assert.match(source, /isPuzzlePlayModeUnlocked/);
   assert.match(source, />標準模式</);
   assert.match(source, />候選偽字</);
   assert.match(source, />盤面伏字</);
-  assert.equal(source.includes('頑固伏字'), false);
+  assert.match(source, />頑固伏字</);
+  assert.match(source, /chooseMode\('trap-stubborn'\)/);
 });
 
 test('candidate tile completes removal only after animation end', async () => {

@@ -26,7 +26,7 @@ function enabledIdiom() {
   });
 }
 
-test('stubborn mode creates no candidate decoys and ignores candidate progress in phase two', () => {
+test('stubborn mode composes candidate decoys and advances candidate progress', () => {
   const level = getPuzzleLevel(1);
   assert.notEqual(level, null);
   const board = buildPuzzleBoard(level);
@@ -37,6 +37,8 @@ test('stubborn mode creates no candidate decoys and ignores candidate progress i
     orderCharacters: (characters) => characters
   });
 
-  assert.deepEqual(session.decoys, []);
-  assert.strictEqual(recordValidCandidatePlacement(session), session);
+  assert.ok(session.decoys.length > 0);
+  const next = recordValidCandidatePlacement(session);
+  assert.notStrictEqual(next, session);
+  assert.equal(next.validPlacements, 1);
 });

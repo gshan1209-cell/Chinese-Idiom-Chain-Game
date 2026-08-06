@@ -6,6 +6,7 @@ import type { PuzzlePlayMode } from '../domain/trap';
 import { calculateStars } from '../progress/progress-engine';
 import { BoardIntruder } from './BoardIntruder';
 import { CandidateDecoyTile } from './CandidateDecoyTile';
+import { StubbornIntruder } from './StubbornIntruder';
 import { playTrapEjectFeedback } from './trap-feedback';
 import { usePuzzleGame } from './use-puzzle-game';
 import './PuzzleGame.css';
@@ -43,6 +44,9 @@ export function PuzzleGame({
   const cells = [];
   const boardIntruderByCell = new Map(
     game.boardIntruders.map((intruder) => [intruder.targetCellKey, intruder])
+  );
+  const stubbornIntruderByCell = new Map(
+    game.stubbornIntruders.map((intruder) => [intruder.targetCellKey, intruder])
   );
   const reportedLevelRef = useRef<string | null>(null);
   const completionResult: LevelCompletionResult = {
@@ -92,6 +96,7 @@ export function PuzzleGame({
       const correct = value !== '' && value === cell.answer;
       const wrong = value !== '' && value !== cell.answer;
       const boardIntruder = boardIntruderByCell.get(key);
+      const stubbornIntruder = stubbornIntruderByCell.get(key);
       cells.push(
         <div className="puzzle-cell-slot" key={key}>
           <button
@@ -113,6 +118,13 @@ export function PuzzleGame({
               }}
               onRevealComplete={(id) => game.finishBoardIntruderReveal(id)}
               onEjectionComplete={(id) => game.finishBoardIntruderEjection(id)}
+            />
+          )}
+          {stubbornIntruder === undefined ? null : (
+            <StubbornIntruder
+              intruder={stubbornIntruder}
+              onHit={(id, nowMs) => game.hitStubborn(id, nowMs)}
+              onEjectionComplete={(id) => game.finishStubbornEjection(id)}
             />
           )}
         </div>

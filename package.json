@@ -24,7 +24,7 @@
     "test:puzzle": "npm run compile:core && node --test tests/puzzle-board.test.mjs tests/puzzle-engine.test.mjs tests/puzzle-levels.test.mjs",
     "test:progress": "npm run compile:core && node --test tests/progress-engine.test.mjs tests/progress-serialization.test.mjs tests/progress-write-queue.test.mjs",
     "test:media": "npm run compile:core && node --test tests/media-*.test.mjs",
-    "test:traps": "npm run compile:core && node --test tests/trap-*.test.mjs tests/candidate-decoy-*.test.mjs tests/board-intruder-*.test.mjs",
+    "test:traps": "npm run compile:core && node --test tests/trap-*.test.mjs tests/candidate-decoy-*.test.mjs tests/board-intruder-*.test.mjs tests/stubborn-intruder-*.test.mjs",
     "test:bonus-energy": "npm run compile:core && node --test tests/bonus-energy.test.mjs",
     "test:game-bonus": "npm run compile:core && node --test tests/game-bonus-integration.test.mjs",
     "test:bonus-question": "npm run compile:core && node --test tests/bonus-question-generator.test.mjs",

@@ -43,7 +43,7 @@ function modeMessage(mode: PuzzlePlayMode): string {
   if (mode === 'trap-board') {
     return '已選擇盤面伏字，候選區與空格都可能出現怪字。';
   }
-  return '此模式尚未開放。';
+  return '已選擇頑固伏字，怪字需要連點三次才能拔除。';
 }
 
 export function LevelMap({
@@ -63,6 +63,8 @@ export function LevelMap({
   const candidateLockReason = getPuzzlePlayModeLockReason(progress, 'trap-candidates');
   const boardModeUnlocked = isPuzzlePlayModeUnlocked(progress, 'trap-board');
   const boardLockReason = getPuzzlePlayModeLockReason(progress, 'trap-board');
+  const stubbornModeUnlocked = isPuzzlePlayModeUnlocked(progress, 'trap-stubborn');
+  const stubbornLockReason = getPuzzlePlayModeLockReason(progress, 'trap-stubborn');
 
   const chooseMode = (mode: PuzzlePlayMode) => {
     if (!isPuzzlePlayModeUnlocked(progress, mode)) {
@@ -141,6 +143,18 @@ export function LevelMap({
             <span>{boardModeUnlocked
               ? '候選區與空格會逐步出現可拔除怪字'
               : boardLockReason}</span>
+          </button>
+          <button
+            className={`play-mode-card trap-mode stubborn-trap-mode ${selectedPlayMode === 'trap-stubborn' ? 'selected' : ''}`}
+            type="button"
+            disabled={!stubbornModeUnlocked}
+            aria-pressed={selectedPlayMode === 'trap-stubborn'}
+            onClick={() => chooseMode('trap-stubborn')}
+          >
+            <strong>頑固伏字</strong>
+            <span>{stubbornModeUnlocked
+              ? '三層陷阱，頑固怪字需連點三次拔除'
+              : stubbornLockReason}</span>
           </button>
         </div>
       </section>

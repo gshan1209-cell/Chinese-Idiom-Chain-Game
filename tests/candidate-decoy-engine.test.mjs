@@ -68,10 +68,11 @@ test('standard mode creates no decoys', () => {
   assert.deepEqual(session.decoys, []);
 });
 
-test('stubborn mode remains candidate-inert during phase two', () => {
+test('stubborn mode composes candidate decoys', () => {
   const session = decoySession(0, 'trap-stubborn');
   assert.equal(session.mode, 'trap-stubborn');
-  assert.deepEqual(session.decoys, []);
+  assert.ok(session.decoys.length > 0);
+  assert.equal(recordValidCandidatePlacement(session).validPlacements, 1);
 });
 
 test('filters disabled idioms, level answers, legal candidates and duplicates', () => {

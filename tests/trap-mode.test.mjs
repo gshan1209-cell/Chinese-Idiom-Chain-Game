@@ -9,7 +9,8 @@ import {
 } from '../.test-dist/src/traps/candidate-decoy-engine.js';
 import {
   usesBoardIntruders,
-  usesCandidateDecoys
+  usesCandidateDecoys,
+  usesStubbornIntruders
 } from '../.test-dist/src/traps/trap-mode.js';
 
 function safeIdiom() {
@@ -30,19 +31,24 @@ function safeIdiom() {
   });
 }
 
-test('phase two mode capabilities are explicit', () => {
+test('phase three mode capabilities are explicit', () => {
   assert.equal(usesCandidateDecoys('standard'), false);
   assert.equal(usesCandidateDecoys('trap-candidates'), true);
   assert.equal(usesCandidateDecoys('trap-board'), true);
-  assert.equal(usesCandidateDecoys('trap-stubborn'), false);
+  assert.equal(usesCandidateDecoys('trap-stubborn'), true);
 
   assert.equal(usesBoardIntruders('standard'), false);
   assert.equal(usesBoardIntruders('trap-candidates'), false);
   assert.equal(usesBoardIntruders('trap-board'), true);
-  assert.equal(usesBoardIntruders('trap-stubborn'), false);
+  assert.equal(usesBoardIntruders('trap-stubborn'), true);
+
+  assert.equal(usesStubbornIntruders('standard'), false);
+  assert.equal(usesStubbornIntruders('trap-candidates'), false);
+  assert.equal(usesStubbornIntruders('trap-board'), false);
+  assert.equal(usesStubbornIntruders('trap-stubborn'), true);
 });
 
-test('board mode composes candidate decoys while stubborn mode stays inert', () => {
+test('board mode composes candidate decoys and stubborn mode keeps them active', () => {
   const level = getPuzzleLevel(1);
   assert.notEqual(level, null);
   const board = buildPuzzleBoard(level);
@@ -62,6 +68,6 @@ test('board mode composes candidate decoys while stubborn mode stays inert', () 
     mode: 'trap-stubborn',
     orderCharacters: (characters) => characters
   });
-  assert.deepEqual(stubbornMode.decoys, []);
-  assert.strictEqual(recordValidCandidatePlacement(stubbornMode), stubbornMode);
+  assert.ok(stubbornMode.decoys.length > 0);
+  assert.equal(recordValidCandidatePlacement(stubbornMode).validPlacements, 1);
 });

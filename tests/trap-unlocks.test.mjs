@@ -57,15 +57,16 @@ test('board traps unlock only after level ten is completed', () => {
   );
 });
 
-test('stubborn traps remain unavailable throughout phase two', () => {
+test('stubborn traps unlock only after level fifteen is completed', () => {
+  const completedFourteen = progressWithCompletedLevels([
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+  ]);
   const completedFifteen = progressWithCompletedLevels([
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
   ]);
-  assert.equal(isPuzzlePlayModeUnlocked(completedFifteen, 'trap-stubborn'), false);
-  assert.equal(
-    getPuzzlePlayModeLockReason(completedFifteen, 'trap-stubborn'),
-    '頑固伏字尚未開放。'
-  );
+
+  assert.equal(isPuzzlePlayModeUnlocked(completedFourteen, 'trap-stubborn'), false);
+  assert.equal(isPuzzlePlayModeUnlocked(completedFifteen, 'trap-stubborn'), true);
 });
 
 test('locked modes expose Traditional Chinese reasons', () => {
@@ -76,5 +77,16 @@ test('locked modes expose Traditional Chinese reasons', () => {
   assert.equal(
     getPuzzlePlayModeLockReason(progressWithCompletedLevels([]), 'trap-board'),
     '完成第 10 關後解鎖盤面伏字。'
+  );
+  assert.equal(
+    getPuzzlePlayModeLockReason(progressWithCompletedLevels([]), 'trap-stubborn'),
+    '完成第 15 關後解鎖頑固伏字。'
+  );
+  assert.equal(
+    getPuzzlePlayModeLockReason(
+      progressWithCompletedLevels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
+      'trap-stubborn'
+    ),
+    null
   );
 });
