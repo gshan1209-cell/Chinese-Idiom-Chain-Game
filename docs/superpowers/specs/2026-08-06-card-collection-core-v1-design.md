@@ -32,10 +32,11 @@ Repository：`gshan1209-cell/Chinese-Idiom-Chain-Game`
 
 ### 2.1 GitHub 與 Drive 現況
 
-- Drive 已有 N／R／SR／SSR 的 v2.1 Approved 模板。
+- 最新正式卡面標準為 v2.6：`1024 × 2000 px`、中央主圖區 `1200 px`、主標下方依序顯示注音橫列與帶聲調漢語拼音橫列。
+- Drive 仍保存 N／R／SR／SSR 的 v2.1 Approved 模板，作為歷史版型與稀有度徽章參考；不得覆寫 v2.6 最新規格。
 - 現有 22 張成語卡在 Manifest 中仍為 `Legacy` 或 `Review`。
 - 現有成語卡來源狀態仍為 `NeedsReview`。
-- 未完成注音、來源、文字與稀有度人工核准的圖卡不得進入正式卡池。
+- 未完成注音、拼音、來源、文字、稀有度與素材人工核准的圖卡不得進入正式卡池。
 - Approved 模板是版面框架，不是可發放圖卡。
 
 因此本階段正式卡池初始值固定為空陣列。
@@ -87,7 +88,7 @@ src/cards/
 責任分離：
 
 - `card-types.ts`：領域型別，不依賴 React、DOM 或 IndexedDB。
-- `card-definition-validator.ts`：正式卡片 allowlist、注音、核准、來源與權重驗證。
+- `card-definition-validator.ts`：正式卡片 allowlist、注音、拼音、核准、來源與權重驗證。
 - `card-pool.ts`：建立合法里程碑卡池。
 - `milestone-grants.ts`：計算應有里程碑、固定 ID 與補發差集。
 - `reward-resolver.ts`：以注入 RNG 執行未持有優先與加權解析。
@@ -130,6 +131,7 @@ export interface IdiomCardDefinition {
   readonly idiomId: string;
   readonly title: string;
   readonly bopomofo: readonly [string, string, string, string];
+  readonly pinyin: readonly [string, string, string, string];
   readonly subtitle: string;
   readonly rarity: CardRarity;
   readonly difficulty: IdiomDifficultyGrade;
@@ -153,7 +155,7 @@ export interface IdiomCardDefinition {
 
 ### 4.1 定義驗證
 
-正式卡片資料採嚴格 allowlist。未知欄位一律拒絕，因此 `pinyin`、`romanization`、`englishPronunciation` 或其他羅馬拼音欄位不能悄悄進入正式資料。
+正式卡片資料採嚴格 allowlist。`pinyin` 是 v2.6 唯一允許的漢語拼音欄位；`romanization`、`englishPronunciation`、`phoneticLatin` 或其他任意羅馬拼音欄位一律拒絕。
 
 每筆卡片必須符合：
 
@@ -161,7 +163,10 @@ export interface IdiomCardDefinition {
 - `idiomId` 指向啟用中的成語資料。
 - `title` 恰好四個繁體中文字，且與對應成語文字一致。
 - `bopomofo` 恰好四筆，依序對應四個國字，每筆非空。
-- 不含任何羅馬拼音欄位。
+- `pinyin` 恰好四筆，依序對應四個國字。
+- `pinyin` 必須使用小寫漢語拼音與正式聲調符號；禁止數字聲調、全大寫、無分字串接或省略核准讀音。
+- 注音與拼音都必須與核准來源一致，不得由 UI 即時計算或猜測。
+- 不得包含 `pinyin` 以外的羅馬拼音欄位。
 - `subtitle`、`storySummary`、`storySource`、`motto` 非空。
 - `imageAsset` 與 `thumbnailAsset` 必須是 Repository 內核准的本機資產路徑，不接受遠端 URL、`data:`、`blob:` 或任意 HTML。
 - `enabled === true`。
@@ -182,7 +187,7 @@ export interface IdiomCardDefinition {
 export const IDIOM_CARD_DEFINITIONS: readonly IdiomCardDefinition[] = [];
 ```
 
-在首張正式卡完成來源、注音、稀有度與素材核准前，該陣列保持空白。
+在首張正式卡完成來源、注音、拼音、稀有度與素材核准前，該陣列保持空白。
 
 ---
 
@@ -321,7 +326,7 @@ export interface PlayerCardInventoryItem {
 
 里程碑卡池只包含通過第 4 節全部驗證的卡片。
 
-現有 Review、Legacy、NeedsReview、未核准稀有度、未校訂注音、模板空框與遠端素材都不得進入卡池。
+現有 Review、Legacy、NeedsReview、未核准稀有度、未校訂注音／拼音、模板空框與遠端素材都不得進入卡池。
 
 ### 8.2 未持有優先
 
@@ -563,25 +568,27 @@ export interface CardCollectionStatus {
 7. 多分頁競爭只保存一筆相同 rewardId。
 8. 正式卡池空白時 grant 保持 pending。
 9. Review、Legacy、NeedsReview 或未核准稀有度卡不得進池。
-10. 四字圖卡缺少任一注音時驗證失敗。
-11. 含羅馬拼音或未知欄位的正式資料被拒絕。
-12. 遠端圖片 URL 或非本機核准資產被拒絕。
-13. 非正整數權重被拒絕。
-14. UR 缺少授權證據時被拒絕。
-15. 未持有卡優先於重複卡。
-16. 注入相同 RNG 時解析結果一致。
-17. RNG 非法時保持 pending。
-18. 同一 rewardId 重放不再次消耗 RNG。
-19. Grant 與 inventory 在同一 transaction 成功。
-20. Transaction 失敗時不產生部分收藏。
-21. 重複 acquisitionId 不增加 ownedCount。
-22. Inventory 的 `ownedCount` 與唯一 acquisition 數量一致。
-23. 收藏失敗不影響已保存關卡完成紀錄。
-24. App 重開後依 progress 補發遺漏 grant。
-25. 不修改 `cicg-progress` database version 1。
-26. 收藏核心不依賴 React、DOM、CSS 或隱式 `Math.random()`。
-27. `IDIOM_CARD_DEFINITIONS` 初始保持空白。
-28. 模板空框、Review 圖與 v1.0 圖卡不得成為可發放卡片。
+10. 四字圖卡缺少任一注音或拼音時驗證失敗。
+11. 正式 `pinyin` 四字對齊且使用小寫聲調符號時通過。
+12. 數字聲調、錯誤分字、未知羅馬拼音欄位或未知資料欄位被拒絕。
+13. 遠端圖片 URL 或非本機核准資產被拒絕。
+14. 非正整數權重被拒絕。
+15. UR 缺少授權證據時被拒絕。
+16. 未持有卡優先於重複卡。
+17. 注入相同 RNG 時解析結果一致。
+18. RNG 非法時保持 pending。
+19. 同一 rewardId 重放不再次消耗 RNG。
+20. Grant 與 inventory 在同一 transaction 成功。
+21. Transaction 失敗時不產生部分收藏。
+22. 重複 acquisitionId 不增加 ownedCount。
+23. Inventory 的 `ownedCount` 與唯一 acquisition 數量一致。
+24. 收藏失敗不影響已保存關卡完成紀錄。
+25. App 重開後依 progress 補發遺漏 grant。
+26. 不修改 `cicg-progress` database version 1。
+27. 收藏核心不依賴 React、DOM、CSS 或隱式 `Math.random()`。
+28. `IDIOM_CARD_DEFINITIONS` 初始保持空白。
+29. 模板空框、Review 圖與 v1.0 圖卡不得成為可發放卡片。
+30. v2.6 發音欄位規則覆寫早期「禁止拼音」條款。
 
 最終必須重新執行：
 
@@ -636,6 +643,7 @@ npm install
 - 收藏保存失敗不破壞主線進度。
 - `cicg-progress` 仍為 version 1。
 - 沒有未核准圖卡被視為正式收藏。
+- 注音與 v2.6 正式拼音欄位均有嚴格 Gate。
 - 全部新增與既有測試、TypeScript、ESLint、Build、PWA、npm audit 通過。
 - 合併前分支 `behind_by = 0`，且沒有未解決 review threads。
 - 完成交付報告與 ChatGPT Audit 後才可 Squash Merge。
