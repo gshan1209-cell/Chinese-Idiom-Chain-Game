@@ -68,6 +68,14 @@ test('standard mode creates no decoys', () => {
   assert.deepEqual(session.decoys, []);
 });
 
+test('future trap modes do not create candidate decoys', () => {
+  for (const mode of ['trap-board', 'trap-stubborn']) {
+    const session = decoySession(0, mode);
+    assert.equal(session.mode, mode);
+    assert.deepEqual(session.decoys, []);
+  }
+});
+
 test('filters disabled idioms, level answers, legal candidates and duplicates', () => {
   const board = levelOneBoard();
   const session = createCandidateDecoySession({
