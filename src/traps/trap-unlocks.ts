@@ -1,0 +1,34 @@
+import type { CampaignProgress } from '../domain/progress.js';
+import type { PuzzlePlayMode } from '../domain/trap.js';
+
+const REQUIRED_LEVEL = Object.freeze({
+  'trap-candidates': 5,
+  'trap-board': 10,
+  'trap-stubborn': 15
+} as const);
+
+export function isPuzzlePlayModeUnlocked(
+  progress: CampaignProgress,
+  mode: PuzzlePlayMode
+): boolean {
+  if (mode === 'standard') return true;
+  const requiredLevel = REQUIRED_LEVEL[mode];
+  const levelId = `level-${String(requiredLevel).padStart(3, '0')}`;
+  return progress.levelProgressById[levelId]?.completed === true;
+}
+
+export function getPuzzlePlayModeLockReason(
+  progress: CampaignProgress,
+  mode: PuzzlePlayMode
+): string | null {
+  if (isPuzzlePlayModeUnlocked(progress, mode)) return null;
+  if (mode === 'standard') return null;
+
+  const requiredLevel = REQUIRED_LEVEL[mode];
+  const label = mode === 'trap-candidates'
+    ? '候選偽字'
+    : mode === 'trap-board'
+      ? '盤面伏字'
+      : '頑固伏字';
+  return `完成第 ${String(requiredLevel)} 關後解鎖${label}。`;
+}
