@@ -29,8 +29,6 @@ Pull Request：#22
 
 ## 2. 正式資料模型
 
-### 圖卡發音與核准
-
 正式圖卡必須包含：
 
 ```ts
@@ -46,7 +44,7 @@ pinyin: readonly [string, string, string, string];
 - UR 需正式授權證據，且不進一般十關卡池。
 - 首版 `IDIOM_CARD_DEFINITIONS` 保持空陣列。
 
-### 里程碑識別
+里程碑：
 
 ```text
 card-grant:main-levels:10
@@ -68,16 +66,9 @@ Stores：grants、inventory、metadata
 Metadata key：collection
 ```
 
-`transact()` 在同一個 IndexedDB readwrite transaction 中：
+`transact()` 在同一 IndexedDB readwrite transaction 中讀取三個 stores、執行 operation 一次並寫回完整 snapshot；只有 `transaction.oncomplete` 才回傳成功。error、abort 或同步例外均拒絕，不宣稱玩家已取得圖卡。
 
-1. 讀取三個 stores。
-2. 解析目前 snapshot。
-3. 同步執行 operation 一次。
-4. 寫回 grants、inventory 與 metadata。
-5. 只有 `transaction.oncomplete` 才回傳成功。
-6. error、abort 或 operation 例外均拒絕，不宣稱玩家已取得圖卡。
-
-既有闖關資料保持不變：
+既有闖關資料保持：
 
 ```text
 Database：cicg-progress
@@ -96,36 +87,27 @@ Key：chapter-1
 | IndexedDB 原子交易 | CI #327 | CI #329 |
 | 收藏服務與闖關保存順序 | CI #332 | CI #335 |
 | 空卡池離線與已解析 Grant 修復 | CI #338 | CI #339 |
+| 文件最新 HEAD | — | CI #342 |
 
 每個 RED 均先確認既有測試保持綠色，新失敗只指向尚未實作或刻意補強的行為。
 
-## 5. CI #339 驗證結果
+## 5. 最終驗證
 
-CI #339 在功能 HEAD `140c51c3db7dedfbf518d9b3da8bf406a4754c35` 成功執行完整 Repository Gate。
+CI #342 已在包含 README、規格索引與本交付報告的最新文件樹成功執行完整 Repository Gate。
 
 - Card tests：50／50 通過。
-- 完整 Node 測試：289 項通過、0 失敗；此數字由同一 CI 的既有 239 項群組與新增 50 項 Card 群組加總。
+- 完整 Node 測試：289 項通過、0 失敗；由既有 239 項測試群組與新增 50 項 Card 群組加總。
 - TypeScript strict：通過。
 - ESLint：通過。
 - Vite production build：通過。
 - PWA Service Worker：成功產生。
 - npm install audit：0 vulnerabilities。
 
-文件最新 HEAD 仍須再執行一次完整 CI，最終合併以該次結果為準。
+最終合併仍須確認 `behind_by = 0`、最新 HEAD 未移動與 review threads 為 0。
 
 ## 6. GitHub／Drive 狀態
 
-### GitHub
-
-功能完成時分支相對最新 `main`：
-
-```text
-behind_by = 0
-```
-
 功能差異集中於 `src/cards`、闖關保存協調、Card 測試及文件。
-
-### Google Drive
 
 Drive 有核准模板與元件化素材治理，但現有成語卡仍缺少可直接進正式里程碑卡池的完整 Approved 證據。Review／Legacy 圖片不會被本功能使用。
 
@@ -150,14 +132,12 @@ src/media/**
 data/idioms.source.csv
 ```
 
-`src/domain/progress.ts` 沒有加入任何卡牌欄位，`cicg-progress` 仍是 version 1。
+`src/domain/progress.ts` 沒有加入卡牌欄位，`cicg-progress` 仍是 version 1。
 
 ## 8. 尚待後續
 
 - 核准首批正式成語圖卡資料與 PWA runtime assets。
-- 圖卡收藏圖鑑頁。
-- 待揭示清單與翻卡動畫。
-- 卡片詳細學習頁。
+- 圖卡收藏圖鑑頁、待揭示清單、翻卡動畫與卡片詳細學習頁。
 - Android／iOS 真機 IndexedDB、多分頁與離線補發證據。
 - 瀏覽器 E2E、Lighthouse 與完整 PWA 實機驗收。
 - 未來指定圖卡或固定內容卡包；不導入付費隨機抽卡。
