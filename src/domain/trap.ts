@@ -49,3 +49,28 @@ export interface BoardIntruderSession {
   readonly actionCount: number;
   readonly intruders: readonly BoardIntruder[];
 }
+
+export type StubbornIntruderStatus =
+  | 'scheduled'
+  | 'active'
+  | 'ejecting'
+  | 'removed';
+
+export interface StubbornIntruder {
+  readonly id: string;
+  readonly character: string;
+  readonly targetCellKey: string;
+  readonly activationAfterValidPlacements: number;
+  readonly requiredHitCount: 3;
+  readonly currentHitStreak: number;
+  readonly lastAcceptedHitAtMs: number | null;
+  readonly status: StubbornIntruderStatus;
+}
+
+export interface StubbornIntruderSession {
+  readonly levelId: string;
+  readonly mode: PuzzlePlayMode;
+  readonly validPlacements: number;
+  readonly actionCount: number;
+  readonly intruders: readonly StubbornIntruder[];
+}
