@@ -6,6 +6,7 @@ import { PUZZLE_LEVELS } from '../puzzle/levels';
 import { LevelMap } from './LevelMap';
 import { PuzzleGame } from './PuzzleGame';
 import { useCampaignProgress } from './use-campaign-progress';
+import { useCardCollection } from './use-card-collection';
 
 export interface CampaignGameProps {
   readonly onExit: () => void;
@@ -15,6 +16,7 @@ type CampaignScreen = 'map' | 'play';
 
 export function CampaignGame({ onExit }: CampaignGameProps) {
   const campaign = useCampaignProgress();
+  const cards = useCardCollection(campaign.progress, campaign.loading);
   const [screen, setScreen] = useState<CampaignScreen>('map');
   const [activeLevelNumber, setActiveLevelNumber] = useState(1);
   const [playMode, setPlayMode] = useState<PuzzlePlayMode>('standard');
@@ -27,7 +29,10 @@ export function CampaignGame({ onExit }: CampaignGameProps) {
   };
 
   const completeLevel = (result: LevelCompletionResult) => {
-    campaign.completeLevel(result);
+    const completion = campaign.completeLevel(result);
+    void completion.persisted
+      .then(() => cards.syncAfterProgressSaved(completion.progress))
+      .catch(() => undefined);
   };
 
   const resetProgress = () => {
