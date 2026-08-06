@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-06T23:15:00+08:00",
+  "folders": [
+    {
+      "folderKey": "project.root",
+      "driveFolderId": "1uF6Gzt8RnLkGAk02e_PXhnMcTHQQ72Nw",
+      "name": "Chinese-Idiom-Chain-Game",
+      "parentFolderKey": null,
+      "lifecycleRole": "root"
+    },
+    {
+      "folderKey": "project.management",
+      "driveFolderId": "1HGywCqfcGPAcUP7WOc2cbdwadhhH-K_q",
+      "name": "00_Project_Management",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.design-specs",
+      "driveFolderId": "1jRlNdGcfgunVzNG8Kc6zEjPXA4WeSlsC",
+      "name": "01_Design_And_Specs",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.visuals",
+      "driveFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+      "name": "02_UI_UX_And_Visuals",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.game-content",
+      "driveFolderId": "1dq9is47CQSlIrQz-hVFnH4x7GIMEVltw",
+      "name": "03_Game_Content_And_Data",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.testing",
+      "driveFolderId": "1q3u3eXoZ9EOiBlVYFqsjXWV_7hVbDjHD",
+      "name": "04_Testing_And_Evidence",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.releases",
+      "driveFolderId": "1OG_EG-A8b985E8fk2y89XYNivFUIxgNC",
+      "name": "05_Releases_And_Store_Assets",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "project.inbox",
+      "driveFolderId": "1h_yncfl1MHcZy7IKrP3dGfmNC5lVGfuV",
+      "name": "80_Inbox",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "inbox"
+    },
+    {
+      "folderKey": "project.archive",
+      "driveFolderId": "1nqvBeExct6jW_1TJ-be_eGZ-wJIK-TJr",
+      "name": "90_Archive",
+      "parentFolderKey": "project.root",
+      "lifecycleRole": "archive"
+    },
+    {
+      "folderKey": "legacy.visuals.templates-v2-6.review",
+      "driveFolderId": "1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_",
+      "name": "CICG_Card_Templates_v2.6_Review",
+      "parentFolderKey": "project.visuals",
+      "lifecycleRole": "review"
+    },
+    {
+      "folderKey": "legacy.visuals.card-assets-backup",
+      "driveFolderId": "1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO",
+      "name": "CICG_Legacy_Card_Assets_Backup",
+      "parentFolderKey": "project.visuals",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.visuals.templates-v2-1",
+      "driveFolderId": "1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB",
+      "name": "CICG_Card_Templates_v2.1_Approved",
+      "parentFolderKey": "project.visuals",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.backup.badge-references",
+      "driveFolderId": "1lVGaYqnWnROae-xNJsCFABpPOUDPjNWq",
+      "name": "badge-references",
+      "parentFolderKey": "legacy.visuals.card-assets-backup",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.backup.idiom-card-drafts",
+      "driveFolderId": "1sftr1bLMKrGk6tCccipE_Cb-Ijbt6Ot-",
+      "name": "idiom-card-drafts",
+      "parentFolderKey": "legacy.visuals.card-assets-backup",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.backup.template-experiments",
+      "driveFolderId": "15o4T3b-6ci2mm8wVHRAWFN73ny4VegYH",
+      "name": "template-experiments",
+      "parentFolderKey": "legacy.visuals.card-assets-backup",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.inbox.pending-review",
+      "driveFolderId": "1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP",
+      "name": "CICG_Idiom_Cards_Pending_Review_2026-08-06",
+      "parentFolderKey": "project.inbox",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.pending.batch-01",
+      "driveFolderId": "1GguTa7uT5LnxPCaLJsW7BDhwJGRFqyVd",
+      "name": "Batch_01_Initial_Layout_Drafts",
+      "parentFolderKey": "legacy.inbox.pending-review",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.pending.batch-02",
+      "driveFolderId": "1zFqygxNn12-VYCL9iv8NZFqfvS7LuUlF",
+      "name": "Batch_02_Layout_And_Zhuyin_Review",
+      "parentFolderKey": "legacy.inbox.pending-review",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.pending.batch-03",
+      "driveFolderId": "1Q8lBIBrOId2lEt0XumrKFlt3-wjBZYpc",
+      "name": "Batch_03_Rarity_Badge_Corrections",
+      "parentFolderKey": "legacy.inbox.pending-review",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.archive.idiom-cards",
+      "driveFolderId": "1HTMdGnQrx9KPdOMOiM30UOIPLRyhb179",
+      "name": "Idiom_Cards",
+      "parentFolderKey": "project.archive",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.archive.templates-v2-5",
+      "driveFolderId": "18BsnJPuh-nar6fdtob4vJcgIl5VlonFN",
+      "name": "Templates_v2.5",
+      "parentFolderKey": "legacy.archive.idiom-cards",
+      "lifecycleRole": "container"
+    },
+    {
+      "folderKey": "legacy.archive.templates-v2-2",
+      "driveFolderId": "1jqq1tEhcfeoCIfv9uAl5YCZUZyq1uA8C",
+      "name": "Templates_v2.2",
+      "parentFolderKey": "legacy.archive.idiom-cards",
+      "lifecycleRole": "container"
+    }
+  ]
+}
