@@ -181,3 +181,17 @@ test('registers Drive schema and CLI validation contracts', async () => {
   assert.match(cli, /drive-folders\.json/u);
   assert.match(cli, /idiom-card-assets\.json/u);
 });
+
+test('keeps migration snapshot types aligned with nullable blocked entries', async () => {
+  const source = await readFile(
+    new URL('../src/cards/drive-assets/drive-asset-types.ts', import.meta.url),
+    'utf8',
+  );
+
+  for (const field of ['before', 'after', 'rollback']) {
+    assert.match(
+      source,
+      new RegExp(`readonly ${field}: DriveResourceSnapshot \\| null;`, 'u'),
+    );
+  }
+});
