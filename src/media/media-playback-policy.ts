@@ -20,6 +20,7 @@ export type MediaPlaybackAction =
   | Readonly<{ type: 'PLAY_RADIO'; itemId: string }>
   | Readonly<{ type: 'PLAY_YOUTUBE'; itemId: string }>
   | Readonly<{ type: 'PAUSE_ALL' }>
+  | Readonly<{ type: 'SET_SELECTED_ITEM'; itemId: string | null }>
   | Readonly<{ type: 'SET_BASE_VOLUME'; volume: number }>
   | Readonly<{ type: 'SET_MUTED'; muted: boolean }>
   | Readonly<{ type: 'BONUS_STARTED' }>
@@ -91,6 +92,14 @@ export function reducePlaybackState(
       return freezeState({
         ...state,
         activeSource: null,
+        radioPlaying: false,
+        youtubePlaying: false
+      });
+    case 'SET_SELECTED_ITEM':
+      return freezeState({
+        ...state,
+        activeSource: null,
+        activeItemId: action.itemId,
         radioPlaying: false,
         youtubePlaying: false
       });
