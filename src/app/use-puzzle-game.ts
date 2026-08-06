@@ -168,16 +168,21 @@ export function usePuzzleGame(
   const removeSelected = useCallback(() => {
     const current = session;
     if (current.selectedCellKey === null) return;
+    const hadValue = current.values[current.selectedCellKey] !== undefined;
     const next = removePuzzleCell(current, current.selectedCellKey);
-    if (next !== current) recordBoardPuzzleAction(next);
+    if (hadValue) recordBoardPuzzleAction(next);
     setSession(next);
-    setFeedback({ tone: 'info', message: '已移除目前格子的文字。' });
+    setFeedback(hadValue
+      ? { tone: 'info', message: '已移除目前格子的文字。' }
+      : { tone: 'info', message: '目前格子沒有可移除的文字。' });
   }, [recordBoardPuzzleAction, session]);
 
   const hint = useCallback(() => {
     const current = session;
     const result = usePuzzleHint(current);
-    if (result.session !== current) recordBoardPuzzleAction(result.session);
+    if (result.hintedCellKey !== null) {
+      recordBoardPuzzleAction(result.session);
+    }
     setSession(result.session);
     setFeedback(result.hintedCellKey === null
       ? { tone: 'info', message: '本關提示已用完，或盤面已經完成。' }
@@ -186,10 +191,13 @@ export function usePuzzleGame(
 
   const clear = useCallback(() => {
     const current = session;
+    const hadValues = Object.keys(current.values).length > 0;
     const next = clearPuzzleEntries(current);
-    if (next !== current) recordBoardPuzzleAction(next);
+    if (hadValues) recordBoardPuzzleAction(next);
     setSession(next);
-    setFeedback({ tone: 'info', message: '已清除本關自行填入的文字。' });
+    setFeedback(hadValues
+      ? { tone: 'info', message: '已清除本關自行填入的文字。' }
+      : { tone: 'info', message: '盤面目前沒有可清除的文字。' });
   }, [recordBoardPuzzleAction, session]);
 
   const shuffleTiles = useCallback(() => {
