@@ -26,19 +26,17 @@ function enabledIdiom() {
   });
 }
 
-test('unimplemented future modes create no candidate decoys and ignore candidate progress', () => {
+test('stubborn mode creates no candidate decoys and ignores candidate progress in phase two', () => {
   const level = getPuzzleLevel(1);
   assert.notEqual(level, null);
   const board = buildPuzzleBoard(level);
+  const session = createCandidateDecoySession({
+    board,
+    idioms: [enabledIdiom()],
+    mode: 'trap-stubborn',
+    orderCharacters: (characters) => characters
+  });
 
-  for (const mode of ['trap-board', 'trap-stubborn']) {
-    const session = createCandidateDecoySession({
-      board,
-      idioms: [enabledIdiom()],
-      mode,
-      orderCharacters: (characters) => characters
-    });
-    assert.deepEqual(session.decoys, []);
-    assert.strictEqual(recordValidCandidatePlacement(session), session);
-  }
+  assert.deepEqual(session.decoys, []);
+  assert.strictEqual(recordValidCandidatePlacement(session), session);
 });
