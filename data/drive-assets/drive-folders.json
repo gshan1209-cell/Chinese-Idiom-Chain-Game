@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-07T05:33:08+08:00",
+  "updatedAt": "2026-08-07T05:58:00+08:00",
   "folders": [
     {
       "folderKey": "project.root",
@@ -69,21 +69,21 @@
       "folderKey": "legacy.visuals.templates-v2-6.review",
       "driveFolderId": "1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_",
       "name": "CICG_Card_Templates_v2.6_Review",
-      "parentFolderKey": "project.visuals",
+      "parentFolderKey": "idiom-cards.templates.review",
       "lifecycleRole": "review"
     },
     {
       "folderKey": "legacy.visuals.card-assets-backup",
       "driveFolderId": "1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO",
       "name": "CICG_Legacy_Card_Assets_Backup",
-      "parentFolderKey": "project.visuals",
+      "parentFolderKey": "idiom-cards.inbox",
       "lifecycleRole": "container"
     },
     {
       "folderKey": "legacy.visuals.templates-v2-1",
       "driveFolderId": "1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB",
       "name": "CICG_Card_Templates_v2.1_Approved",
-      "parentFolderKey": "project.visuals",
+      "parentFolderKey": "idiom-cards.inbox",
       "lifecycleRole": "container"
     },
     {
@@ -111,7 +111,7 @@
       "folderKey": "legacy.inbox.pending-review",
       "driveFolderId": "1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP",
       "name": "CICG_Idiom_Cards_Pending_Review_2026-08-06",
-      "parentFolderKey": "project.inbox",
+      "parentFolderKey": "idiom-cards.inbox",
       "lifecycleRole": "container"
     },
     {
