@@ -12,7 +12,7 @@ export function MediaLauncher({ children }: MediaLauncherProps) {
     <button
       className="secondary-action media-launcher"
       type="button"
-      onClick={media.openPanel}
+      onClick={() => media.openPanel()}
     >
       {children}
     </button>
