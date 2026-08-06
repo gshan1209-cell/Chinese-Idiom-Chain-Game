@@ -15,6 +15,7 @@ import {
   usePuzzleHint
 } from '../puzzle/puzzle-engine';
 import { PUZZLE_LEVELS } from '../puzzle/levels';
+import { useBoardIntruders } from './use-board-intruders';
 import { useCandidateDecoys } from './use-candidate-decoys';
 
 function shuffled<T>(items: readonly T[]): readonly T[] {
@@ -82,6 +83,7 @@ export function usePuzzleGame(
   );
   const {
     visibleDecoys: candidateDecoys,
+    reservedCharacters,
     recordValidPlacement,
     beginEjection,
     completeEjection
@@ -89,6 +91,20 @@ export function usePuzzleGame(
     board: session.board,
     mode: playMode,
     idioms
+  });
+  const {
+    visibleIntruders: boardIntruders,
+    recordValidPlacement: recordValidBoardPlacement,
+    recordPuzzleAction: recordBoardPuzzleAction,
+    beginEjection: beginBoardEjection,
+    completeEjection: completeBoardEjection,
+    completeReveal: completeBoardReveal
+  } = useBoardIntruders({
+    board: session.board,
+    puzzleSession: session,
+    mode: playMode,
+    idioms,
+    excludedCharacters: reservedCharacters
   });
 
   const level = PUZZLE_LEVELS[levelIndex];
@@ -112,7 +128,10 @@ export function usePuzzleGame(
   const chooseTile = useCallback((tileId: string) => {
     const current = session;
     const result = placePuzzleTile(current, tileId);
-    if (result.session !== current) recordValidPlacement();
+    if (result.session !== current) {
+      recordValidPlacement();
+      recordValidBoardPlacement(result.session);
+    }
     setSession(result.session);
 
     if (result.session.status === 'completed') {
@@ -122,7 +141,7 @@ export function usePuzzleGame(
     } else {
       setFeedback({ tone: 'error', message: '這個字不對，可以再選一次或使用提示。' });
     }
-  }, [recordValidPlacement, session]);
+  }, [recordValidBoardPlacement, recordValidPlacement, session]);
 
   const chooseCandidateDecoy = useCallback((id: string) => {
     beginEjection(id);
@@ -133,28 +152,45 @@ export function usePuzzleGame(
     completeEjection(id);
   }, [completeEjection]);
 
+  const chooseBoardIntruder = useCallback((id: string) => {
+    beginBoardEjection(id);
+    setFeedback({ tone: 'success', message: '抓到盤面怪字了！' });
+  }, [beginBoardEjection]);
+
+  const finishBoardIntruderEjection = useCallback((id: string) => {
+    completeBoardEjection(id, session);
+  }, [completeBoardEjection, session]);
+
+  const finishBoardIntruderReveal = useCallback((id: string) => {
+    completeBoardReveal(id);
+  }, [completeBoardReveal]);
+
   const removeSelected = useCallback(() => {
-    setSession((current) => {
-      if (current.selectedCellKey === null) return current;
-      return removePuzzleCell(current, current.selectedCellKey);
-    });
+    const current = session;
+    if (current.selectedCellKey === null) return;
+    const next = removePuzzleCell(current, current.selectedCellKey);
+    if (next !== current) recordBoardPuzzleAction(next);
+    setSession(next);
     setFeedback({ tone: 'info', message: '已移除目前格子的文字。' });
-  }, []);
+  }, [recordBoardPuzzleAction, session]);
 
   const hint = useCallback(() => {
-    setSession((current) => {
-      const result = usePuzzleHint(current);
-      setFeedback(result.hintedCellKey === null
-        ? { tone: 'info', message: '本關提示已用完，或盤面已經完成。' }
-        : { tone: 'success', message: '已替你填入一個正確的字。' });
-      return result.session;
-    });
-  }, []);
+    const current = session;
+    const result = usePuzzleHint(current);
+    if (result.session !== current) recordBoardPuzzleAction(result.session);
+    setSession(result.session);
+    setFeedback(result.hintedCellKey === null
+      ? { tone: 'info', message: '本關提示已用完，或盤面已經完成。' }
+      : { tone: 'success', message: '已替你填入一個正確的字。' });
+  }, [recordBoardPuzzleAction, session]);
 
   const clear = useCallback(() => {
-    setSession((current) => clearPuzzleEntries(current));
+    const current = session;
+    const next = clearPuzzleEntries(current);
+    if (next !== current) recordBoardPuzzleAction(next);
+    setSession(next);
     setFeedback({ tone: 'info', message: '已清除本關自行填入的文字。' });
-  }, []);
+  }, [recordBoardPuzzleAction, session]);
 
   const shuffleTiles = useCallback(() => {
     setSession((current) => reorderPuzzleTiles(current, shuffled));
@@ -177,10 +213,14 @@ export function usePuzzleGame(
     completedIdioms,
     playMode,
     candidateDecoys,
+    boardIntruders,
     selectCell,
     chooseTile,
     chooseCandidateDecoy,
     finishCandidateDecoyEjection,
+    chooseBoardIntruder,
+    finishBoardIntruderEjection,
+    finishBoardIntruderReveal,
     removeSelected,
     hint,
     clear,
