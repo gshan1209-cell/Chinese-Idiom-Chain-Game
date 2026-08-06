@@ -53,13 +53,197 @@ export const REQUIRED_PHASE1_FOLDER_KEYS = [
 export type RequiredPhase1FolderKey =
   (typeof REQUIRED_PHASE1_FOLDER_KEYS)[number];
 
+interface RequiredPhase1FolderContract {
+  readonly name: string;
+  readonly parentFolderKey: string | null;
+}
+
+const REQUIRED_PHASE1_FOLDER_CONTRACTS = {
+  'project.root': {
+    name: 'Chinese-Idiom-Chain-Game',
+    parentFolderKey: null,
+  },
+  'project.visuals': {
+    name: '02_UI_UX_And_Visuals',
+    parentFolderKey: 'project.root',
+  },
+  'project.inbox': {
+    name: '80_Inbox',
+    parentFolderKey: 'project.root',
+  },
+  'project.archive': {
+    name: '90_Archive',
+    parentFolderKey: 'project.root',
+  },
+  'idiom-cards.root': {
+    name: 'Idiom_Cards',
+    parentFolderKey: 'project.visuals',
+  },
+  'idiom-cards.shortcuts': {
+    name: '00_Readme_And_Shortcuts',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.artworks': {
+    name: '01_Artworks',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.artworks.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.artworks',
+  },
+  'idiom-cards.artworks.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.artworks',
+  },
+  'idiom-cards.components': {
+    name: '02_Components',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.components.card-frames': {
+    name: '01_Card_Frames',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.card-frames.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.card-frames',
+  },
+  'idiom-cards.components.card-frames.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.card-frames',
+  },
+  'idiom-cards.components.rarity-badges': {
+    name: '02_Rarity_Badges',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.rarity-badges.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.rarity-badges',
+  },
+  'idiom-cards.components.rarity-badges.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.rarity-badges',
+  },
+  'idiom-cards.components.difficulty-badges': {
+    name: '03_Difficulty_Badges',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.difficulty-badges.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.difficulty-badges',
+  },
+  'idiom-cards.components.difficulty-badges.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.difficulty-badges',
+  },
+  'idiom-cards.components.theme-badges': {
+    name: '04_Theme_Badges',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.theme-badges.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.theme-badges',
+  },
+  'idiom-cards.components.theme-badges.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.theme-badges',
+  },
+  'idiom-cards.components.motto-plaques': {
+    name: '05_Motto_Plaques',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.motto-plaques.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.motto-plaques',
+  },
+  'idiom-cards.components.motto-plaques.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.motto-plaques',
+  },
+  'idiom-cards.components.effect-overlays': {
+    name: '06_Effect_Overlays',
+    parentFolderKey: 'idiom-cards.components',
+  },
+  'idiom-cards.components.effect-overlays.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.components.effect-overlays',
+  },
+  'idiom-cards.components.effect-overlays.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.components.effect-overlays',
+  },
+  'idiom-cards.templates': {
+    name: '03_Templates',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.templates.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.templates',
+  },
+  'idiom-cards.templates.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.templates',
+  },
+  'idiom-cards.composites': {
+    name: '04_Composites',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.composites.review': {
+    name: '10_Review',
+    parentFolderKey: 'idiom-cards.composites',
+  },
+  'idiom-cards.composites.approved': {
+    name: '20_Approved',
+    parentFolderKey: 'idiom-cards.composites',
+  },
+  'idiom-cards.reference-only': {
+    name: '05_Reference_Only',
+    parentFolderKey: 'idiom-cards.root',
+  },
+  'idiom-cards.inbox': {
+    name: 'Idiom_Cards',
+    parentFolderKey: 'project.inbox',
+  },
+  'idiom-cards.archive': {
+    name: 'Idiom_Cards',
+    parentFolderKey: 'project.archive',
+  },
+  'idiom-cards.archive.artworks': {
+    name: '01_Artworks',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+  'idiom-cards.archive.components': {
+    name: '02_Components',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+  'idiom-cards.archive.templates': {
+    name: '03_Templates',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+  'idiom-cards.archive.composites': {
+    name: '04_Composites',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+  'idiom-cards.archive.legacy-flat-cards': {
+    name: '05_Legacy_Flat_Cards',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+  'idiom-cards.archive.rejected-unverifiable': {
+    name: '06_Rejected_And_Unverifiable',
+    parentFolderKey: 'idiom-cards.archive',
+  },
+} as const satisfies Readonly<
+  Record<RequiredPhase1FolderKey, RequiredPhase1FolderContract>
+>;
+
 export type DriveFolderIssueCode =
   | 'missing-required-folder'
   | 'duplicate-drive-folder-id'
   | 'duplicate-folder-key'
   | 'unknown-parent-folder'
   | 'parent-cycle'
-  | 'lifecycle-role-mismatch';
+  | 'lifecycle-role-mismatch'
+  | 'parent-folder-mismatch'
+  | 'folder-name-mismatch';
 
 export interface DriveFolderIssue {
   readonly code: DriveFolderIssueCode;
@@ -99,6 +283,18 @@ function expectedLifecycleRole(folderKey: string): DriveFolderLifecycleRole {
     return 'reference';
   }
   return 'container';
+}
+
+function requiredFolderContract(
+  folderKey: string,
+): RequiredPhase1FolderContract | null {
+  if (!Object.hasOwn(REQUIRED_PHASE1_FOLDER_CONTRACTS, folderKey)) {
+    return null;
+  }
+
+  return REQUIRED_PHASE1_FOLDER_CONTRACTS[
+    folderKey as RequiredPhase1FolderKey
+  ];
 }
 
 function cycleKeys(
@@ -185,6 +381,25 @@ export function validateDriveFolderRegistry(
         folder.folderKey,
         `Parent folder key ${folder.parentFolderKey} 不存在。`,
       ));
+    }
+
+    const contract = requiredFolderContract(folder.folderKey);
+    if (contract !== null) {
+      if (folder.parentFolderKey !== contract.parentFolderKey) {
+        issues.push(issue(
+          'parent-folder-mismatch',
+          folder.folderKey,
+          `Folder ${folder.folderKey} 必須掛在 ${contract.parentFolderKey ?? 'null'}。`,
+        ));
+      }
+
+      if (folder.name !== contract.name) {
+        issues.push(issue(
+          'folder-name-mismatch',
+          folder.folderKey,
+          `Folder ${folder.folderKey} 必須使用名稱 ${contract.name}。`,
+        ));
+      }
     }
 
     const expectedRole = expectedLifecycleRole(folder.folderKey);
