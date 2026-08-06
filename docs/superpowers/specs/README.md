@@ -45,7 +45,8 @@ docs/card-prompts/state/current-batch.json
 3. 2026-08-06-idiom-card-collection-design.md
 4. 2026-08-06-idiom-card-collection-data-integrity-amendment.md
 5. 2026-08-06-card-template-v2.1-layout-amendment.md
-6. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
+6. 2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
+7. 個別圖卡企劃、Prompt、Implementation Plan 與素材證據
 ```
 
 ### 規格用途
@@ -56,8 +57,9 @@ docs/card-prompts/state/current-batch.json
 | `2026-08-06-idiom-card-rarity-standard-design.md` | 定義 N／R／SR／SSR／UR、正面意義判定、UR 聯名授權 Gate |
 | `2026-08-06-idiom-card-review-governance-design.md` | 定義預檢、內容、視覺、權利、發布與版本審核流程 |
 | `2026-08-06-idiom-card-collection-design.md` | 定義每十關免費贈卡、收藏頁、資料模型與未來固定商品購買 |
-| `2026-08-06-idiom-card-collection-data-integrity-amendment.md` | 鎖定逐字注音資料模型與先保存、後揭示的冪等獎勵交易 |
-| `2026-08-06-card-template-v2.1-layout-amendment.md` | 鎖定直立注音、禁用羅馬拼音、典故區及低高度直式箴言版型 |
+| `2026-08-06-idiom-card-collection-data-integrity-amendment.md` | 定義逐字注音與先保存、後揭示的冪等獎勵交易；其中禁止拼音顯示的舊條款由 v2.6 覆寫 |
+| `2026-08-06-card-template-v2.1-layout-amendment.md` | 歷史版型基礎：典故區、主題徽章與低高度直式箴言 |
+| `2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` | 鎖定 `1024 × 2000`、中央主圖 `1200 px`、注音橫列與帶聲調漢語拼音橫列 |
 
 ### 規範優先序
 
@@ -69,7 +71,8 @@ GitHub main 與最新 Approved 規格
 → 審核治理
 → 收藏資料完整性增補
 → 收藏與里程碑贈卡
-→ 卡牌模板版面增補
+→ v2.6 卡牌模板增補
+→ v2.1 歷史版面增補
 → Repository-local skill 與批次狀態
 → 個別卡片企劃與 Prompt
 ```
@@ -81,7 +84,9 @@ GitHub main 與最新 Approved 規格
 - 收藏規格第 3.1 節的舊句「稀有度描述卡牌收藏價值與視覺規格」已被稀有度標準取代。
 - 正確規則：N～SSR 主要依成語正面意義、勵志程度、精神象徵、共鳴力與代表性判定。
 - UR 是正式授權 IP 聯名的例外等級，不得進入一般里程碑卡池。
-- 圖卡定義必須包含四筆逐字注音，不得保存或顯示羅馬拼音欄位。
+- v2.6 正式圖卡尺寸固定為 `1024 × 2000 px`，不再使用 `2:3` 或 `1024 × 1536`。
+- v2.6 上方資訊區為 `360 px`、中央主圖區為 `1200 px`、下方內容區為 `440 px`。
+- v2.6 主標下方第一列為逐字對齊注音，第二列為小寫、帶聲調符號的漢語拼音。
 - 里程碑圖卡必須先固定並持久化 rewardId、resolvedCardId 與 acquisitionId，確認成功後才播放揭示動畫。
 
 ---
@@ -93,8 +98,9 @@ GitHub main 與最新 Approved 規格
 - `SSR` 必須有正面語義與精神價值理由，不能只因畫面華麗。
 - `UR` 只保留給取得正式授權的外部 IP 聯名。
 - 未授權的角色、名稱、Logo、服裝辨識元素與官方視覺不得進入正式素材。
-- 圖卡必須為直式 `2:3`，且情境插圖必須有人物。
-- 四字成語旁必須逐字配置直立注音；禁止漢語拼音與其他羅馬拼音。
+- 圖卡固定為 `1024 × 2000 px`，且情境插圖必須有人物。
+- 中央主圖區固定 `y = 360–1559`，高度 `1200 px`。
+- 四字主標下方必須依序顯示注音橫列與帶聲調漢語拼音橫列。
 - 典故來源須完成校訂，並以卡面最下方小字單行呈現。
 - 右下箴言使用貼合文字的低高度直式牌匾，不得留下大面積空白。
 - 只有 `Approved` 圖卡可以進入正式收藏頁、免費卡池或未來商店。
@@ -122,10 +128,12 @@ Google Drive 專案：
 90_Archive/Idiom_Cards
 ```
 
-核准標準模板：
+核准 v2.6 SSR 標準模板：
 
 ```text
-CICG_CardTemplate_IdiomCard_v1.0_Approved.png
+CICG_CardTemplate_Rarity_SSR_v2.6_Approved.png
+Drive File ID：1nfFsm6s03fl9XFq_sca98BIkfNLFTs07
+尺寸：1024 × 2000 px
 ```
 
 GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素材參照；Drive 保存圖片與大型發布素材。
@@ -139,7 +147,9 @@ GitHub 保存規格、技能、批次狀態、資料定義、審核紀錄與素�
 - 狀態檔與 Drive／Manifest 不一致時猜測完成。
 - 把稀有度與難易度混為同一欄位。
 - 自行把未授權聯名概念升級為 UR 正式卡。
-- 省略四字逐字注音或加入羅馬拼音欄位。
+- 省略主標下方的注音橫列或漢語拼音橫列。
+- 使用數字聲調或省略正式拼音聲調符號。
+- 將正式 v2.6 圖卡輸出為 `1024 × 1536` 或 `2:3`。
 - 先播放圖卡獎勵動畫，再保存抽取與收藏結果。
 - 直接覆蓋已發布圖卡。
 - 將 Review、Rejected、Deprecated 或來源未校訂卡加入卡池。

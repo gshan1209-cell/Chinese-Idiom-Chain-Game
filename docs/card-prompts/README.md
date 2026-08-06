@@ -1,6 +1,6 @@
 # CICG 成語圖卡提示語素材庫
 
-- 規範版本：v2.1
+- 規範版本：v2.6
 - 圖片保存：Google Drive
 - 提示語保存：GitHub
 - 舊圖狀態：Legacy / Review / Approved
@@ -34,7 +34,7 @@ docs/card-prompts/state/current-batch.json
 
 `current-batch.json` 只記錄接續狀態，不能取代 Drive File ID、Manifest、來源校訂、授權或最終核准證據。
 
-正式專案提示語仍保存於：
+正式專案提示語保存於：
 
 ```text
 docs/card-prompts/PROJECT_PROMPT.md
@@ -50,15 +50,16 @@ docs/card-prompts/PROJECT_PROMPT.md
 4. 讀取 `docs/card-prompts/state/current-batch.json`。
 5. 讀取技能列出的 `references/required-specs.md`。
 6. 讀取 `PROJECT_PROMPT.md`。
-7. 讀取 `docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md`。
-8. 讀取 `shared/card-master-prompt.md`。
-9. 讀取 `shared/negative-constraints.md`。
-10. 套用 `templates/` 對應稀有度模板。
-11. 套用 `idioms/` 對應的單張提示語。
-12. 讀取 `manifest.md`，確認版本、來源狀態與稀有度狀態。
-13. 單張提示語未重複寫出的固定欄位，以較新的 Approved 規格與共用母提示語為準。
-14. 產圖後先放入 Drive `80_Inbox`；核准後才能移入正式資料夾。
-15. 更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 `manifest.md`。
+7. 讀取 `docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md` 作為歷史基礎。
+8. 讀取 `docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md` 作為目前版面標準。
+9. 讀取 `shared/card-master-prompt.md`。
+10. 讀取 `shared/negative-constraints.md`。
+11. 套用 `templates/` 對應稀有度模板。
+12. 套用 `idioms/` 對應的單張提示語。
+13. 讀取 `manifest.md`，確認版本、來源狀態與稀有度狀態。
+14. 單張提示語未重複寫出的固定欄位，以較新的 Approved 規格與共用母提示語為準。
+15. 產圖後先放入 Drive `80_Inbox`；核准後才能移入正式資料夾。
+16. 更新 `current-batch.json`；Drive 或發布狀態變更時同步更新 `manifest.md`。
 
 ## 簡短接續指令
 
@@ -81,9 +82,10 @@ Agent 必須先讀取 `current-batch.json`，再依 `activeBatchId`、`nextActio
 ```text
 GitHub 最新 main
 → 最新 Approved 規格與規格索引
+→ v2.6 尺寸與發音版面增補
 → Repository-local skill
 → current-batch.json
-→ v2.1 版面增補
+→ v2.1 歷史版面增補
 → PROJECT_PROMPT.md
 → 共用母提示語與負面限制
 → 單張成語提示語
@@ -116,7 +118,11 @@ docs/card-prompts/
 
 ## 最新固定版型 Gate
 
-- 四字成語旁必須放置逐字直立注音；不得顯示漢語拼音或其他羅馬拼音。
+- 正式圖卡固定為 `1024 × 2000 px`。
+- 上方資訊區為 `360 px`，中央主圖區為 `1200 px`，下方內容區為 `440 px`。
+- 四字主標下方第一列為四組逐字對齊注音。
+- 注音下方第二列為小寫、帶聲調符號的漢語拼音。
+- 禁止數字聲調，禁止正式核准版本省略拼音聲調符號。
 - 下方區塊標題使用「典故」，不得顯示「典故說明」四字標籤。
 - 左下主題徽章、固定圖示、底色與完整類別名稱必須保留。
 - 右下箴言使用獨立窄版深色金框直式牌匾，由右至左閱讀；牌匾高度必須貼合文字並下降，不得留下大面積空白或壓縮主插圖。
@@ -127,7 +133,9 @@ docs/card-prompts/
 
 每張圖卡至少確認：
 
-- 成語與逐字注音
+- 成語
+- 逐字注音
+- 漢語拼音
 - 白話副標
 - 難易度
 - 稀有度與判定理由
@@ -137,7 +145,7 @@ docs/card-prompts/
 - 人物、動作、場景與關鍵道具
 - `Verified / NeedsReview` 狀態
 
-來源、注音或稀有度仍為 `NeedsReview` 時，只能產製 Review 圖，不得宣稱 Approved 或可進正式卡池。
+來源、注音、拼音或稀有度仍為 `NeedsReview` 時，只能產製 Review 圖，不得宣稱 Approved 或可進正式卡池。
 
 ## 核心分工
 
@@ -149,3 +157,12 @@ docs/card-prompts/
 - 未完成正式典故與授權校訂者一律標記 `NeedsReview`。
 - 未依正面意義標準完成人工複核的稀有度一律標記 `NeedsReview`，不得視為正式卡池等級。
 - 產製 Agent 不得自行把自己的輸出直接標為最終 Approved。
+
+## 目前核准標準模板
+
+```text
+CICG_CardTemplate_Rarity_SSR_v2.6_Approved.png
+尺寸：1024 × 2000 px
+中央主圖：1200 px
+Drive File ID：1nfFsm6s03fl9XFq_sca98BIkfNLFTs07
+```
