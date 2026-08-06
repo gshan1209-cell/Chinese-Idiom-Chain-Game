@@ -39,6 +39,14 @@ test('uses a visible official YouTube iframe with required attributes', () => {
   assert.doesNotMatch(source, /display:\s*none|hidden=\{true\}/);
 });
 
+test('unmounts the YouTube iframe whenever playback is paused', () => {
+  const source = readSource('src/app/media/MediaLibraryPanel.tsx');
+  assert.match(
+    source,
+    /media\.playback\.youtubePlaying\s*&&\s*media\.activeItem !== null/
+  );
+});
+
 test('reserves a visible 16:9 player and mobile safe-area space', () => {
   const css = readSource('src/app/media/media.css');
   assert.match(css, /min-width:\s*200px/);
