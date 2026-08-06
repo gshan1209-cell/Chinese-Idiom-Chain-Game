@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { URL } from 'node:url';
 
 import {
+  REQUIRED_PHASE1_FOLDER_KEYS,
   validateDriveAssetRegistry,
   validateDriveFolderRegistry,
   validateDriveMigrationLedger,
@@ -16,23 +17,20 @@ async function readJson(relativePath) {
   ));
 }
 
-test('records the read-only Drive baseline without pretending Phase 1 is ready', async () => {
+test('records the complete Phase 1 folder topology with real Drive IDs', async () => {
   const [folders, assets, migration] = await Promise.all([
     readJson('../data/drive-assets/drive-folders.json'),
     readJson('../data/drive-assets/idiom-card-assets.json'),
     readJson('../data/drive-assets/migrations/2026-08-06-phase1-batch0-inventory.json'),
   ]);
 
-  const folderIssues = validateDriveFolderRegistry(folders);
-  const missingRequiredFolders = folderIssues.filter(
-    ({ code }) => code === 'missing-required-folder',
-  );
+  const folderKeys = new Set(folders.folders.map(({ folderKey }) => folderKey));
 
-  assert.equal(folders.folders.length, 22);
+  assert.equal(folders.folders.length, 60);
   assert.equal(assets.assets.length, 4);
   assert.equal(migration.entries.length, 0);
-  assert.equal(missingRequiredFolders.length, 39);
-  assert.ok(folderIssues.every(({ code }) => code === 'missing-required-folder'));
+  assert.ok(REQUIRED_PHASE1_FOLDER_KEYS.every((folderKey) => folderKeys.has(folderKey)));
+  assert.deepEqual(validateDriveFolderRegistry(folders), []);
   assert.deepEqual(validateDriveAssetRegistry(assets), []);
   assert.deepEqual(validateDriveMigrationLedger(migration), []);
 });
