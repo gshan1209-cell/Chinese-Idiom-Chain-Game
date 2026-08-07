@@ -85,7 +85,7 @@ Allowed `themeCategory` values are exactly:
 
 ```text
 military
- governance
+governance
 strategy
 arts
 perseverance
