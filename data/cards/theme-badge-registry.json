@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-07T14:01:41+08:00",
+  "badges": [
+    {
+      "systemValue": "military",
+      "displayName": "軍事",
+      "assetId": "theme-badge-military-v1.0",
+      "iconDefinition": "劍與軍旗",
+      "backgroundHex": "#8E1E24",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "governance",
+      "displayName": "內政",
+      "assetId": "theme-badge-governance-v1.0",
+      "iconDefinition": "玉璽與卷軸",
+      "backgroundHex": "#176B52",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "strategy",
+      "displayName": "智謀",
+      "assetId": "theme-badge-strategy-v1.0",
+      "iconDefinition": "羽扇與棋盤",
+      "backgroundHex": "#5A338A",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "arts",
+      "displayName": "文藝",
+      "assetId": "theme-badge-arts-v1.0",
+      "iconDefinition": "毛筆與畫卷",
+      "backgroundHex": "#167A83",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "perseverance",
+      "displayName": "勵志",
+      "assetId": "theme-badge-perseverance-v1.0",
+      "iconDefinition": "山路與旭日",
+      "backgroundHex": "#C77B1F",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "selfCultivation",
+      "displayName": "修身",
+      "assetId": "theme-badge-self-cultivation-v1.0",
+      "iconDefinition": "蓮花與竹簡",
+      "backgroundHex": "#B95B79",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "relationships",
+      "displayName": "人際",
+      "assetId": "theme-badge-relationships-v1.0",
+      "iconDefinition": "相握之手",
+      "backgroundHex": "#9A5B22",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "cautionary",
+      "displayName": "警世",
+      "assetId": "theme-badge-cautionary-v1.0",
+      "iconDefinition": "警鐘與眼睛",
+      "backgroundHex": "#3F2B78",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    },
+    {
+      "systemValue": "perspective",
+      "displayName": "見識",
+      "assetId": "theme-badge-perspective-v1.0",
+      "iconDefinition": "眼睛與遠山窗口",
+      "backgroundHex": "#1D5F9E",
+      "version": "1.0",
+      "pixelWidth": 1024,
+      "pixelHeight": 1280,
+      "mimeType": "image/png",
+      "transparentBackground": true
+    }
+  ]
+}
