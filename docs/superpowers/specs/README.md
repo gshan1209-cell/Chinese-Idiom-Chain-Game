@@ -119,7 +119,7 @@ GitHub main 與最新 Approved 規格
 - 成語圖卡採 type-first：Artwork、Component、Template、Composite 分類後，各自設 `10_Review` 與 `20_Approved`。
 - 所有新素材先進 `80_Inbox/Idiom_Cards/<BatchId>`，不得直接進 Approved。
 - 舊版、Rejected、Unverifiable 與 Legacy 移入 `90_Archive/Idiom_Cards`，不永久刪除。
-- 同一 `assetType + identity` 最多只有一個 `isCurrent = true` 的 Approved master。
+- 同一 `assetType + identity` 最多只有一個 `currentApproved = true` 的 Approved master。
 - Drive move 必須保留原 File ID；不得以同名重新上傳假裝搬移。
 - 搬移前必須有 Asset Registry、Folder Registry、Migration Ledger 與 rollback path。
 - 搬移後必須驗證 parent Folder ID、File ID、checksum、大小、MIME type 與 webViewLink。
@@ -147,26 +147,39 @@ GitHub main 與最新 Approved 規格
 docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
 ```
 
+Drive governance canonical entry points：
+
+```text
+data/drive-assets/drive-folders.json
+data/drive-assets/idiom-card-assets.json
+data/drive-assets/migrations/
+data/drive-assets/physical-audit-2026-08-07.json
+```
+
+- `drive-folders.json` 是 Folder ID 與 parent 關係的唯一 canonical mapping；其他文件不得複製完整 Folder ID 表。
+- `idiom-card-assets.json` 是 current Approved、Review、Quarantined 與其他資產狀態的唯一 machine-readable Registry。
+- `migrations/` 下每一份 JSON Ledger 都必須由永久 CLI 自動發現及驗證。
+- Phase 1 drift 與 Phase 2 readiness 讀取：
+
+```text
+docs/superpowers/reports/2026-08-07-drive-phase1-migration-report.md
+docs/superpowers/reports/2026-08-07-drive-phase2-readiness.md
+```
+
 核准四階外框 master：
 
 ```text
-N：CICG_CardFrame_Rarity_N_v1.0_Approved.png
-Drive File ID：1KO7NHfipw-MlFfYLDaakHuupGjtrwYu8
-
-R：CICG_CardFrame_Rarity_R_v1.0_Approved.png
-Drive File ID：18AgLp9b1hCrqawfsk5-OxPlmgSt93YGR
-
-SR：CICG_CardFrame_Rarity_SR_v1.0_Approved.png
-Drive File ID：1cZPhfFv483bJAxk0kCBj6XS4V6Vyfx40
-
-SSR：CICG_CardTemplate_Rarity_SSR_v2.8_Approved.png
-Drive File ID：1_PR-_mZXBkf7WJxXwq83AjaOvWpUJwbz
+N：CICG_Component_RarityFrame_N_v1.0_Approved.png
+R：CICG_Component_RarityFrame_R_v1.0_Approved.png
+SR：CICG_Component_RarityFrame_SR_v1.0_Approved.png
+SSR：CICG_Component_RarityFrame_SSR_v2.8_Approved.png
 ```
 
-完整 checksum 與元件 ID：
+完整 Drive File ID、checksum、元件 ID 與唯一正式位置：
 
 ```text
 docs/card-prompts/components/rarity-frame-registry-v1.md
+data/drive-assets/idiom-card-assets.json
 ```
 
 ## 禁止事項

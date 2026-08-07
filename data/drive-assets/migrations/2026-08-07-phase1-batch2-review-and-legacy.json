@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "batchId": "phase1-batch2-review-and-legacy",
+  "phase": "phase1",
+  "createdAt": "2026-08-07T05:55:00+08:00",
+  "sourceCommit": "9bc0094d6b0ada2a3de005ca66c17d99afeff6f4",
+  "status": "verified",
+  "entries": [
+    {
+      "resourceKind": "folder",
+      "assetId": null,
+      "driveResourceId": "1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_",
+      "operation": "move",
+      "before": {
+        "name": "CICG_Card_Templates_v2.6_Review",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_"
+      },
+      "after": {
+        "name": "CICG_Card_Templates_v2.6_Review",
+        "parentFolderId": "1z948HUCJA4EY6QkR4sMd9PYGwo0UbCgC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_"
+      },
+      "rollback": {
+        "name": "CICG_Card_Templates_v2.6_Review",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1zA5wEA4KOKj9G-gpum6f8xe0RgpiyBe_"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "folder",
+      "assetId": null,
+      "driveResourceId": "1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP",
+      "operation": "move",
+      "before": {
+        "name": "CICG_Idiom_Cards_Pending_Review_2026-08-06",
+        "parentFolderId": "1h_yncfl1MHcZy7IKrP3dGfmNC5lVGfuV",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP"
+      },
+      "after": {
+        "name": "CICG_Idiom_Cards_Pending_Review_2026-08-06",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP"
+      },
+      "rollback": {
+        "name": "CICG_Idiom_Cards_Pending_Review_2026-08-06",
+        "parentFolderId": "1h_yncfl1MHcZy7IKrP3dGfmNC5lVGfuV",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1-uFlkMnGlllroZ1UBoBVfFb12A-NpvNP"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "folder",
+      "assetId": null,
+      "driveResourceId": "1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO",
+      "operation": "move",
+      "before": {
+        "name": "CICG_Legacy_Card_Assets_Backup",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO"
+      },
+      "after": {
+        "name": "CICG_Legacy_Card_Assets_Backup",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO"
+      },
+      "rollback": {
+        "name": "CICG_Legacy_Card_Assets_Backup",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1estQ2VP1tbQLI2VNbS3V2FvpDICjbOGO"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "folder",
+      "assetId": null,
+      "driveResourceId": "1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB",
+      "operation": "move",
+      "before": {
+        "name": "CICG_Card_Templates_v2.1_Approved",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB"
+      },
+      "after": {
+        "name": "CICG_Card_Templates_v2.1_Approved",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB"
+      },
+      "rollback": {
+        "name": "CICG_Card_Templates_v2.1_Approved",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "application/vnd.google-apps.folder",
+        "sizeBytes": null,
+        "sha256": null,
+        "webViewLink": "https://drive.google.com/drive/folders/1vAc0oT3CUvbG-5isbOdA5K4lpuOd_-gB"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "file",
+      "assetId": "difficulty-badge-sheet-e-s-v1.0",
+      "driveResourceId": "1azohQXFHLVP5scplRQuJa33h2pUU8qq4",
+      "operation": "move-and-rename",
+      "before": {
+        "name": "CICG_Difficulty_Badge_Template_E_to_S_v1.0_Approved.jpeg",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/jpeg",
+        "sizeBytes": 403355,
+        "sha256": "1e0f12baaf9e245ecdad7e2735b9240454b54f9ee363d279f6b0cbc6fbeabc10",
+        "webViewLink": "https://drive.google.com/file/d/1azohQXFHLVP5scplRQuJa33h2pUU8qq4/view"
+      },
+      "after": {
+        "name": "CICG_Component_DifficultyBadge_E-S_v1.0_Review.jpeg",
+        "parentFolderId": "1EULAzoGG-Adnwha8A6HTFRBfiLPs8d4F",
+        "mimeType": "image/jpeg",
+        "sizeBytes": 403355,
+        "sha256": "1e0f12baaf9e245ecdad7e2735b9240454b54f9ee363d279f6b0cbc6fbeabc10",
+        "webViewLink": "https://drive.google.com/file/d/1azohQXFHLVP5scplRQuJa33h2pUU8qq4/view"
+      },
+      "rollback": {
+        "name": "CICG_Difficulty_Badge_Template_E_to_S_v1.0_Approved.jpeg",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/jpeg",
+        "sizeBytes": 403355,
+        "sha256": "1e0f12baaf9e245ecdad7e2735b9240454b54f9ee363d279f6b0cbc6fbeabc10",
+        "webViewLink": "https://drive.google.com/file/d/1azohQXFHLVP5scplRQuJa33h2pUU8qq4/view"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "file",
+      "assetId": "template-rarity-n-v2.7-quarantined",
+      "driveResourceId": "1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd",
+      "operation": "move",
+      "before": {
+        "name": "CICG_CardTemplate_Rarity_N_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2562659,
+        "sha256": "7b5723a15d755ad4baebc62a3928cf76d2bbf7328866611cc02f26edf648175e",
+        "webViewLink": "https://drive.google.com/file/d/1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd/view"
+      },
+      "after": {
+        "name": "CICG_CardTemplate_Rarity_N_v2.7_Approved.png",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "image/png",
+        "sizeBytes": 2562659,
+        "sha256": "7b5723a15d755ad4baebc62a3928cf76d2bbf7328866611cc02f26edf648175e",
+        "webViewLink": "https://drive.google.com/file/d/1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd/view"
+      },
+      "rollback": {
+        "name": "CICG_CardTemplate_Rarity_N_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2562659,
+        "sha256": "7b5723a15d755ad4baebc62a3928cf76d2bbf7328866611cc02f26edf648175e",
+        "webViewLink": "https://drive.google.com/file/d/1SvFOcRz16rlWaxAf7u8fKl1JDAlPs-Sd/view"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "file",
+      "assetId": "template-rarity-r-v2.7-quarantined",
+      "driveResourceId": "1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2",
+      "operation": "move",
+      "before": {
+        "name": "CICG_CardTemplate_Rarity_R_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2655867,
+        "sha256": "48e8bf0281c0c4ad9525595fd1eff1b15ba898635bb2b486c44f032d4cd07603",
+        "webViewLink": "https://drive.google.com/file/d/1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2/view"
+      },
+      "after": {
+        "name": "CICG_CardTemplate_Rarity_R_v2.7_Approved.png",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "image/png",
+        "sizeBytes": 2655867,
+        "sha256": "48e8bf0281c0c4ad9525595fd1eff1b15ba898635bb2b486c44f032d4cd07603",
+        "webViewLink": "https://drive.google.com/file/d/1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2/view"
+      },
+      "rollback": {
+        "name": "CICG_CardTemplate_Rarity_R_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2655867,
+        "sha256": "48e8bf0281c0c4ad9525595fd1eff1b15ba898635bb2b486c44f032d4cd07603",
+        "webViewLink": "https://drive.google.com/file/d/1lFaEbD2pxuLgDHwUa5bApEoe4GN07Mj2/view"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "file",
+      "assetId": "template-rarity-sr-v2.7-quarantined",
+      "driveResourceId": "1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51",
+      "operation": "move",
+      "before": {
+        "name": "CICG_CardTemplate_Rarity_SR_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2768075,
+        "sha256": "e5b11b757c1e74068a8af3241ba1c85dbb180bfc2692c7205abddf5945143905",
+        "webViewLink": "https://drive.google.com/file/d/1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51/view"
+      },
+      "after": {
+        "name": "CICG_CardTemplate_Rarity_SR_v2.7_Approved.png",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "image/png",
+        "sizeBytes": 2768075,
+        "sha256": "e5b11b757c1e74068a8af3241ba1c85dbb180bfc2692c7205abddf5945143905",
+        "webViewLink": "https://drive.google.com/file/d/1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51/view"
+      },
+      "rollback": {
+        "name": "CICG_CardTemplate_Rarity_SR_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 2768075,
+        "sha256": "e5b11b757c1e74068a8af3241ba1c85dbb180bfc2692c7205abddf5945143905",
+        "webViewLink": "https://drive.google.com/file/d/1-sqXKjKTH9eLU8HwU7mvDCBFlEmDIt51/view"
+      },
+      "status": "verified",
+      "blockingReason": null
+    },
+    {
+      "resourceKind": "file",
+      "assetId": "template-rarity-ssr-v2.7-quarantined",
+      "driveResourceId": "1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV",
+      "operation": "move",
+      "before": {
+        "name": "CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 3427910,
+        "sha256": "cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785",
+        "webViewLink": "https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view"
+      },
+      "after": {
+        "name": "CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png",
+        "parentFolderId": "1JCXiqxRxpasAWc3p80If__slBAXoCOoy",
+        "mimeType": "image/png",
+        "sizeBytes": 3427910,
+        "sha256": "cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785",
+        "webViewLink": "https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view"
+      },
+      "rollback": {
+        "name": "CICG_CardTemplate_Rarity_SSR_v2.7_Approved.png",
+        "parentFolderId": "1cH0KYWGvUT5ci57HW8JBFv3v-8uG51IC",
+        "mimeType": "image/png",
+        "sizeBytes": 3427910,
+        "sha256": "cf8f8cb9c6f3cac5f4a115bcbcf53fb57162842dcf34e48173b84f902dcbf785",
+        "webViewLink": "https://drive.google.com/file/d/1NoNZ2muThkzA7k22TF5W5foAD1gq8VpV/view"
+      },
+      "status": "verified",
+      "blockingReason": null
+    }
+  ]
+}

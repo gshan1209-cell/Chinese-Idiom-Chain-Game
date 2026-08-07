@@ -7,6 +7,7 @@ if [[ ! -d node_modules ]]; then
 fi
 
 npm run build:data
+npm run validate:drive-assets
 npm run test
 npm run typecheck
 npm run lint

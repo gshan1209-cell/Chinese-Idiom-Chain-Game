@@ -232,6 +232,25 @@ Drive 永久 Gate：
 - 舊版移入 Archive，不永久刪除。
 - Blocking drift 未解決時，不得核准、發布、打包或開始下一批搬移。
 
+Drive governance canonical entry points：
+
+```text
+data/drive-assets/drive-folders.json
+data/drive-assets/idiom-card-assets.json
+data/drive-assets/migrations/
+data/drive-assets/physical-audit-2026-08-07.json
+```
+
+- Folder Registry 是 Folder ID 與 parent 關係的唯一 canonical mapping；其他文件不得複製完整 Folder ID 表。
+- Asset Registry 是 Approved、Review、Quarantined 與其他素材狀態的唯一 machine-readable Registry。
+- `scripts/validate-drive-assets.mjs` 必須自動發現並驗證 `migrations/` 下全部 JSON Ledgers。
+- 最新 drift 與 readiness 讀取：
+
+```text
+docs/superpowers/reports/2026-08-07-drive-phase1-migration-report.md
+docs/superpowers/reports/2026-08-07-drive-phase2-readiness.md
+```
+
 四階外框元件註冊表：
 
 ```text

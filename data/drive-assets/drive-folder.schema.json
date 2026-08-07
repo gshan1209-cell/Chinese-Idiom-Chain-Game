@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cicg.local/schemas/drive-folder.schema.json",
+  "title": "CICG Drive Folder Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "folders"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "folders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "folderKey", "driveFolderId", "name", "parentFolderKey", "lifecycleRole"
+        ],
+        "properties": {
+          "folderKey": { "type": "string", "minLength": 1 },
+          "driveFolderId": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "parentFolderKey": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+          },
+          "lifecycleRole": {
+            "enum": [
+              "root", "container", "inbox", "review", "approved", "archive", "reference"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
