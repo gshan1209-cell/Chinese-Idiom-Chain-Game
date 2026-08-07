@@ -12,7 +12,7 @@ const catalogPath = fileURLToPath(
 const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
 
 function cloneCatalog() {
-  return structuredClone(catalog);
+  return JSON.parse(JSON.stringify(catalog));
 }
 
 test('chapter one card catalog passes all permanent gates', () => {
