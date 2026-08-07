@@ -16,7 +16,7 @@ async function readJson(relativePath) {
   ));
 }
 
-test('keeps the audited Drive physical state aligned with all registries and ledgers', async () => {
+test('keeps the audited Phase 1 Drive state aligned as later ledgers are added', async () => {
   const [audit, folders, assets] = await Promise.all([
     readJson('../data/drive-assets/physical-audit-2026-08-07.json'),
     readJson('../data/drive-assets/drive-folders.json'),
@@ -28,6 +28,14 @@ test('keeps the audited Drive physical state aligned with all registries and led
     .sort();
   const ledgers = await Promise.all(
     migrationFilenames.map((filename) => readJson(
+      `../data/drive-assets/migrations/${filename}`,
+    )),
+  );
+  const auditedMigrationFilenames = audit.migrationLedgers
+    .map(({ filename }) => filename)
+    .sort();
+  const auditedLedgers = await Promise.all(
+    auditedMigrationFilenames.map((filename) => readJson(
       `../data/drive-assets/migrations/${filename}`,
     )),
   );
@@ -73,11 +81,11 @@ test('keeps the audited Drive physical state aligned with all registries and led
     assert.equal(folderByKey.get(folderKey).lifecycleRole, 'approved');
   }
 
-  assert.deepEqual(migrationFilenames, audit.migrationLedgers
-    .map(({ filename }) => filename)
-    .sort());
+  assert.ok(auditedMigrationFilenames.every((filename) => (
+    migrationFilenames.includes(filename)
+  )));
   assert.deepEqual(
-    ledgers.map(({ status, entries }) => ({ status, entryCount: entries.length })),
+    auditedLedgers.map(({ status, entries }) => ({ status, entryCount: entries.length })),
     audit.migrationLedgers.map(({ status, entryCount }) => ({ status, entryCount })),
   );
 
