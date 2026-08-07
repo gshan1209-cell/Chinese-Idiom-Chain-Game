@@ -6,7 +6,7 @@
 
 **Architecture:** 圖像本體以九枚獨立 `1024 × 1280` RGBA PNG 保存於 Drive Approved；GitHub 以通用 Drive Asset Registry 保存檔案證據，另以 `theme-badge-registry.json` 保存九類語意、圖式、底色與 asset 映射。Node／TypeScript 驗證器確保九類完整、唯一、Asset ID 正確、Drive 證據齊全，產圖 Agent 只能透過 Registry 解析徽章。
 
-**Tech Stack:** Node.js 22、TypeScript strict、內建 `node:test`、Google Drive、Google Sheets、Image Generation／image editing、既有 Vite PWA CI。
+**Tech Stack:** Node.js 22、TypeScript strict、內建 `node:test`、Python 3＋Pillow（一次性圖像尺寸／alpha 驗證）、Google Drive、Google Sheets、Image Generation／image editing、既有 Vite PWA CI。
 
 ## Global Constraints
 
@@ -16,7 +16,7 @@
 - 背景不得保留棕色漸層、矩形陰影、浮水印或卡面內容。
 - 同一類別只能有一枚 `currentApproved=true` 母件。
 - 正式類別固定為 `military`、`governance`、`strategy`、`arts`、`perseverance`、`selfCultivation`、`relationships`、`cautionary`、`perspective`。
-- 卡面只能讀取 Registry 中的 `themeCategoryLabel` 與 `themeBadgeAssetId`，不得由模型自由生成。
+- 卡面只能讀取 Registry 中的 `displayName` 與 `assetId`，不得由模型自由生成。
 - 九枚徽章與稀有度、難易度、角色性別互相獨立。
 - 本計畫不遷移第一章 61 張分類、不重製第一批圖卡；這兩項由後續獨立計畫處理。
 
@@ -33,17 +33,17 @@
 - `src/cards/theme-badges/index.ts`：公開匯出入口。
 - `scripts/validate-theme-badges.mjs`：CI CLI。
 - `tests/theme-badge-registry.test.mjs`：永久 Gate 測試。
-- `data/drive-assets/migrations/2026-08-07-theme-badge-system-v1.json`：Drive 搬移／核准證據。
+- `data/drive-assets/migrations/2026-08-07-theme-badge-system-v1.json`：Review → Approved 搬移證據。
 - `docs/superpowers/reports/2026-08-07-theme-badge-system-v1-delivery.md`：交付與 Audit 證據。
 
 ### Modified files
 
-- `data/drive-assets/idiom-card-assets.json`：新增九枚 Approved 母件與總覽圖。
+- `data/drive-assets/idiom-card-assets.json`：新增九枚 Approved 母件與一張 reference-only 總覽圖。
 - `package.json`：加入 `validate:theme-badges`、`test:theme-badges`。
 - `scripts/verify.sh`：加入永久 Gate。
 - `AGENTS.md`：產圖前必讀 Registry。
 - `.agents/skills/generating-cicg-idiom-cards/SKILL.md`：禁止模型直接生成主題徽章。
-- `docs/card-prompts/state/current-batch.json` 或目前等效狀態檔：登錄 v2.6 徽章系統狀態。
+- `docs/card-prompts/state/chapter-one-card-catalog-current.json`：登錄 v2.6 徽章系統狀態。
 - Google Sheet `CICG_素材管理控制中心_v1.0`：新增九枚 Asset Register、Codebook 與版本紀錄。
 
 ---
@@ -74,27 +74,48 @@ Run:
 find /mnt/data -maxdepth 1 -type f -name '*.png' -printf '%f\t%s\n' | sort
 ```
 
-Expected: 找到已命名的 `strategy`、`perseverance`、`selfCultivation`、`relationships`、`cautionary`、`perspective` 來源；若 `military`、`governance`、`arts` 只剩聊天內展示而沒有獨立檔案，僅重建缺少的三枚，不重新設計已核准圖式。
+Expected: 已命名來源至少包含 `strategy`、`perseverance`、`selfCultivation`、`relationships`、`cautionary`、`perspective`；缺少獨立來源檔的 `military`、`governance`、`arts` 僅依已核准畫面重建，不改變圖式。
 
-- [ ] **Step 2: 使用圖片編輯產出透明母件**
+- [ ] **Step 2: 使用圖片編輯移除背景**
 
-每枚編輯指令必須包含：
+每枚編輯指令固定為：
 
 ```text
 保留核准徽章的金色圓形雲紋外框、中央圖式、固定寶石底色與下方繁體中文名稱牌；
 移除所有棕色漸層背景與外部陰影矩形；
-輸出完整不裁切的 1024×1280 RGBA 透明背景 PNG；
+輸出 RGBA 透明背景 PNG；
 不得改變中央圖式、類別名稱、字形內容、底色或裝飾輪廓；
 不得增加浮水印、Logo、卡框、稀有度或難易度文字。
 ```
 
-Expected: 九枚母件皆為透明背景、圖式完整、文字正確。
+- [ ] **Step 3: 使用 Pillow 正規化畫布**
 
-- [ ] **Step 3: 建立總覽圖**
+將透明結果等比例縮放並置中於 `1024 × 1280` 透明畫布，不裁切徽章外框或名稱牌：
 
-建立 `3 × 3` 九宮格總覽，每格只放一枚母件及其系統值／中文名稱；總覽圖只作文件與審核用途，不能被 renderer 裁切使用。
+```python
+from pathlib import Path
+from PIL import Image
 
-- [ ] **Step 4: 驗證像素、格式與透明度**
+TARGET = (1024, 1280)
+for source in Path('/mnt/data/theme-badge-edits').glob('*.png'):
+    image = Image.open(source).convert('RGBA')
+    bbox = image.getbbox()
+    if bbox is None:
+        raise ValueError(f'empty image: {source.name}')
+    subject = image.crop(bbox)
+    subject.thumbnail((920, 1160), Image.Resampling.LANCZOS)
+    canvas = Image.new('RGBA', TARGET, (0, 0, 0, 0))
+    x = (TARGET[0] - subject.width) // 2
+    y = (TARGET[1] - subject.height) // 2
+    canvas.alpha_composite(subject, (x, y))
+    canvas.save(Path('/mnt/data') / source.name, optimize=True)
+```
+
+- [ ] **Step 4: 建立總覽圖**
+
+使用九枚正規化母件建立 `3 × 3` 九宮格，總覽圖只作文件與審核用途，不能被 renderer 裁切使用。
+
+- [ ] **Step 5: 驗證像素、格式與透明度**
 
 Run:
 
@@ -103,8 +124,7 @@ python - <<'PY'
 from pathlib import Path
 from PIL import Image
 
-root = Path('/mnt/data')
-files = sorted(root.glob('CICG_Component_ThemeBadge_*_v1.0_Approved.png'))
+files = sorted(Path('/mnt/data').glob('CICG_Component_ThemeBadge_*_v1.0_Approved.png'))
 assert len(files) == 9, f'expected 9 masters, got {len(files)}'
 for path in files:
     image = Image.open(path)
@@ -113,15 +133,14 @@ for path in files:
     alpha = image.getchannel('A')
     lo, hi = alpha.getextrema()
     assert lo == 0 and hi == 255, (path.name, lo, hi)
-    print(path.name, image.size, image.mode, alpha.getbbox())
+    assert alpha.getbbox() is not None, path.name
+    print(path.name, image.size, image.mode)
 PY
 ```
 
-Expected: 9 files、`(1024, 1280)`、`RGBA`、alpha 同時包含 0 與 255。
+Expected: 9 files、`(1024, 1280)`、`RGBA`，alpha 同時包含 0 與 255。
 
-- [ ] **Step 5: 人工視覺核對**
-
-逐枚核對：
+- [ ] **Step 6: 人工視覺核對**
 
 ```text
 軍事：劍與軍旗／#8E1E24／軍事
@@ -135,11 +154,11 @@ Expected: 9 files、`(1024, 1280)`、`RGBA`、alpha 同時包含 0 與 255。
 見識：眼睛與遠山窗口／#1D5F9E／見識
 ```
 
-Expected: 九枚均符合；任一文字、圖示或底色錯誤，該枚退回重新編輯，不得上傳 Approved。
+任一文字、圖示或底色錯誤，該枚退回重新編輯，不得進 Drive Approved。
 
 ---
 
-### Task 2: 建立 Theme Badge Registry 的失敗測試與型別
+### Task 2: 建立 Registry 的 RED 測試與型別
 
 **Files:**
 - Create: `src/cards/theme-badges/theme-badge-types.ts`
@@ -199,8 +218,6 @@ test('rejects non-transparent or wrong-size masters', () => {
 
 - [ ] **Step 2: Run test to verify RED**
 
-Run:
-
 ```bash
 npm run compile:core
 node --test tests/theme-badge-registry.test.mjs
@@ -247,8 +264,6 @@ export interface ThemeBadgeRegistry {
 
 - [ ] **Step 4: Implement pure validator**
 
-`validateThemeBadgeRegistry` 回傳：
-
 ```ts
 export interface ThemeBadgeValidationResult {
   readonly errors: readonly string[];
@@ -259,15 +274,13 @@ export interface ThemeBadgeValidationResult {
 }
 ```
 
-驗證：九類順序與唯一性、中文名稱、圖示定義、色碼、`1024 × 1280`、PNG、透明背景，以及對應 Drive asset 必須是 `theme-badge`、`approved`、`currentApproved=true`、相同尺寸與 Asset ID。
+驗證九類順序與唯一性、中文名稱、圖式定義、色碼、`1024 × 1280`、PNG、透明背景，以及對應 Drive asset 必須是 `theme-badge`、`approved`、`currentApproved=true`、相同尺寸與正確 identity。
 
 - [ ] **Step 5: Add JSON Schema**
 
-Schema 固定九個 `systemValue`、`additionalProperties=false`，並要求上述全部欄位。
+Schema 固定九個 `systemValue`、`additionalProperties=false`，並要求全部欄位。
 
-- [ ] **Step 6: Run test to confirm expected data dependency failure**
-
-Run:
+- [ ] **Step 6: Run test to confirm the data dependency failure**
 
 ```bash
 npm run compile:core
@@ -285,38 +298,38 @@ git commit -m "test: define theme badge registry gates"
 
 ---
 
-### Task 3: 上傳九枚母件至 Drive Approved
+### Task 3: Review 上傳、技術驗證與 Approved 搬移
 
 **Files:**
-- Upload to Drive folder ID: `181mpCL3649D0EwZk7c4KWesxV229TZiV`
+- Upload Review folder ID: `1W9aY_1VBdqQOZrVuAEqOYrLmRWZl7rpD`
+- Move to Approved folder ID: `181mpCL3649D0EwZk7c4KWesxV229TZiV`
 - Create: `data/drive-assets/migrations/2026-08-07-theme-badge-system-v1.json`
 
 **Interfaces:**
-- Consumes: Task 1 九枚透明 PNG。
-- Produces: 九個穩定 Drive File ID、URL、sizeBytes、SHA-256。
+- Consumes: Task 1 的九枚母件與一張總覽圖。
+- Produces: 十個穩定 Drive File ID、URL、sizeBytes、SHA-256 與 Review → Approved 證據。
 
-- [ ] **Step 1: Compute local checksums before upload**
-
-Run:
+- [ ] **Step 1: Compute local checksums**
 
 ```bash
-sha256sum /mnt/data/CICG_Component_ThemeBadge_*_v1.0_Approved.png
+sha256sum /mnt/data/CICG_Component_ThemeBadge_*_v1.0_Approved.png \
+  /mnt/data/CICG_ThemeBadgeSystem_v1.0_Approved.png
 ```
 
-Expected: 九個不同 SHA-256。
+Expected: 十個不同 SHA-256。
 
-- [ ] **Step 2: Upload all nine files**
+- [ ] **Step 2: Upload all ten files to Review**
 
 目的地：
 
 ```text
-02_UI_UX_And_Visuals/Idiom_Cards/02_Components/04_Theme_Badges/20_Approved
-Drive folder ID：181mpCL3649D0EwZk7c4KWesxV229TZiV
+02_UI_UX_And_Visuals/Idiom_Cards/02_Components/04_Theme_Badges/10_Review
+Drive folder ID：1W9aY_1VBdqQOZrVuAEqOYrLmRWZl7rpD
 ```
 
-使用原檔名逐一上傳，不建立 ZIP，不覆寫其他元件。
+不建立 ZIP，不覆寫其他元件。
 
-- [ ] **Step 3: Read back Drive metadata**
+- [ ] **Step 3: Read back Review metadata**
 
 每枚讀取：
 
@@ -324,31 +337,38 @@ Drive folder ID：181mpCL3649D0EwZk7c4KWesxV229TZiV
 id, name, mimeType, size, webViewLink, parents, createdTime, modifiedTime
 ```
 
-Expected: 名稱逐字一致、`mimeType=image/png`、parent 為 Approved folder。
+Expected: 名稱逐字一致、`mimeType=image/png`、parent 為 Review folder。
 
-- [ ] **Step 4: Download/read back and verify checksum**
+- [ ] **Step 4: Verify uploaded bytes**
 
-Drive 回讀檔案的 SHA-256 必須與 Step 1 本地值完全一致；不一致時刪除錯誤上傳並重新上傳，不得將不同 bytes 登錄成同一 master。
+下載或串流回讀十個檔案，重新計算 SHA-256；每個值必須與 Step 1 完全一致。
 
-- [ ] **Step 5: Record migration ledger**
+- [ ] **Step 5: Move all ten files to Approved**
 
-Ledger 固定：
+使用同一個 Drive File ID，`addParents=181mpCL3649D0EwZk7c4KWesxV229TZiV`，`removeParents=1W9aY_1VBdqQOZrVuAEqOYrLmRWZl7rpD`。搬移後再次讀取 metadata，確認 parent 只有 Approved folder。
 
-```json
-{
-  "schemaVersion": 1,
-  "batchId": "theme-badge-system-v1-2026-08-07",
-  "phase": "phase2",
-  "createdAt": "2026-08-07T00:00:00+08:00",
-  "sourceCommit": "<implementation-branch-head-sha>",
-  "status": "verified",
-  "entries": []
-}
+- [ ] **Step 6: Record verified migration ledger**
+
+建立 ledger 前執行：
+
+```bash
+git rev-parse HEAD
 ```
 
-九個 entries 皆為 `resourceKind=file`、`operation=move-and-rename` 或實際採用的上傳治理操作、`status=verified`，`after` 保存 parent、MIME、size、SHA 與 URL。
+將輸出的完整 SHA 寫入 `sourceCommit`。Ledger 固定：
 
-- [ ] **Step 6: Commit ledger after IDs are known**
+```text
+batchId = theme-badge-system-v1-2026-08-07
+phase = phase2
+status = verified
+entries = 10
+operation = move-and-rename
+entry status = verified
+```
+
+每筆 `before` 指向 Review parent，每筆 `after` 指向 Approved parent，並保存實際名稱、MIME、size、SHA 與 URL。
+
+- [ ] **Step 7: Commit ledger**
 
 ```bash
 git add data/drive-assets/migrations/2026-08-07-theme-badge-system-v1.json
@@ -357,7 +377,7 @@ git commit -m "docs: record theme badge Drive evidence"
 
 ---
 
-### Task 4: 建立 canonical Registry 並使測試轉綠
+### Task 4: 建立 canonical Registry 並轉綠
 
 **Files:**
 - Create: `data/cards/theme-badge-registry.json`
@@ -366,40 +386,43 @@ git commit -m "docs: record theme badge Drive evidence"
 - Modify: `src/cards/theme-badges/index.ts`
 
 **Interfaces:**
-- Consumes: Task 3 的 Drive metadata 與 checksum。
-- Produces: 九類 canonical Registry、CLI 驗證器。
+- Consumes: Task 3 的十個 Drive metadata 與 checksum。
+- Produces: 九類 canonical Registry、十筆 Drive Asset records、CLI 驗證器。
 
-- [ ] **Step 1: Add nine Drive Asset records**
+- [ ] **Step 1: Add nine theme-badge Drive records**
 
-每筆固定：
+固定 identity／assetId：
 
-```json
-{
-  "assetId": "theme-badge-military-v1.0",
-  "assetType": "theme-badge",
-  "identity": "theme-badge-military",
-  "version": "1.0",
-  "status": "approved",
-  "currentApproved": true,
-  "filename": "CICG_Component_ThemeBadge_Military_v1.0_Approved.png",
-  "driveFileId": "<actual-file-id>",
-  "parentFolderKey": "idiom-cards.components.theme-badges.approved",
-  "mimeType": "image/png",
-  "sizeBytes": 1,
-  "sha256": "<actual-sha256>",
-  "widthPx": 1024,
-  "heightPx": 1280,
-  "webViewLink": "<actual-drive-url>",
-  "supersedesAssetId": null,
-  "supersededByAssetId": null,
-  "approvalEvidenceIds": ["user-approved-v2.6", "theme-badge-system-v1-pr"],
-  "licenseEvidenceId": null
-}
+```text
+theme-badge-military-v1.0         → theme-badge-military
+theme-badge-governance-v1.0       → theme-badge-governance
+theme-badge-strategy-v1.0         → theme-badge-strategy
+theme-badge-arts-v1.0             → theme-badge-arts
+theme-badge-perseverance-v1.0     → theme-badge-perseverance
+theme-badge-self-cultivation-v1.0 → theme-badge-self-cultivation
+theme-badge-relationships-v1.0    → theme-badge-relationships
+theme-badge-cautionary-v1.0       → theme-badge-cautionary
+theme-badge-perspective-v1.0      → theme-badge-perspective
 ```
 
-其餘八筆依正式檔名／identity 建立。`sizeBytes` 必須填實際值，不得保留示例數字 `1`。
+每筆從 Task 3 metadata 精確複製 `driveFileId`、`sizeBytes`、`webViewLink`，從 Task 3 checksum 精確複製 `sha256`；固定 `assetType=theme-badge`、`status=approved`、`currentApproved=true`、`parentFolderKey=idiom-cards.components.theme-badges.approved`、`widthPx=1024`、`heightPx=1280`。
 
-- [ ] **Step 2: Create canonical theme registry**
+- [ ] **Step 2: Add overview reference record**
+
+```text
+assetId = theme-badge-system-overview-v1.0
+assetType = reference-only
+identity = theme-badge-system-overview
+status = approved
+currentApproved = false
+filename = CICG_ThemeBadgeSystem_v1.0_Approved.png
+```
+
+其 Drive 證據同樣使用 Task 3 的實際值。
+
+- [ ] **Step 3: Create canonical theme registry**
+
+依固定順序寫入九筆：
 
 ```json
 {
@@ -422,9 +445,9 @@ git commit -m "docs: record theme badge Drive evidence"
 }
 ```
 
-依固定九類順序補齊其餘八筆。
+其餘八筆使用 v2.6 規格中的正式值，不得從圖片內容 OCR 推導。
 
-- [ ] **Step 3: Implement CLI**
+- [ ] **Step 4: Implement CLI**
 
 ```js
 import { readFileSync } from 'node:fs';
@@ -442,9 +465,7 @@ if (result.errors.length > 0) {
 }
 ```
 
-- [ ] **Step 4: Run focused tests**
-
-Run:
+- [ ] **Step 5: Run focused tests**
 
 ```bash
 npm run compile:core
@@ -456,12 +477,12 @@ npm run validate:drive-assets
 Expected:
 
 ```text
-3+ theme badge tests passed
+theme badge tests passed
 [theme-badges] PASS badges=9 approved=9
-[drive-assets] PASS ... assets=<previous+9>
+Drive asset count equals the pre-change count plus 10
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add data/cards/theme-badge-registry.json data/drive-assets/idiom-card-assets.json scripts/validate-theme-badges.mjs src/cards/theme-badges
@@ -477,7 +498,7 @@ git commit -m "feat: register nine approved theme badges"
 - Modify: `scripts/verify.sh`
 - Modify: `AGENTS.md`
 - Modify: `.agents/skills/generating-cicg-idiom-cards/SKILL.md`
-- Modify: `docs/card-prompts/state/current-batch.json` or the active equivalent state file
+- Modify: `docs/card-prompts/state/chapter-one-card-catalog-current.json`
 
 **Interfaces:**
 - Consumes: `validate-theme-badges.mjs`。
@@ -506,15 +527,15 @@ npm run validate:theme-badges
 
 - [ ] **Step 3: Update AGENTS.md**
 
-加入必讀順序：
+產圖前必讀順序：
 
 ```text
 data/cards/theme-badge-registry.json
 → data/drive-assets/idiom-card-assets.json
-→ v2.6 standard
+→ docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
 ```
 
-以及硬性規則：
+硬性規則：
 
 ```text
 主題徽章不得由圖片模型生成；只能套用 Registry 的 current Approved PNG。
@@ -532,7 +553,7 @@ composition：套用外框、難易度、主題徽章與文字
 
 - [ ] **Step 5: Update current state**
 
-狀態需呈現：
+加入：
 
 ```json
 {
@@ -548,8 +569,6 @@ composition：套用外框、難易度、主題徽章與文字
 
 - [ ] **Step 6: Run focused and full verification**
 
-Run:
-
 ```bash
 npm run test:theme-badges
 npm run validate:theme-badges
@@ -561,7 +580,7 @@ Expected: 所有既有測試、TypeScript strict、ESLint、PWA build、npm audi
 - [ ] **Step 7: Commit**
 
 ```bash
-git add package.json scripts/verify.sh AGENTS.md .agents/skills/generating-cicg-idiom-cards/SKILL.md docs/card-prompts/state
+git add package.json scripts/verify.sh AGENTS.md .agents/skills/generating-cicg-idiom-cards/SKILL.md docs/card-prompts/state/chapter-one-card-catalog-current.json
 git commit -m "feat: enforce v2.6 theme badge workflow"
 ```
 
@@ -573,10 +592,10 @@ git commit -m "feat: enforce v2.6 theme badge workflow"
 - Update: Google Sheet `1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94`
 
 **Interfaces:**
-- Consumes: canonical Registry 與九個 Drive records。
+- Consumes: canonical Registry 與十個 Drive records。
 - Produces: 人工可管理的九大徽章表與版本歷史。
 
-- [ ] **Step 1: Add or update Theme_Badge_Registry worksheet**
+- [ ] **Step 1: Add `Theme_Badge_Registry` worksheet**
 
 欄位固定：
 
@@ -608,22 +627,13 @@ notes
 
 - [ ] **Step 3: Update Asset_Register**
 
-逐筆登錄九枚 Approved 母件與一張總覽圖；總覽圖 asset type 應為 `reference-only`，不得 `currentApproved` 成為卡面元件。
+逐筆登錄九枚 Approved 母件與一張總覽圖；總覽圖使用 `reference-only`，`currentApproved=false`。
 
 - [ ] **Step 4: Update Version_History**
 
-新增：
-
-```text
-standard v2.6 written spec
-nine theme badge masters approved
-Drive IDs and checksums registered
-GitHub PR / merge SHA
-```
+記錄 v2.6 written spec、九枚母件、Drive IDs／checksums、GitHub PR 與 merge SHA。
 
 - [ ] **Step 5: Read back and verify**
-
-Expected:
 
 ```text
 Theme_Badge_Registry rows = 9
@@ -644,19 +654,29 @@ transparent_background = TRUE for all 9
 - Consumes: Tasks 1–6 的所有證據。
 - Produces: 合併至 `main` 的 current v2.6 Theme Badge System。
 
-- [ ] **Step 1: Synchronize branch with latest main**
-
-Run:
+- [ ] **Step 1: Create isolated implementation branch**
 
 ```bash
 git fetch origin
-git checkout <implementation-branch>
+git checkout main
+git pull --ff-only origin main
+git checkout -b feat/theme-badge-system-v1
+```
+
+- [ ] **Step 2: Execute Tasks 1–6 with TDD commits**
+
+每個 Task 依本計畫自己的 RED／GREEN／commit 步驟執行，不把所有變更壓成一個未驗證 commit。
+
+- [ ] **Step 3: Synchronize latest main before PR completion**
+
+```bash
+git fetch origin
 git rebase origin/main
 ```
 
 Expected: 無衝突；PR `behind_by = 0`。
 
-- [ ] **Step 2: Open one implementation PR**
+- [ ] **Step 4: Open one implementation PR**
 
 Title:
 
@@ -664,21 +684,20 @@ Title:
 feat: 註冊 v2.6 九大主題徽章系統
 ```
 
-PR body 記錄九個 Drive File ID、SHA-256、Sheet 範圍與實際驗證結果。
+PR body 記錄十個 Drive File ID、SHA-256、Sheet 範圍與實際驗證結果。
 
-- [ ] **Step 3: Wait for GitHub Actions**
+- [ ] **Step 5: Wait for GitHub Actions**
 
-不得沿用舊測試數字。記錄最新：Node tests、theme badge tests、Drive validator、TypeScript、ESLint、Vite PWA build、npm audit。
+不得沿用舊測試數字。記錄最新 Node tests、theme badge tests、Drive validator、TypeScript、ESLint、Vite PWA build、npm audit。
 
-- [ ] **Step 4: ChatGPT Audit**
-
-Audit 必須核對：
+- [ ] **Step 6: ChatGPT Audit**
 
 ```text
 9 independent transparent PNG masters
 9 unique system values
-9 unique Approved Drive assets
-9 checksum matches
+9 unique Approved Drive theme-badge assets
+1 Approved reference-only overview
+10 checksum matches
 1 current Approved asset per category
 no background rectangles
 no generated badge substitution in skill docs
@@ -687,29 +706,25 @@ behind_by = 0
 unresolved review threads = 0
 ```
 
-- [ ] **Step 5: Write delivery report**
+- [ ] **Step 7: Write delivery report**
 
 報告包含實際 CI 數字、PR、merge SHA、Drive 路徑與 `readyForCatalogMigration=true`。
 
-- [ ] **Step 6: Squash merge**
+- [ ] **Step 8: Squash merge and verify main**
 
-僅在完整 CI、Audit 與 Sheet 回讀全部通過後執行 Squash Merge。
-
-- [ ] **Step 7: Verify main**
-
-確認 `main` 最新 commit 是合併 SHA，並再次讀取 `theme-badge-registry.json` 與 GitHub Actions conclusion=`success`。
+僅在完整 CI、Audit 與 Sheet 回讀全部通過後 Squash Merge；再確認 `main` 的 Registry 與 Actions conclusion=`success`。
 
 ---
 
 ## Follow-on Plan Boundary
 
-本計畫合併後，再建立並執行獨立計畫：
+本計畫合併後，再建立並執行：
 
 ```text
 docs/superpowers/plans/2026-08-07-card-catalog-theme-migration-v2-6.md
 ```
 
-該計畫負責：
+後續計畫負責：
 
 1. 第一章 61 張卡重新判定九大 `themeCategory`。
 2. `categoryPrimary／categorySecondary` 遷移為 `themeCategory／secondaryThemeTags`。
