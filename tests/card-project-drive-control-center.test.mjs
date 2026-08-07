@@ -142,6 +142,10 @@ const controlCenter = {
 
 const context = { currentMainSha: mainSha, openAssetPrs: [36] };
 
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 function issueCodes(snapshot, nextContext = context) {
   return validateAssetControlCenterSnapshot(
     snapshot,
@@ -178,19 +182,19 @@ test('marks the dashboard stale when its tracked asset PR is no longer open', ()
 });
 
 test('rejects dashboard KPI counts that do not match registries', () => {
-  const snapshot = structuredClone(controlCenter);
+  const snapshot = clone(controlCenter);
   snapshot.currentSnapshot.approvedCurrentMasters = 999;
   assert.ok(issueCodes(snapshot).includes('dashboard-count-mismatch'));
 });
 
 test('rejects a tracked logical asset count that does not match distinct families', () => {
-  const snapshot = structuredClone(controlCenter);
+  const snapshot = clone(controlCenter);
   snapshot.currentSnapshot.trackedLogicalAssets = 999;
   assert.ok(issueCodes(snapshot).includes('dashboard-count-mismatch'));
 });
 
 test('rejects a dashboard timestamp more than five minutes ahead of both registries', () => {
-  const snapshot = structuredClone(controlCenter);
+  const snapshot = clone(controlCenter);
   snapshot.updatedAt = '2026-08-07T10:22:04+08:00';
   assert.ok(issueCodes(snapshot).includes('stale-dashboard-registry'));
 });
