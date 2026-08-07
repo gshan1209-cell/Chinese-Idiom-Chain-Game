@@ -11,11 +11,13 @@ export {
   validateDriveAssetFolderAssignments,
 } from './validate-drive-asset-folder-assignments.js';
 export { validateDriveAssetRegistry } from './validate-drive-asset-registry.js';
+export { validateDriveRegistryCrossLinks } from './validate-drive-registry-cross-links.js';
 export {
   REQUIRED_PHASE1_FOLDER_KEYS,
   validateDriveFolderRegistry,
 } from './validate-drive-folder-registry.js';
 export { validateDriveMigrationLedger } from './validate-drive-migration-ledger.js';
+export { validateProjectAssetFolderAssignments } from './validate-project-asset-folder-assignments.js';
 export { validateProjectAssetRegistry } from './validate-project-asset-registry.js';
 
 export type {
@@ -49,6 +51,10 @@ export type {
   DriveRegistryIssueCode,
 } from './validate-drive-asset-registry.js';
 export type {
+  DriveRegistryCrossLinkIssue,
+  DriveRegistryCrossLinkIssueCode,
+} from './validate-drive-registry-cross-links.js';
+export type {
   DriveFolderIssue,
   DriveFolderIssueCode,
   RequiredPhase1FolderKey,
@@ -57,6 +63,10 @@ export type {
   DriveMigrationIssue,
   DriveMigrationIssueCode,
 } from './validate-drive-migration-ledger.js';
+export type {
+  ProjectAssetFolderAssignmentIssue,
+  ProjectAssetFolderAssignmentIssueCode,
+} from './validate-project-asset-folder-assignments.js';
 export type {
   ProjectAssetIssue,
   ProjectAssetIssueCode,
