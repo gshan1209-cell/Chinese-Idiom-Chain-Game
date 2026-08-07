@@ -1,7 +1,8 @@
 # 第一章成語圖卡主檔交付紀錄
 
 日期：2026-08-07  
-分支：`feat/chapter-one-card-catalog`
+分支：`feat/chapter-one-card-catalog`  
+Pull Request：`#38`
 
 ## 已交付
 
@@ -52,6 +53,21 @@ current_master = false
 
 因此不會進入正式卡池，也不會以未校訂內容冒充 Approved 成品。
 
-## 待 GitHub Actions 驗證
+## GitHub Actions 驗證
 
-PR 建立後須執行完整 `./scripts/verify.sh`，並以實際 CI 結果補記測試數量、TypeScript、ESLint、PWA Build 與 npm audit。
+最新同步 `main` 後的 CI #423 執行完整 `./scripts/verify.sh` 並通過：
+
+```text
+Node tests：346 passed／0 failed
+其中 Card Catalog：7 passed／0 failed
+Drive Asset Validator：PASS（folders=60 assets=9 migrations=3）
+TypeScript strict：PASS
+ESLint：PASS
+Vite production PWA build：PASS
+PWA generateSW：PASS，precache 12 entries（403.12 KiB）
+npm audit：0 vulnerabilities
+behind_by：0
+Review threads：0
+```
+
+驗證分支 SHA：`0c253cf561049537ab75f605b008a9dd0947b97e`。
