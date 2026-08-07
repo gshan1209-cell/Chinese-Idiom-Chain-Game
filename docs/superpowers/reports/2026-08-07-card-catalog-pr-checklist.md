@@ -10,7 +10,7 @@
 - [x] Google Sheet Card_Catalog
 - [x] Google Sheet Card_Dashboard
 - [x] Node 驗證器與專用測試
-- [ ] GitHub Actions 全綠
-- [ ] behind_by = 0
-- [ ] ChatGPT Audit
+- [x] GitHub Actions 全綠（CI #423）
+- [x] behind_by = 0
+- [x] ChatGPT Audit
 - [ ] Squash Merge
