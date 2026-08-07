@@ -7,6 +7,7 @@ export {
   PROJECT_ASSET_LIFECYCLE_STATUSES,
   PROJECT_ASSET_ROLES,
 } from './project-asset-types.js';
+export { validateAssetControlCenterSnapshot } from './validate-asset-control-center.js';
 export {
   validateDriveAssetFolderAssignments,
 } from './validate-drive-asset-folder-assignments.js';
@@ -42,6 +43,11 @@ export type {
   ProjectAssetRegistry,
   ProjectAssetRole,
 } from './project-asset-types.js';
+export type {
+  AssetControlCenterIssue,
+  AssetControlCenterIssueCode,
+  AssetControlCenterValidationContext,
+} from './validate-asset-control-center.js';
 export type {
   DriveAssetFolderAssignmentIssue,
   DriveAssetFolderAssignmentIssueCode,
