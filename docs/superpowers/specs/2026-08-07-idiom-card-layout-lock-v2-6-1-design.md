@@ -1,7 +1,7 @@
 # CICG 成語圖卡版型鎖定規範 v2.6.1
 
 日期：2026-08-07  
-狀態：User Approved／Written Spec  
+狀態：User Approved Design／Written Spec Review Pending  
 適用專案：`gshan1209-cell/Chinese-Idiom-Chain-Game`
 
 ## 1. 目的
@@ -67,20 +67,22 @@ y 向下增加
 - 固定四字、單行、水平置中。
 - 不得換行、直排或侵入注音區。
 - 使用核准繁體中文字體；不得由圖片模型生成文字。
-- 字級可在 renderer 的核准範圍內微調，但不得非等比拉伸文字。
-- 若文字超出 Bounding Box，屬 Blocking failure；不得縮小整個 Header。
+- 使用固定 `textStyleId = idiom-title-v1`；禁止單卡自動縮字或非等比拉伸。
+- 若文字超出 Bounding Box，屬 Blocking failure；必須修正 typography token，不得縮小整個 Header。
 
 ### 3.3 注音
 
 - 只顯示四組逐字對齊的臺灣注音符號。
 - 不顯示漢語拼音、日文假名、羅馬字或近似符號。
 - 四組注音必須與四個成語字依序對齊。
+- 使用固定 `textStyleId = zhuyin-row-v1`。
 - 注音由結構化資料寫入，不得由圖片模型生成。
 
 ### 3.4 白話副標
 
 - 固定單行。
 - 建議不超過 14 個全形中文字元與標點。
+- 使用固定 `textStyleId = subtitle-v1`；禁止單卡自動縮字。
 - 超出時必須編修文案；不得換成兩行、不得向下侵入中央插畫。
 
 ### 3.5 稀有度與難易度
@@ -133,8 +135,8 @@ preserveAspectRatio: true
 
 ```text
 人物與主要動作安全區：x = 96–928, y = 430–1390
-頭部最低安全上界：重要頭部不得高於 y = 420
-下方安全界：重要手部、武器、道具不得低於 y = 1470
+重要頭部最高點：不得進入 y < 420
+重要手部、武器或道具最低點：不得進入 y > 1470
 ```
 
 - 主角臉部不得被 Header 或 Footer 遮擋。
@@ -166,20 +168,23 @@ preserveAspectRatio: true
 
 - 區塊標題固定為 `典故`，不得寫成 `典故說明`。
 - 內文最多四行。
-- 超出時優先精簡文案；不得降低到低於核准最小字級，也不得拉高 Footer。
+- 使用固定 `textStyleId = allusion-body-v1`；禁止單卡自動縮字。
+- 超出時必須精簡文案，不得拉高 Footer。
 - 典故文字必須由結構化資料寫入，不得由圖片模型生成。
 
 ### 5.4 箴言牌匾
 
 - 固定右下窄版深色金框牌匾。
 - 固定三欄直式排版，由右至左閱讀。
+- 使用固定 `textStyleId = motto-vertical-v1`。
 - 文案通常三句，每句約四至六字並保留標點。
 - 牌匾高度、寬度與位置不得隨文案增減。
-- 文案過長時必須重寫，禁止增加欄數或改為橫排。
+- 文案過長時必須重寫，禁止增加欄數、縮字或改為橫排。
 
 ### 5.5 典故來源列
 
 - 固定最底部單行。
+- 使用固定 `textStyleId = source-line-v1`；禁止單卡自動縮字。
 - 不得換行或侵入 Footer 其他區塊。
 - 來源未完成校訂時，只能維持 Draft／Review，不得以臆測來源升格 Approved。
 
@@ -228,16 +233,18 @@ renderer 必須以可重現的固定順序合成：
 ```text
 01 background / panel base
 02 canonical artwork
-03 rarity frame skin
-04 SSR neon overlay（僅 SSR）
-05 Header / Footer structural panels
-06 rarity badge
-07 difficulty badge
-08 theme badge
-09 title / Zhuyin / subtitle
-10 allusion / motto / source
-11 approved edge highlights
+03 Header / Footer structural panels
+04 rarity frame skin
+05 rarity badge
+06 difficulty badge
+07 theme badge
+08 title / Zhuyin / subtitle
+09 allusion / motto / source
+10 approved edge highlights
+11 SSR neon overlay（僅 SSR，最上層）
 ```
+
+SSR neon overlay 雖位於最上層，但其不透明與光暈像素只能存在於核准的外框區域；不得覆蓋內容安全區。
 
 圖片模型只負責第 02 層 artwork。其他層全部由 renderer 使用 Approved 資產與結構化資料合成。
 
@@ -253,8 +260,11 @@ renderer 必須以可重現的固定順序合成：
 - 區域高度。
 - 元件座標。
 - 元件縮放比例。
+- `textStyleId`。
 - 文字流向與對齊。
 - 圖層順序。
+
+不得使用單卡 auto-fit、隨機位置、生成式 UI 或依圖片內容自動重排。
 
 ### 8.2 永久禁止
 
@@ -283,6 +293,7 @@ renderer 必須以可重現的固定順序合成：
 10. 典故最多四行、箴言固定三欄直式、來源固定一行。
 11. 任何文字或重要人物區域不得超出 safe zone 或被外框遮擋。
 12. Canonical artwork 不得含正式卡面文字、徽章或外框。
+13. 同一輸入重複渲染的 geometry manifest 必須完全一致。
 
 任一 Blocking Gate 失敗時：
 
