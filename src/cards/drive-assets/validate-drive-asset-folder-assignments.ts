@@ -46,6 +46,15 @@ function isFolderRecord(value: unknown): value is DriveFolderRecord {
 }
 
 function expectedLifecycleRole(asset: DriveAssetRecord): DriveFolderLifecycleRole {
+  switch (asset.status) {
+    case 'archived':
+    case 'rejected':
+    case 'unverifiable':
+      return 'archive';
+    default:
+      break;
+  }
+
   if (asset.assetType === 'reference-only') {
     return 'reference';
   }
@@ -57,14 +66,14 @@ function expectedLifecycleRole(asset: DriveAssetRecord): DriveFolderLifecycleRol
     case 'review':
     case 'changes-requested':
       return 'review';
-    case 'archived':
-    case 'rejected':
-    case 'unverifiable':
-      return 'archive';
     case 'intake':
     case 'classified':
     case 'quarantined':
       return 'inbox';
+    case 'archived':
+    case 'rejected':
+    case 'unverifiable':
+      return 'archive';
   }
 }
 
