@@ -38,3 +38,25 @@ test('rejects current Approved flags on non-approved lifecycle states', () => {
     ({ code }) => code === 'current-approved-status-mismatch',
   ));
 });
+
+test('rejects Approved or published status on reference-only assets', () => {
+  const issues = validateDriveAssetRegistry({
+    schemaVersion: 1,
+    updatedAt: '2026-08-07T00:00:00+08:00',
+    assets: [{
+      ...reviewAsset,
+      assetId: 'reference-approved',
+      assetType: 'reference-only',
+      identity: 'competitor-layout-reference',
+      status: 'approved',
+      currentApproved: false,
+      driveFileId: 'reference-approved-file',
+      parentFolderKey: 'idiom-cards.reference-only',
+      approvalEvidenceIds: ['review-evidence'],
+    }],
+  });
+
+  assert.ok(issues.some(
+    ({ code }) => code === 'reference-only-approved',
+  ));
+});
