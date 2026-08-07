@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-07T12:00:00+08:00",
+  "status": "draft-catalog-ready",
+  "chapterId": "chapter-1",
+  "catalog": {
+    "seedPath": "data/cards/chapter-1-card-catalog.seed.csv",
+    "controlCenterPath": "data/cards/chapter-1-card-catalog-control-center.json",
+    "schemaPath": "data/cards/chapter-1-card-catalog.schema.json",
+    "buildCommand": "npm run build:card-catalog",
+    "testCommand": "npm run test:card-catalog"
+  },
+  "counts": {
+    "cards": 61,
+    "batches": 7,
+    "femalePrimaryVisualLeads": 31,
+    "ssr": 8,
+    "completePrompts": 61
+  },
+  "gates": {
+    "chapterFemaleAtLeastHalf": "pass",
+    "everyBatchFemaleAtLeastHalf": "pass",
+    "raritySpecificFrames": "pass",
+    "ssrEpicPromptBlocks": "pass",
+    "copyReview": "pending",
+    "licenseReview": "pending",
+    "approvedPoolEligible": false
+  },
+  "googleSheets": {
+    "spreadsheetId": "1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94",
+    "cardCatalogSheetId": 1976080701,
+    "cardDashboardSheetId": 1976080702
+  }
+}
