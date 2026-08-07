@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  validateDriveAssetFolderAssignments,
   validateDriveAssetRegistry,
   validateDriveFolderRegistry,
   validateDriveMigrationLedger,
@@ -44,6 +45,7 @@ async function main() {
   const issues = [
     ...validateDriveFolderRegistry(folders),
     ...validateDriveAssetRegistry(assets),
+    ...validateDriveAssetFolderAssignments(assets, folders),
     ...migrations.flatMap((ledger) => validateDriveMigrationLedger(ledger)),
   ];
 
