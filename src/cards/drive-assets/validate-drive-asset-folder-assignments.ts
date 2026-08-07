@@ -70,10 +70,6 @@ function expectedLifecycleRole(asset: DriveAssetRecord): DriveFolderLifecycleRol
     case 'classified':
     case 'quarantined':
       return 'inbox';
-    case 'archived':
-    case 'rejected':
-    case 'unverifiable':
-      return 'archive';
   }
 }
 
