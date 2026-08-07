@@ -2,11 +2,12 @@
   "schemaVersion": 2,
   "project": "Chinese-Idiom-Chain-Game",
   "defaultRenderMode": "modular",
-  "layoutVersion": "2.6",
+  "layoutVersion": "2.6.1",
+  "currentLayoutStandard": "docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md",
   "componentSetVersion": "theme-badges-v1.0",
   "activeBatchId": null,
-  "workflowStatus": "theme-badge-system-ready",
-  "nextAction": "Migrate all 61 chapter-one cards from deprecated categoryPrimary/categorySecondary values to one fixed themeCategory plus secondaryThemeTags, then regenerate batch 01 using approved theme badges.",
-  "lastUpdatedAt": "2026-08-07T14:23:46+08:00",
+  "workflowStatus": "layout-standard-v2-6-1-ready",
+  "nextAction": "Migrate all 61 chapter-one cards to fixed themeCategory fields, then generate illustration-only Batch 01 artwork and compose cards with the deterministic v2.6.1 layout contract.",
+  "lastUpdatedAt": "2026-08-07T20:46:38+08:00",
   "cards": []
 }
