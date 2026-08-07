@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cicg.local/schemas/project-inventory.schema.json",
+  "title": "CICG Phase 2 Drive Inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "capturedAt",
+    "sourceCommit",
+    "complete",
+    "roots",
+    "resources",
+    "orphanResourceIds",
+    "warnings"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "complete": { "type": "boolean" },
+    "roots": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "driveFolderId", "directChildCount"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "driveFolderId": { "type": "string", "minLength": 1 },
+          "directChildCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resourceKind",
+          "driveResourceId",
+          "name",
+          "parentDriveId",
+          "mimeType",
+          "sizeBytes",
+          "modifiedTime",
+          "webViewLink",
+          "folderKey",
+          "assetRecordId",
+          "lifecycleClaim",
+          "directChildCount",
+          "evidenceSource"
+        ],
+        "properties": {
+          "resourceKind": { "enum": ["file", "folder"] },
+          "driveResourceId": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "parentDriveId": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "null" }
+            ]
+          },
+          "mimeType": { "type": "string", "minLength": 1 },
+          "sizeBytes": {
+            "anyOf": [
+              { "type": "integer", "minimum": 0 },
+              { "type": "null" }
+            ]
+          },
+          "modifiedTime": { "type": "string", "format": "date-time" },
+          "webViewLink": { "type": "string", "format": "uri" },
+          "folderKey": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "null" }
+            ]
+          },
+          "assetRecordId": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "null" }
+            ]
+          },
+          "lifecycleClaim": {
+            "enum": ["none", "review", "approved", "inbox", "archive", "reference"]
+          },
+          "directChildCount": {
+            "anyOf": [
+              { "type": "integer", "minimum": 0 },
+              { "type": "null" }
+            ]
+          },
+          "evidenceSource": {
+            "enum": ["live-drive-scan", "delegated-phase1-governance"]
+          }
+        }
+      }
+    },
+    "orphanResourceIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "delegatedEvidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["folderKey", "registryPath", "auditPath", "reason"],
+        "properties": {
+          "folderKey": { "type": "string", "minLength": 1 },
+          "registryPath": { "type": "string", "minLength": 1 },
+          "auditPath": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
