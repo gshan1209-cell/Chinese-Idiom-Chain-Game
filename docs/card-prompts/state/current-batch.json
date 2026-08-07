@@ -3,10 +3,10 @@
   "project": "Chinese-Idiom-Chain-Game",
   "defaultRenderMode": "modular",
   "layoutVersion": "2.6",
-  "componentSetVersion": "1.0",
+  "componentSetVersion": "theme-badges-v1.0",
   "activeBatchId": null,
-  "workflowStatus": "ready",
-  "nextAction": "Select or confirm the next modular idiom-card batch, then prepare illustration-only artwork before composition.",
-  "lastUpdatedAt": "2026-08-06T20:27:21+08:00",
+  "workflowStatus": "theme-badge-system-ready",
+  "nextAction": "Migrate all 61 chapter-one cards from deprecated categoryPrimary/categorySecondary values to one fixed themeCategory plus secondaryThemeTags, then regenerate batch 01 using approved theme badges.",
+  "lastUpdatedAt": "2026-08-07T14:23:46+08:00",
   "cards": []
 }

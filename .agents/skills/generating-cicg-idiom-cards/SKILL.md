@@ -14,7 +14,9 @@ Use GitHub `main` and the batch-state file as the continuity layer. New cards us
 1. Read `AGENTS.md`.
 2. Read `references/required-specs.md`.
 3. Read `docs/card-prompts/state/current-batch.json`.
-4. Read the matching rarity template, idiom prompt, Manifest, and available Drive evidence.
+4. Read `data/cards/theme-badge-registry.json`.
+5. Read `data/drive-assets/idiom-card-assets.json`.
+6. Read the matching rarity template, idiom prompt, Manifest, and available Drive evidence.
 
 If Repository files cannot be read, state that the continuation source is unavailable. Do not guess the previous batch.
 
@@ -39,11 +41,13 @@ Before generation, each card must have:
 
 - idiom
 - four aligned Zhuyin readings
-- four tone-marked Hanyu Pinyin syllables
+- optional data-layer Hanyu Pinyin for search or speech; Pinyin must not render on the card
 - subtitle
 - difficulty
 - rarity and rationale
-- theme badge
+- `themeCategory` from the fixed nine-category registry
+- `themeBadgeAssetId` resolved from the registry
+- optional `secondaryThemeTags`, which must not render on the card
 - allusion summary and source status
 - motto
 - character action and historical setting
@@ -69,13 +73,51 @@ Then compose the final `1024 × 2000 px` card with approved components and struc
 
 Generate only Review assets unless an independent human approval is explicitly recorded. The producing Agent cannot self-approve its own artwork or composite.
 
+## Theme Badge Contract v2.6
+
+The lower-left category is not free text. It must resolve through:
+
+```text
+data/cards/theme-badge-registry.json
+```
+
+Allowed `themeCategory` values are exactly:
+
+```text
+military
+governance
+strategy
+arts
+perseverance
+selfCultivation
+relationships
+cautionary
+perspective
+```
+
+Display names are exactly:
+
+```text
+軍事、內政、智謀、文藝、勵志、修身、人際、警世、見識
+```
+
+Permanent rules:
+
+- The image model must never draw or invent the theme badge inside the artwork.
+- The composite renderer must resolve `displayName` and `assetId` from the Registry.
+- `secondaryThemeTags` such as 專注、豪情、公義、新歲、自然 or 情感 are management/search metadata only and must not appear on the card.
+- The same category must always use the same current Approved PNG, icon definition, background color, and Traditional Chinese label.
+- The nine Approved masters are `1024 × 1280` RGBA transparent PNG assets stored in the Theme Badge Asset Registry.
+- A missing, mismatched, non-current, non-transparent, or wrong-size badge blocks composition approval.
+- The overview sheet is documentation only and must never be cropped into a card component.
+
 ## Modular Invariants
 
 - New cards default to `renderMode: modular`.
 - Existing indivisible PNG cards remain `flat-legacy` until intentionally migrated.
 - Artwork is canonical visual source; Review／Approved composite PNG is derived output.
 - Rarity, difficulty, theme badge, title, pronunciation, allusion, motto, source and frame must remain replaceable.
-- Changing difficulty or rarity badge must not change `artworkAssetId`, artwork version, or artwork SHA-256.
+- Changing difficulty, rarity, or theme badge must not change `artworkAssetId`, artwork version, or artwork SHA-256.
 - Unknown Drive IDs, checksums, approvals, source verification, or license evidence remain `null`.
 
 ## Permanent Gates
@@ -87,15 +129,14 @@ Generate only Review assets unless an independent human approval is explicitly r
 - Modular artwork source is `1024 × 1200 px` or verified safe for that slot.
 - Traditional Chinese four-character idiom.
 - First row below the title: four aligned Zhuyin groups.
-- Second row below Zhuyin: lowercase tone-marked Hanyu Pinyin.
-- No numbered tones and no missing tone marks in Approved assets.
-- Rarity at upper left; difficulty at upper right; never mix them.
+- No Hanyu Pinyin or other Romanized pronunciation line on the card.
+- Rarity at upper left; difficulty at upper right; theme badge at lower left; never mix them.
 - New SSR cards use the v2.7 legendary iridescent golden-dragon badge: large dimensional gold `SSR`, purple-blue-magenta nebula core, and a purple diamond main gemstone.
 - The SSR badge must differ clearly from SR in silhouette, material, light effects, and main gemstone; changing only letters, brightness, or saturation is a Blocking failure.
-- SSR iridescence remains confined to the upper-left badge and must not recolor the whole card.
-- N／R／SR must not use the v2.7 SSR badge.
+- SSR iridescence remains confined to the approved rarity frame/effects and must not recolor the theme badge.
+- N／R／SR must not use the SSR badge or SSR full-rainbow frame.
 - At least one person actively expresses the idiom.
-- Full theme badge at lower left.
+- Full current Approved theme badge at lower left, with the exact Registry label.
 - Section label is `典故`, not `典故說明`.
 - Low-height, narrow, vertical motto plaque at lower right.
 - One-line source at the bottom.
@@ -128,8 +169,9 @@ Report only evidence-backed facts:
 - artwork and composition status per card
 - artwork and composite filenames
 - actual artwork and composite dimensions
-- Zhuyin and Pinyin review status
-- SSR v2.7 badge review status when applicable
+- Zhuyin review status
+- theme category, exact Registry label, and resolved badge Asset ID
+- SSR badge/frame review status when applicable
 - Drive File IDs actually returned
 - artwork and composite checksums actually calculated
 - Manifest/state updates actually committed

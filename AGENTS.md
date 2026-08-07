@@ -144,10 +144,11 @@ docs/card-prompts/state/current-batch.json
 8. docs/superpowers/specs/2026-08-06-card-rarity-frame-system-amendment.md
 9. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
 10. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
-11. docs/card-prompts/PROJECT_PROMPT.md
+11. docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
+12. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與禁止羅馬拼音條款；v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；四階外框規格定義 N／R／SR／SSR 的 frame-skin 與 effect-overlay；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工；Drive 素材治理規格定義 type-first 結構、生命週期、Registry、Migration Ledger 與 drift Gate。
+v2.1 保留為歷史版面基礎；2026-08-06 的 v2.6 修正尺寸與注音定位；2026-08-07 的 v2.6 正式規範進一步覆寫卡面拼音、九大主題徽章與元件化合成流程。v2.7 只覆寫 SSR 左上稀有度徽章的視覺標準；四階外框規格定義 N／R／SR／SSR 的 frame-skin 與 effect-overlay；元件化規格定義來源資產、資料、元件、render plan 與 derived PNG 的分工；Drive 素材治理規格定義 type-first 結構、生命週期、Registry、Migration Ledger 與 drift Gate。
 
 發生衝突時，較新的 Approved 規格優先；技能與狀態檔不能取代 Drive、Manifest、Registry、來源、授權或核准證據。
 
@@ -162,7 +163,7 @@ v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與�
 - Review、Rejected、Deprecated、來源未校訂或權利不清的卡不得進入正式卡池。
 - 正式圖卡固定為 `1024 × 2000 px`。
 - 上方資訊區固定 `360 px`、中央主圖區固定 `1200 px`、下方內容區固定 `440 px`。
-- 四字主標下方第一列為四組逐字對齊注音；第二列為小寫、帶聲調符號的漢語拼音。
+- 四字主標下方只顯示四組逐字對齊注音；漢語拼音可保留於資料層供搜尋或語音使用，但不得進入卡面渲染。
 - 新產 SSR 圖卡必須使用 v2.7 傳奇級虹彩金龍徽章：大型立體金色 SSR、紫藍洋紅星雲核心與紫色菱形主寶石。
 - SSR 徽章必須與 SR 在輪廓、材質、光效與主寶石上明顯區隔；只改文字、亮度或飽和度視為 Blocking failure。
 - N 外框固定為深翡翠古金；R 為霜藍鋼銀；SR 為皇家紫晶；SSR v2.8 為完整青藍、紫、洋紅、翠綠虹彩霓虹包框。
@@ -170,6 +171,11 @@ v2.1 保留為歷史版面基礎；v2.6 覆寫尺寸、比例、注音位置與�
 - SSR v2.8 可把虹彩用於外框與 effect overlay，但不得把 canonical artwork、難易度框、典故區、主題徽章或箴言牌匾全面染色。
 - N／R／SR 不得套用 v2.7 SSR 徽章或 v2.8 SSR 完整虹彩外框。
 - 稀有度外框不得改寫難易度；右上 difficulty badge 必須是獨立元件。
+- 左下主題類別只能讀取 `data/cards/theme-badge-registry.json` 的九大正式類別：軍事、內政、智謀、文藝、勵志、修身、人際、警世、見識。
+- `secondaryThemeTags` 只供管理與搜尋，不得顯示在卡面；「專注、豪情、公義、新歲」等自由文字不得取代正式類別。
+- 產圖模型不得在中央插畫中自行生成主題徽章、類別名稱、稀有度、難易度或任何正式卡面文字。
+- 合成時必須依 `themeCategory` 解析 current Approved `themeBadgeAssetId`；缺少、錯配、尺寸錯誤或非透明母件均屬 Blocking failure。
+- 九枚主題徽章母件固定為 `1024 × 1280 px` RGBA 透明 PNG；總覽圖只供文件審核，不得裁切作為卡面元件。
 - 新建圖卡預設 `renderMode = modular`；舊整張 PNG 使用 `flat-legacy`。
 - 中央主插圖必須保存為獨立 artwork，不得烙入稀有度、難易度、主標、注音、拼音、典故、箴言或來源。
 - 難易度、稀有度、外框、主題徽章、文字、箴言牌匾與來源必須能獨立替換。
@@ -255,6 +261,12 @@ docs/superpowers/reports/2026-08-07-drive-phase2-readiness.md
 
 ```text
 docs/card-prompts/components/rarity-frame-registry-v1.md
+```
+
+九大主題徽章註冊表：
+
+```text
+data/cards/theme-badge-registry.json
 ```
 
 ---
