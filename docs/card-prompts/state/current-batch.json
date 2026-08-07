@@ -1,13 +1,64 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "project": "Chinese-Idiom-Chain-Game",
   "defaultRenderMode": "modular",
   "layoutVersion": "2.6.1",
   "currentLayoutStandard": "docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md",
   "componentSetVersion": "theme-badges-v1.0",
-  "activeBatchId": null,
-  "workflowStatus": "layout-standard-v2-6-1-ready",
-  "nextAction": "Migrate all 61 chapter-one cards to fixed themeCategory fields, then generate illustration-only Batch 01 artwork and compose cards with the deterministic v2.6.1 layout contract.",
-  "lastUpdatedAt": "2026-08-07T20:46:38+08:00",
-  "cards": []
+  "activeBatchId": "review-batch-2026-08-07-01",
+  "workflowStatus": "batch-approved-recorded-awaiting-consolidated-drive-move",
+  "batchWorkflow": {
+    "productionComplete": true,
+    "userReviewRequiredBeforeRecordUpdate": true,
+    "recordUpdateBeforeDriveMove": true,
+    "driveMoveMode": "consolidated-after-multiple-approved-batches",
+    "moveFilesNow": false
+  },
+  "approval": {
+    "status": "approved-by-user",
+    "approvedAt": "2026-08-08T21:00:00+08:00",
+    "relocationStatus": "pending-consolidated-move"
+  },
+  "nextAction": "Produce the next batch, ask the user to approve or reject it, update this state file after approval, and defer all Drive relocation until the user requests the consolidated move.",
+  "lastUpdatedAt": "2026-08-08T21:00:00+08:00",
+  "cards": [
+    {
+      "idiom": "破釜沉舟",
+      "rarity": "SSR",
+      "difficulty": "A",
+      "reviewStatus": "approved-by-user",
+      "driveFileId": "1CL7nwv-O00HC9YTjGvOcWtmt44mXYatd",
+      "driveLocationStatus": "review-folder-pending-consolidated-move"
+    },
+    {
+      "idiom": "臥薪嘗膽",
+      "rarity": "SR",
+      "difficulty": "B",
+      "reviewStatus": "approved-by-user",
+      "driveFileId": "1GpXiCIzF-iAYJaHFKFNgoTNwYrPg5fjp",
+      "driveLocationStatus": "review-folder-pending-consolidated-move"
+    },
+    {
+      "idiom": "一諾千金",
+      "rarity": "R",
+      "difficulty": "C",
+      "reviewStatus": "approved-by-user",
+      "driveFileId": "1WlFiv6ALCv9oT7eAOXNRM4a1oOoQUk3C",
+      "driveLocationStatus": "review-folder-pending-consolidated-move"
+    },
+    {
+      "idiom": "集思廣益",
+      "rarity": "N",
+      "difficulty": "D",
+      "reviewStatus": "approved-by-user",
+      "driveFileId": "1Aug_SfFeovTEaZ54gPGGZR59i-LXjuom",
+      "driveLocationStatus": "review-folder-pending-consolidated-move"
+    }
+  ],
+  "excludedFromApprovedBatch": [
+    {
+      "idiom": "水滴石穿",
+      "reason": "generated after batch approval and not yet reviewed"
+    }
+  ]
 }
