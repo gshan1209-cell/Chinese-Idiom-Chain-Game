@@ -3,6 +3,11 @@ export {
   DRIVE_ASSET_TYPES,
 } from './drive-asset-types.js';
 export {
+  PROJECT_ASSET_DOMAINS,
+  PROJECT_ASSET_LIFECYCLE_STATUSES,
+  PROJECT_ASSET_ROLES,
+} from './project-asset-types.js';
+export {
   validateDriveAssetFolderAssignments,
 } from './validate-drive-asset-folder-assignments.js';
 export { validateDriveAssetRegistry } from './validate-drive-asset-registry.js';
@@ -27,6 +32,13 @@ export type {
   DriveMigrationOperation,
   DriveResourceSnapshot,
 } from './drive-asset-types.js';
+export type {
+  ProjectAssetDomain,
+  ProjectAssetLifecycleStatus,
+  ProjectAssetRecord,
+  ProjectAssetRegistry,
+  ProjectAssetRole,
+} from './project-asset-types.js';
 export type {
   DriveAssetFolderAssignmentIssue,
   DriveAssetFolderAssignmentIssueCode,
