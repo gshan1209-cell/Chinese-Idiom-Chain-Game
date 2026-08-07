@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-07T14:01:41+08:00",
+  "updatedAt": "2026-08-07T14:18:00+08:00",
   "assets": [
     {
       "assetId": "frame-n-v1.0-emerald-antique-gold",
@@ -386,7 +386,7 @@
       "identity": "theme-badge-system-overview",
       "version": "1.0",
       "status": "approved",
-      "currentApproved": false,
+      "currentApproved": true,
       "filename": "CICG_ThemeBadgeSystem_v1.0_Approved.png",
       "driveFileId": "1s-cNroYhFxsfcWjV7D-0ajsbTMflNnDX",
       "parentFolderKey": "idiom-cards.components.theme-badges.approved",
