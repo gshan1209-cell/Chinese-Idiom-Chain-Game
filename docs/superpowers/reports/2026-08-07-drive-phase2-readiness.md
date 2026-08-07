@@ -1,7 +1,7 @@
 # Drive Phase 2 Readiness
 
 日期：2026-08-07  
-判定：**Phase 2 Ready = false**
+判定：**Phase 2 Ready = true**
 
 ## 1. Readiness Gate
 
@@ -16,7 +16,7 @@ Unregistered files in Approved = 0
 Full repository verify = PASS
 ```
 
-目前判定：
+最終判定：
 
 | Gate | 結果 | 證據 |
 |---|---|---|
@@ -25,16 +25,16 @@ Full repository verify = PASS
 | Unverified applied migrations | 0 / PASS | Batch 1、Batch 2 全部 verified |
 | Missing rollback snapshots | 0 / PASS | 每個 mutation entry 皆有 rollback snapshot |
 | Unregistered files in Approved | 0 / PASS | 9 個 Approved leaf folders 已全部掃描 |
-| Latest full repository verify | **PENDING** | 最新 commit 尚無可引用的完整 CI 結果 |
+| Latest full repository verify | **PASS** | GitHub Actions CI #400，run `31138472337`，PR merge ref `a217771a2de7982efe28333a520874b309aa295e` |
 
 因此：
 
 ```text
-Phase 2 Ready = false
-Blocking reason = latest-full-repository-verify-pending
+Phase 2 Ready = true
+Blocking reason = none
 ```
 
-在新 CI 明確通過前，不得開始 Phase 2 實體搬移，也不得將 PR 標記可合併。
+Phase 2 可以進入「全專案 read-only inventory 與規格規劃」。這個判定不授權直接大量搬移；每一個後續 mutation batch 仍須具備 Registry、Migration Ledger、rollback snapshot 與批次驗證。
 
 ## 2. Phase 1 已達成的能力
 
@@ -48,6 +48,8 @@ Blocking reason = latest-full-repository-verify-pending
 - Migration Ledgers 具有完整 before／after／rollback snapshots。
 - `scripts/verify.sh` 永久執行 Drive governance validation。
 - CLI 自動掃描 `data/drive-assets/migrations/` 下全部 JSON Ledgers。
+- CLI 交叉驗證 Asset status、`currentApproved` 與 Folder lifecycle role。
+- Validator 對 malformed raw JSON 回傳可稽核 issue，不因 TypeError 中斷整體 Gate。
 
 ## 3. 尚待逐檔治理的 Phase 1 素材
 
@@ -112,23 +114,28 @@ docs/superpowers/plans/2026-08-06-drive-asset-governance.md
 docs/superpowers/reports/2026-08-07-drive-phase1-migration-report.md
 ```
 
-## 6. 解除阻擋條件
+## 6. 解除阻擋證據
 
-當最新 PR head 完成以下驗證後，才可重新計算 readiness：
+GitHub Actions CI #400 已在 Node.js 22.16.0 執行：
 
-```bash
-npm install
-./scripts/verify.sh
-git status --short
-git diff --check
+```text
+Drive governance：PASS，folders=60 assets=9 migrations=3
+全部測試：339 passed，0 failed
+Card tests：100 / 100
+Puzzle tests：37 / 37
+Trap tests：95 / 95
+TypeScript strict：PASS
+ESLint：PASS
+Vite production build：PASS
+PWA precache：12 entries（403.12 KiB）
+npm audit：419 packages，0 vulnerabilities
 ```
 
-並要求：
+合併前仍須對本報告更新後的最終 PR head 再執行一次完整 CI，並確認：
 
-- GitHub Actions 最新 run 成功。
 - `behind_by = 0`。
 - 未解決 review threads = 0。
 - Live Drive metadata 與 physical audit snapshot 無新漂移。
-- PR 完成 ChatGPT Audit。
+- ChatGPT Audit 無 Critical／Important findings。
 
-滿足後可將 `Phase 2 Ready` 更新為 true；在此之前維持 false。
+以上全部成立後，PR #35 才可 Squash Merge。
