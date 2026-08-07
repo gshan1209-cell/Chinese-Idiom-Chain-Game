@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "batchId": "phase2-batch1-control-center-backgrounds",
+  "phase": "phase2",
+  "batchType": "registration-only",
+  "createdAt": "2026-08-07T12:40:00+08:00",
+  "sourceCommit": "efcc5a5ad2d119eac4c87f1a56ae7747f4a1b8f7",
+  "status": "verified",
+  "driveMutationCount": 0,
+  "entries": []
+}

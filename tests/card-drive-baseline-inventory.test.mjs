@@ -32,14 +32,21 @@ test('records the complete Phase 1 folder topology with real Drive IDs', async (
   const quarantinedAssets = assets.assets.filter(
     ({ status }) => status === 'quarantined',
   );
+  const phase2FolderKeys = [
+    'project.management.asset-control-center',
+    'visuals.game-backgrounds',
+    'visuals.game-backgrounds.review',
+    'visuals.game-backgrounds.approved',
+  ];
 
-  assert.equal(folders.folders.length, 60);
+  assert.equal(folders.folders.length, 64);
+  assert.ok(REQUIRED_PHASE1_FOLDER_KEYS.every((folderKey) => folderKeys.has(folderKey)));
+  assert.ok(phase2FolderKeys.every((folderKey) => folderKeys.has(folderKey)));
   assert.equal(assets.assets.length, 9);
   assert.equal(approvedAssets.length, 4);
   assert.equal(reviewAssets.length, 1);
   assert.equal(quarantinedAssets.length, 4);
   assert.equal(migration.entries.length, 0);
-  assert.ok(REQUIRED_PHASE1_FOLDER_KEYS.every((folderKey) => folderKeys.has(folderKey)));
   assert.deepEqual(validateDriveFolderRegistry(folders), []);
   assert.deepEqual(validateDriveAssetRegistry(assets), []);
   assert.deepEqual(validateDriveMigrationLedger(migration), []);
