@@ -2,6 +2,9 @@ export {
   DRIVE_ASSET_STATUSES,
   DRIVE_ASSET_TYPES,
 } from './drive-asset-types.js';
+export {
+  validateDriveAssetFolderAssignments,
+} from './validate-drive-asset-folder-assignments.js';
 export { validateDriveAssetRegistry } from './validate-drive-asset-registry.js';
 export {
   REQUIRED_PHASE1_FOLDER_KEYS,
@@ -24,6 +27,10 @@ export type {
   DriveMigrationOperation,
   DriveResourceSnapshot,
 } from './drive-asset-types.js';
+export type {
+  DriveAssetFolderAssignmentIssue,
+  DriveAssetFolderAssignmentIssueCode,
+} from './validate-drive-asset-folder-assignments.js';
 export type {
   DriveRegistryIssue,
   DriveRegistryIssueCode,
