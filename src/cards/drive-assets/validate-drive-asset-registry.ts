@@ -15,6 +15,7 @@ export type DriveRegistryIssueCode =
   | 'approved-missing-evidence'
   | 'published-not-approved'
   | 'current-approved-status-mismatch'
+  | 'reference-only-approved'
   | 'ur-missing-license'
   | 'broken-supersession';
 
@@ -209,6 +210,17 @@ export function validateDriveAssetRegistry(
         'current-approved-status-mismatch',
         asset.assetId,
         '只有 approved 或 published 資產可以標記 current Approved。',
+      ));
+    }
+
+    if (
+      asset.assetType === 'reference-only' &&
+      (asset.status === 'approved' || asset.status === 'published')
+    ) {
+      issues.push(issue(
+        'reference-only-approved',
+        asset.assetId,
+        'Reference Only 資產不得標記 approved 或 published。',
       ));
     }
 
