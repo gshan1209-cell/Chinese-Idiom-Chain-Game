@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gshan1209-cell/Chinese-Idiom-Chain-Game/data/cards/theme-badge-registry.schema.json",
+  "title": "CICG Theme Badge Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "badges"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "badges": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": { "$ref": "#/$defs/themeBadge" }
+    }
+  },
+  "$defs": {
+    "themeBadge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "systemValue",
+        "displayName",
+        "assetId",
+        "iconDefinition",
+        "backgroundHex",
+        "version",
+        "pixelWidth",
+        "pixelHeight",
+        "mimeType",
+        "transparentBackground"
+      ],
+      "properties": {
+        "systemValue": {
+          "enum": [
+            "military",
+            "governance",
+            "strategy",
+            "arts",
+            "perseverance",
+            "selfCultivation",
+            "relationships",
+            "cautionary",
+            "perspective"
+          ]
+        },
+        "displayName": {
+          "enum": ["軍事", "內政", "智謀", "文藝", "勵志", "修身", "人際", "警世", "見識"]
+        },
+        "assetId": { "type": "string", "minLength": 1 },
+        "iconDefinition": { "type": "string", "minLength": 1 },
+        "backgroundHex": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+        "version": { "const": "1.0" },
+        "pixelWidth": { "const": 1024 },
+        "pixelHeight": { "const": 1280 },
+        "mimeType": { "const": "image/png" },
+        "transparentBackground": { "const": true }
+      }
+    }
+  }
+}
