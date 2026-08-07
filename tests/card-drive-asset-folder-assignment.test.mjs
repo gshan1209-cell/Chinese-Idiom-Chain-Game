@@ -47,6 +47,20 @@ const folders = Object.freeze({
       parentFolderKey: null,
       lifecycleRole: 'review',
     },
+    {
+      folderKey: 'references.active',
+      driveFolderId: 'reference-folder',
+      name: '05_Reference_Only',
+      parentFolderKey: null,
+      lifecycleRole: 'reference',
+    },
+    {
+      folderKey: 'references.archive',
+      driveFolderId: 'archive-folder',
+      name: '06_Rejected_And_Unverifiable',
+      parentFolderKey: null,
+      lifecycleRole: 'archive',
+    },
   ],
 });
 
@@ -82,6 +96,25 @@ test('rejects Approved-folder assets that are not current Approved masters', () 
   assert.ok(issues.some(
     ({ code }) => code === 'asset-current-approved-mismatch',
   ));
+});
+
+test('routes archived reference-only assets to Archive instead of active Reference', () => {
+  const issues = validateDriveAssetFolderAssignments({
+    schemaVersion: 1,
+    updatedAt: '2026-08-07T00:00:00+08:00',
+    assets: [{
+      ...approvedAsset,
+      assetId: 'archived-reference',
+      assetType: 'reference-only',
+      status: 'archived',
+      currentApproved: false,
+      driveFileId: 'archived-reference-file',
+      parentFolderKey: 'references.archive',
+      approvalEvidenceIds: [],
+    }],
+  }, folders);
+
+  assert.deepEqual(issues, []);
 });
 
 test('accepts the current governed Asset and Folder registries', async () => {
