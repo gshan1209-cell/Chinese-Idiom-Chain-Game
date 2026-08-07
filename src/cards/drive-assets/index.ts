@@ -16,6 +16,7 @@ export {
   validateDriveFolderRegistry,
 } from './validate-drive-folder-registry.js';
 export { validateDriveMigrationLedger } from './validate-drive-migration-ledger.js';
+export { validateProjectAssetRegistry } from './validate-project-asset-registry.js';
 
 export type {
   DriveAssetRecord,
@@ -56,3 +57,7 @@ export type {
   DriveMigrationIssue,
   DriveMigrationIssueCode,
 } from './validate-drive-migration-ledger.js';
+export type {
+  ProjectAssetIssue,
+  ProjectAssetIssueCode,
+} from './validate-project-asset-registry.js';
