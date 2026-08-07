@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gshan1209-cell/Chinese-Idiom-Chain-Game/data/cards/chapter-1-card-catalog.schema.json",
+  "title": "CICG Chapter One Card Catalog",
+  "type": "object",
+  "required": ["schemaVersion", "chapterId", "genderQuota", "rarityFrameMap", "difficultyLabelMap", "cards"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "chapterId": { "const": "chapter-1" },
+    "cards": {
+      "type": "array",
+      "minItems": 61,
+      "maxItems": 61,
+      "items": {
+        "type": "object",
+        "required": [
+          "cardId", "idiomId", "idiomText", "levelNumber", "placementOrder", "batchId",
+          "rarity", "frameAssetId", "cardDifficultyCode", "cardDifficultyLabel",
+          "categoryPrimary", "categorySecondary", "primaryVisualLead", "promptMaster",
+          "reviewStatus", "currentMaster"
+        ],
+        "properties": {
+          "rarity": { "enum": ["N", "R", "SR", "SSR"] },
+          "cardDifficultyCode": { "enum": ["E", "D", "C", "B", "A", "S"] },
+          "primaryVisualLead": { "enum": ["female", "male", "mixed", "group", "none"] },
+          "reviewStatus": {
+            "enum": [
+              "draft", "copy-review", "ready-for-art", "artwork-review",
+              "ready-for-composite", "composite-review", "approved"
+            ]
+          },
+          "currentMaster": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

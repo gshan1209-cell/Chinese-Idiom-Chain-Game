@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-07T12:00:00+08:00",
+  "canonicalSource": {
+    "seedPath": "data/cards/chapter-1-card-catalog.seed.csv",
+    "generatedCatalogPath": "data/cards/chapter-1-card-catalog.json",
+    "buildCommand": "npm run build:card-catalog",
+    "validationCommand": "npm run test:card-catalog"
+  },
+  "googleSheets": {
+    "spreadsheetId": "1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94",
+    "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94/edit",
+    "catalogWorksheet": {
+      "title": "Card_Catalog",
+      "sheetId": 1976080701,
+      "range": "A1:BI62"
+    },
+    "dashboardWorksheet": {
+      "title": "Card_Dashboard",
+      "sheetId": 1976080702,
+      "range": "A1:J22"
+    },
+    "codebookWorksheet": "Codebook_Agent",
+    "versionHistoryWorksheet": "Version_History"
+  },
+  "chapterOne": {
+    "totalCards": 61,
+    "batches": 7,
+    "femaleLeadCards": 31,
+    "femaleLeadRatio": 0.5081967213,
+    "femaleQuotaChapter": "PASS",
+    "femaleQuotaAllBatches": "PASS",
+    "rarityCounts": {
+      "N": 12,
+      "R": 18,
+      "SR": 23,
+      "SSR": 8
+    },
+    "difficultyCounts": {
+      "E": 14,
+      "D": 22,
+      "C": 12,
+      "B": 6,
+      "A": 6,
+      "S": 1
+    },
+    "completePromptCount": 61,
+    "ssrEpicPromptCount": 8,
+    "reviewStatus": "draft",
+    "licenseStatus": "pending"
+  },
+  "agentRules": [
+    "Before generating a chapter-one card, read the seed or generated catalog and the Card_Catalog row.",
+    "Do not independently change rarity, frame, difficulty, category, copy, prompt, batch, or primary visual lead.",
+    "N, R, SR, and SSR must resolve to their dedicated approved rarity frame.",
+    "Chapter-wide and per-batch female primary visual lead ratios must remain at least 50 percent.",
+    "Every SSR artwork must satisfy epic, grand, heroic, high-VFX requirements and include the SSR epic prompt block.",
+    "Draft records with missing pronunciation, source review, or license approval must not enter the approved card pool."
+  ]
+}
