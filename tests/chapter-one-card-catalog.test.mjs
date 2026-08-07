@@ -9,7 +9,11 @@ import { validateChapterOneCardCatalog } from '../scripts/validate-card-catalog.
 const catalogPath = fileURLToPath(
   new URL('../data/cards/chapter-1-card-catalog.json', import.meta.url)
 );
+const cardNumberRegistryPath = fileURLToPath(
+  new URL('../data/cards/chapter-1-card-number-registry.json', import.meta.url)
+);
 const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+const cardNumberRegistry = JSON.parse(readFileSync(cardNumberRegistryPath, 'utf8'));
 
 function cloneCatalog() {
   return JSON.parse(JSON.stringify(catalog));
@@ -32,6 +36,41 @@ test('catalog matches the sixty-one chapter-one placements exactly', () => {
 
   assert.equal(catalog.cards.length, 61);
   assert.deepEqual(catalogKeys, placementKeys);
+});
+
+test('rarity card numbers are unique and contiguous in catalog order', () => {
+  assert.equal(cardNumberRegistry.schemaVersion, 1);
+  assert.equal(cardNumberRegistry.chapterId, 'chapter-1');
+  assert.equal(cardNumberRegistry.numberingPolicy.format, '{rarity}-{sequence:000}');
+  assert.equal(cardNumberRegistry.numberingPolicy.scope, 'within-chapter-per-rarity');
+  assert.equal(cardNumberRegistry.numberingPolicy.orderBy, 'catalogOrder');
+  assert.equal(cardNumberRegistry.numberingPolicy.immutableAfterAssignment, true);
+  assert.equal(cardNumberRegistry.cards.length, 61);
+
+  const catalogById = new Map(catalog.cards.map((card) => [card.idiomId, card]));
+  const sortedEntries = [...cardNumberRegistry.cards].sort(
+    (left, right) => left.catalogOrder - right.catalogOrder
+  );
+  const counters = { N: 0, R: 0, SR: 0, SSR: 0 };
+  const seenNumbers = new Set();
+
+  for (const entry of sortedEntries) {
+    const card = catalogById.get(entry.idiomId);
+    assert.ok(card, `missing catalog card for ${entry.idiomId}`);
+    assert.equal(entry.idiomText, card.idiomText);
+    assert.equal(entry.rarity, card.rarity);
+    assert.equal(entry.catalogOrder, card.catalogOrder);
+
+    counters[entry.rarity] += 1;
+    const expectedNumber = `${entry.rarity}-${String(counters[entry.rarity]).padStart(3, '0')}`;
+    assert.equal(entry.cardNumber, expectedNumber);
+    assert.equal(seenNumbers.has(entry.cardNumber), false, `duplicate card number ${entry.cardNumber}`);
+    seenNumbers.add(entry.cardNumber);
+  }
+
+  assert.deepEqual(counters, { N: 12, R: 18, SR: 23, SSR: 8 });
+  assert.deepEqual(cardNumberRegistry.rarityCounts, counters);
+  assert.equal(seenNumbers.size, 61);
 });
 
 test('rejects a rarity frame mismatch', () => {
