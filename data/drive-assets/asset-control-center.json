@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-07T10:00:23+08:00",
+  "controlCenter": {
+    "title": "CICG_素材管理控制中心_v1.0",
+    "spreadsheetId": "1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94",
+    "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94/edit",
+    "driveFolderId": "16p7x1-uISZShEkppN68Fwqn-epm44Uok",
+    "driveFolderUrl": "https://drive.google.com/drive/folders/16p7x1-uISZShEkppN68Fwqn-epm44Uok",
+    "parentFolderKey": "project.management"
+  },
+  "worksheets": {
+    "humanDashboard": "Control_Center",
+    "logicalAssetRegister": "Asset_Register",
+    "immutableVersionHistory": "Version_History",
+    "batchReviewLog": "Batch_Review_Log",
+    "snapshotLog": "Snapshot_Log",
+    "agentContract": "Codebook_Agent"
+  },
+  "sourcePriority": [
+    "github-main",
+    "github-actions",
+    "repository-registry-and-docs",
+    "drive-approved",
+    "github-pr-and-drive-inbox",
+    "local-generated"
+  ],
+  "agentReadProtocol": [
+    "Read the newest row in Snapshot_Log.",
+    "Read Asset_Register by stable asset_id and inspect current_version, lifecycle_status, approval_status, current_master, drift_state, last_verified_at and next_action.",
+    "Read Version_History before changing any current version. Never overwrite or delete historical version rows.",
+    "Only mark a version approved when explicit human approval evidence exists.",
+    "After any asset change, update Asset_Register, append Version_History when bytes or checksum changed, append Snapshot_Log, and update last_verified_at."
+  ],
+  "currentSnapshot": {
+    "snapshotId": "SNAP-20260807-1000",
+    "githubMainSha": "44a187aeec553647b83a36ca68ad4ed25f91242c",
+    "openAssetPr": 36,
+    "trackedLogicalAssets": 54,
+    "approvedCurrentMasters": 5,
+    "reviewOrPrItems": 18,
+    "missingP0Assets": 11,
+    "driftWarnings": 49
+  },
+  "knownBlockers": [
+    "PR #36 is non-mergeable and mixes asset files with unrelated puzzle code and documentation changes.",
+    "Seven generated portrait backgrounds are still local-only and have no Drive File ID, checksum or GitHub Registry record.",
+    "The first chapter card artwork bundle has only 2 review candidates for 61 required artworks.",
+    "PWA icon, splash and device QA evidence assets are incomplete."
+  ]
+}
