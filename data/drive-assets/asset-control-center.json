@@ -1,13 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-07T10:00:23+08:00",
+  "updatedAt": "2026-08-07T10:08:00+08:00",
   "controlCenter": {
     "title": "CICG_素材管理控制中心_v1.0",
     "spreadsheetId": "1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94",
     "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1JwdPPz4cjx94MYE5qXJt2GaE67e9HUlzXPY4OPb6S94/edit",
     "driveFolderId": "16p7x1-uISZShEkppN68Fwqn-epm44Uok",
     "driveFolderUrl": "https://drive.google.com/drive/folders/16p7x1-uISZShEkppN68Fwqn-epm44Uok",
-    "parentFolderKey": "project.management"
+    "parentFolderKey": "project.management",
+    "createdByCommit": "4b31020a7872392e45d9c2df180296bcaee6c9ce"
   },
   "worksheets": {
     "humanDashboard": "Control_Center",
@@ -34,7 +35,7 @@
   ],
   "currentSnapshot": {
     "snapshotId": "SNAP-20260807-1000",
-    "githubMainSha": "44a187aeec553647b83a36ca68ad4ed25f91242c",
+    "baselineGitHubMainSha": "44a187aeec553647b83a36ca68ad4ed25f91242c",
     "openAssetPr": 36,
     "trackedLogicalAssets": 54,
     "approvedCurrentMasters": 5,
