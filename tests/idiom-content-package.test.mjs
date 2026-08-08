@@ -17,7 +17,7 @@ const registry = JSON.parse(await readFile(path.join(projectRoot, 'data', 'cards
 const sample = JSON.parse(await readFile(path.join(projectRoot, 'data', 'idioms', 'review', 'mian-li-cang-zhen.json'), 'utf8'));
 const variant = JSON.parse(await readFile(path.join(projectRoot, 'data', 'card-variants', 'review', 'kimetsu', 'shinobu-mian-li-cang-zhen.json'), 'utf8'));
 
-function clone(value) { return structuredClone(value); }
+function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
 test('Schema v2 保存可供一般卡使用的通用副標與五言四句箴言', () => {
   assert.doesNotThrow(() => validateIdiomContentPackage(sample, { context: 'sample', registry, directoryStatus: 'NeedsReview' }));
