@@ -9,6 +9,7 @@ fi
 npm run build:data
 npm run validate:drive-assets
 npm run validate:theme-badges
+npm run validate:idiom-content
 npm run test
 npm run typecheck
 npm run lint
