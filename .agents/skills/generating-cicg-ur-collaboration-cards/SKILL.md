@@ -83,7 +83,7 @@ If no eligible idiom has verified Traditional Chinese text, four aligned Zhuyin 
 
 UR is reserved for external-IP collaboration cards. `licenseEvidenceId` must resolve to auditable authorization before a card can enter formal numbering, Approved, or publication workflows.
 
-沒有可稽核 `licenseEvidenceId` 時不得指派任何正式 `UR-####` 卡號，只能使用不占序列的 Review 識別碼，並且不得標記 Approved、發布、上架、加入正式收藏或移入 Drive Approved。
+沒有可稽核正式授權的 `licenseEvidenceId` 時不得指派任何正式 `UR-####` 卡號，只能使用不占序列的 Review 識別碼，並且不得標記 Approved、發布、上架、加入正式收藏或移入 Drive Approved。
 
 A chat image, franchise name, user approval, public character image, or generated artwork is not license evidence. Keep unknown evidence fields `null`.
 
