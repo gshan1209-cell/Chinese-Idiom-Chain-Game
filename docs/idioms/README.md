@@ -1,4 +1,4 @@
-# 成語內容包
+# 成語內容包與卡牌變體
 
 本目錄保存成語內容的機器資料與人類校訂紀錄。
 
@@ -8,49 +8,75 @@
 data/idioms/<status>/<slug>.json
 ```
 
-Markdown 只負責說明與稽核，不得覆蓋 JSON 內容。
+共用成語 JSON 是注音、釋義、典故、來源、例句、一般副標、一般箴言、難度與基礎稀有度的唯一真實來源。Markdown 只負責說明與稽核，不得覆蓋 JSON。
+
+## 兩層資料模型
+
+### 共用成語庫
+
+```text
+data/idioms/review/
+data/idioms/approved/
+```
+
+可供一般卡、主線關卡、其他聯名與 Renderer 共用。
+
+`baseRarity` 只描述成語本體的 SR／SSR 水準，不代表卡面一定是聯名卡。
+
+### 聯名覆寫層
+
+```text
+data/card-variants/review/<ip>/
+data/card-variants/approved/<ip>/
+```
+
+只保存角色、招式、聯名副標、聯名箴言與卡面演出。它必須引用共用 `idiomId`，不得重複定義成語典故或來源。
+
+UR 是聯名版本稀有度，只能存在於變體層。
 
 ## 狀態與路徑
 
 | 路徑 | contentStatus | 用途 |
 |---|---|---|
-| `data/idioms/review/` | `NeedsReview` | 內部設計、Review 圖卡、待校訂內容 |
-| `data/idioms/approved/` | `Approved` | 正式遊戲資料與 Renderer |
-| 歷史封存 | `Deprecated` | 稽核使用，不得建立新卡 |
+| `data/idioms/review/` | `NeedsReview` | 待校訂的一般成語內容 |
+| `data/idioms/approved/` | `Approved` | 正式遊戲與一般 Renderer |
+| `data/card-variants/review/` | `NeedsReview` | 待授權、待校訂的聯名覆寫 |
+| `data/card-variants/approved/` | `Approved` | 已完成授權與內容 Gate 的聯名覆寫 |
 
-## 必須分開的內容
+## 共用內容必須分開
 
 - `meaning`：現代釋義。
-- `allusionSummary`：典故意象、來源背景與用法演變。
-- `primarySource`：朝代、作者、作品、篇章、短引文與網址。
-- `rendererProjection`：卡面需要的純成語資料。
+- `allusionType`：典故或語源類型。
+- `allusionSummary`：完整典故／語源說明。
+- `cardAllusion`：卡面短版典故。
+- `primarySource`：來源證據。
+- `genericCardCopy`：一般版本副標與五言四句箴言。
+- `rendererProjection`：一般卡可直接使用的投影資料。
 
-角色、IP、卡號、稀有度與聯名箴言不屬於通用成語內容包。
+## 永久 Gate
 
-## 新增流程
+1. 成語四字、注音四組。
+2. 一般與聯名箴言皆為四句，每句五字。
+3. 共用內容禁止 IP、角色或招式名稱。
+4. 聯名覆寫必須引用有效 `idiomId`。
+5. 聯名覆寫不得定義 `meaning`、`allusionSummary` 或 `primarySource`。
+6. 沒有 `licenseEvidenceId` 不得核准聯名發布。
+7. 詞條或典源尚未確認時使用 `sourceStatus: NeedsReview`，不得杜撰。
 
-1. 在 `data/idioms/review/` 建立 JSON。
-2. 在 `docs/idioms/review/` 建立對應校訂紀錄。
-3. 執行：
+## 驗證
 
 ```bash
 npm run validate:idiom-content
 npm run test:idiom-content
 ```
 
-4. 完成文字與來源校訂後，同一 PR 將 JSON 與 Markdown 移入 `approved/`，並把 `contentStatus` 改為 `Approved`。
-5. 只有 Approved 內容才可遷移到正式字典或正式卡池。
+CLI 會同時驗證共用成語庫與聯名覆寫層。
 
-## 命名
-
-```text
-data/idioms/review/<romanized-slug>.json
-docs/idioms/review/<romanized-slug>-content-review-v<version>.md
-```
-
-首份範例：
+## 首批 v2 內容
 
 ```text
-data/idioms/review/mian-li-cang-zhen.json
-docs/idioms/review/mian-li-cang-zhen-content-review-v1.0.md
+13 份共用成語內容包
+13 份鬼滅 UR Review 覆寫
 ```
+
+所有內容目前均為 `NeedsReview`，未分配正式 UR 卡號。

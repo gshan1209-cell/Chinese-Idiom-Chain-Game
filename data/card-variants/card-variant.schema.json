@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gshan1209-cell.github.io/Chinese-Idiom-Chain-Game/schemas/card-variant.schema.json",
+  "title": "CICG Card Variant Override",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "variantId", "idiomId", "collaboration", "characterCore", "primaryMove", "subtitleOverride", "maximOverride", "visualDirection", "rarity", "contentStatus", "publicationStatus", "licenseEvidenceId", "reviewHistory"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "variantId": {"type": "string", "pattern": "^variant-[a-z0-9-]+$"},
+    "idiomId": {"type": "string", "pattern": "^idiom-[a-z0-9-]+$"},
+    "collaboration": {"type": "object", "additionalProperties": false, "required": ["ipName", "characterName", "characterTitle"], "properties": {"ipName": {"type": "string", "minLength": 1}, "characterName": {"type": "string", "minLength": 1}, "characterTitle": {"type": "string", "minLength": 1}}},
+    "characterCore": {"type": "string", "minLength": 1},
+    "primaryMove": {"type": "object", "additionalProperties": false, "required": ["displayName", "sourceStatus"], "properties": {"displayName": {"type": "string", "minLength": 1}, "sourceStatus": {"enum": ["verified", "NeedsReview"]}}},
+    "subtitleOverride": {"type": "string", "minLength": 1},
+    "maximOverride": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "string", "pattern": "^[\\u3400-\\u9FFF]{5}$"}},
+    "visualDirection": {"type": "string", "minLength": 1},
+    "rarity": {"const": "UR"},
+    "contentStatus": {"enum": ["NeedsReview", "Approved", "Deprecated"]},
+    "publicationStatus": {"enum": ["not-approved-for-publication", "approved-for-publication", "deprecated"]},
+    "licenseEvidenceId": {"type": ["string", "null"]},
+    "reviewHistory": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["reviewedAt", "reviewer", "status", "notes"], "properties": {"reviewedAt": {"type": "string", "format": "date-time"}, "reviewer": {"type": "string", "minLength": 1}, "status": {"enum": ["NeedsReview", "Approved", "Deprecated"]}, "notes": {"type": "string", "minLength": 1}}}}
+  }
+}
