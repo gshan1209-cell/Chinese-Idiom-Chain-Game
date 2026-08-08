@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-08-08T19:55:53+08:00",
+  "recordedAt": "2026-08-08T20:23:25+08:00",
   "project": "Chinese-Idiom-Chain-Game",
   "assetGroup": "ur-collaboration-card-shinobu-mian-li-cang-zhen",
   "driveFolder": {
@@ -16,14 +16,14 @@
     "characterTitle": "蝶柱",
     "characterName": "胡蝶忍",
     "formalCardNumber": null,
-    "reviewIdentifier": null,
+    "reviewIdentifier": "RV-UR-0002",
     "licenseEvidenceId": null,
     "licenseStatus": "needs-review",
     "lifecycleStatus": "approved-design-reference",
     "publicationStatus": "not-approved-for-publication",
     "canonicalRendererOutput": false,
     "blockingReasons": [
-      "The uploaded image is 897x1752 rather than the required 1024x2000 canonical renderer output.",
+      "The registered image is 897x1752 rather than the required 1024x2000 canonical renderer output.",
       "No auditable IP license evidence is registered.",
       "The asset must not consume UR-0001 or any formal UR sequence number."
     ]
@@ -34,15 +34,16 @@
       "assetType": "card-composite-reference",
       "role": "user-approved-design-reference",
       "status": "approved-design-reference",
-      "filename": "CICG_UR_Kimetsu_Shinobu_MianLiCangZhen_DesignReference_v1.0.png",
+      "filename": "CICG_UR_Review_MianLiCangZhen_KochoShinobu_RV-UR-0002.png",
       "driveFileId": "1CtiV-ER-C2ip-lJN3oXA6PJE4huTeRmW",
       "webViewLink": "https://drive.google.com/file/d/1CtiV-ER-C2ip-lJN3oXA6PJE4huTeRmW/view?usp=drivesdk",
       "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
       "mimeType": "image/png",
-      "sizeBytes": 2984122,
-      "sha256": "63aadecb7903e4946b6437558f59245caad2399ef8553f3f3780e226ca5a0752",
+      "sizeBytes": 2955527,
+      "sha256": "f84b7508353a1c9152cddfd88b21c2b4f82bef6ea0921e185b643dfe1f1599e5",
       "widthPx": 897,
       "heightPx": 1752,
+      "driveModifiedTime": "2026-08-08T12:23:25.674Z",
       "current": true,
       "canonical": false,
       "licenseEvidenceId": null
