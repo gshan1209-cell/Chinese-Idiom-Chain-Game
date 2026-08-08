@@ -1,8 +1,9 @@
-# UR 聯名成語圖卡正式母提示語 v1.4
+# UR 聯名成語圖卡正式母提示語 v1.5
 
 用途：外部 IP 聯名 UR 卡之角色成語配對、共用成語內容引用、中央插畫生成與 Renderer 模板組裝。  
 幾何基準：`layoutVersion = 2.6.1`  
-UR 標準：`urStandardVersion = 1.2`
+UR 標準：`urStandardVersion = 1.2`  
+完整卡 Canvas Profile：`cicg-card-897x1752-v1`
 
 > 未具可稽核正式授權時，只能產生 Draft／Review 素材，不得指派正式 `UR-####`、標記 Approved、公開發布或移入 Drive Approved。
 
@@ -11,6 +12,8 @@ UR 標準：`urStandardVersion = 1.2`
 ```text
 docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md
 docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md
+docs/superpowers/specs/2026-08-08-card-dimension-standard-897x1752-design.md
+data/cards/card-canvas-profiles.json
 data/idioms/<status>/<slug>.json
 data/card-variants/<status>/<ip>/<slug>.json
 data/cards/card-number-registry.json
@@ -56,7 +59,7 @@ data/cards/theme-badge-registry.json
 
 ## 3. Character and idiom selection
 
-未指定成語時，自動依角色核心性格、價值觀、重大選擇與成長歷程挑選四字成語。主要招式只負責視覺演出，不得反向主導選詞。
+未指定成語時，自動依角色核心性格、價值觀、重大選擇與成長歷程挑選四字成語。主要招式只負責視覺演出，不得反向主導選詞，也不得在卡面另設招式名稱欄位。
 
 規則：
 
@@ -80,7 +83,7 @@ data/cards/theme-badge-registry.json
 角色情境：{{SCENE_DESCRIPTION}}
 角色特效：{{CHARACTER_EFFECT}}
 
-角色必須以清楚行動呈現成語精神。主要招式用於動作、攻擊動線與特效設計，但不得照搬動畫截圖或官方構圖。
+角色必須以清楚行動呈現成語精神。主要招式用於動作、攻擊動線與特效設計，但不得照搬動畫截圖或官方構圖；卡面不顯示招式名稱。
 
 構圖：單一主要角色；角色占畫面約 55% 至 70%；半身至全身動態構圖；臉部、雙手與主要武器完整；保留右上標籤安全區與 Footer 裁切安全區。
 
@@ -108,13 +111,18 @@ Gate 失敗時，`compositionStatus` 必須為 `changes-requested` 或 `blocked`
 
 ## 6. Renderer composite
 
+完整卡面必須使用：
+
 ```text
-Canvas       x=0, y=0,    width=1024, height=2000
-Header       x=0, y=0,    width=1024, height=360
-Main Artwork x=0, y=360,  width=1024, height=1200
-Footer       x=0, y=1560, width=1024, height=440
-Geometry tolerance = ±2 px
+canvasProfile = cicg-card-897x1752-v1
+Canvas       x=0, y=0,    width=897, height=1752
+Header       x=0, y=0,    width=897, height=315
+Main Artwork x=0, y=315,  width=897, height=1051
+Footer       x=0, y=1366, width=897, height=386
+Geometry tolerance = ±2 px for component placement only
 ```
+
+畫布尺寸本身不允許容差。既有 `1024 × 2000` 完整卡僅可標記為 `legacy-compatible`，不得作為新產圖標準。
 
 ### 6.1 UR visual components
 
@@ -126,11 +134,11 @@ Geometry tolerance = ±2 px
 ### 6.2 Header
 
 ```text
-UR badge           x=24–252,   y=18–326
-idiom title        x=250–788,  y=42–158
-bopomofo[4]        x=278–756,  y=166–232
-spirit subtitle    x=258–782,  y=254–330
-collaboration tag  x=792–1000, y=24–318
+UR badge           x=21–221,  y=16–286
+idiom title        x=219–690, y=37–138
+bopomofo[4]        x=244–662, y=145–203
+spirit subtitle    x=226–685, y=223–289
+collaboration tag  x=694–876, y=21–279
 ```
 
 成語固定四字；注音固定四組；UR 不顯示難度徽章。
@@ -148,11 +156,11 @@ collaboration tag  x=792–1000, y=24–318
 ### 6.4 Footer
 
 ```text
-theme badge         x=28–300,  y=1576–1920, width=272, height=344
-allusion panel      x=286–724, y=1582–1920, width=438, height=338
-motto plaque        x=730–988, y=1722–1922, width=258, height=200
-source line         x=178–398, y=1936–1986, width=220, height=50
-card-number-plaque  x=410–614, y=1936–1986, width=204, height=50, bottom-center
+theme badge         x=25–263,  y=1381–1682, width=238, height=301
+allusion panel      x=251–634, y=1386–1682, width=383, height=296
+motto plaque        x=639–865, y=1508–1684, width=226, height=176
+source line         x=156–349, y=1696–1740, width=193, height=44
+card-number-plaque  x=359–538, y=1696–1740, width=179, height=44, bottom-center
 ```
 
 主題依成語判定，不依 IP 陣營或角色職稱判定。
@@ -169,7 +177,7 @@ card-number-plaque  x=410–614, y=1936–1986, width=204, height=50, bottom-cen
 
 ### 6.5 Five-character quatrain
 
-箴言牌匾固定 `258 × 200 px`，四欄直式、由右至左：
+箴言牌匾固定 `226 × 176 px`，靠下排列於 Footer 右側，四欄直式、由右至左：
 
 ```text
 最右欄：{{MOTTO_1}}
@@ -195,15 +203,17 @@ Renderer 必須放置唯一 `bottom-center card-number-plaque = {{CARD_NUMBER}}`
 禁止五字成語、非四字主標題、簡體字、錯字、假注音、漢語拼音、羅馬拼音、平假名、片假名與亂碼。
 禁止把成語典故改寫成角色劇情，禁止虛構古籍、人物、引文、來源、授權、Asset ID、Drive ID、SHA-256 或 Approved 狀態。
 禁止在典故區顯示本義。
-禁止三欄箴言、橫排箴言、非五字句、少於或多於二十字、超過 200 px 的箴言牌匾或大面積空白。
+禁止顯示招式名稱欄位。
+禁止三欄箴言、橫排箴言、非五字句、少於或多於二十字、超出 176 px 高度的箴言牌匾或大面積空白。
 禁止聯名標籤顯示「聯名卡」，禁止移除 IP Logo。
 禁止圖片模型生成 UR 徽章、虹彩外框、IP Logo、聯名標籤、主題徽章、典故、箴言、來源或卡號。
-禁止改變 Header／Main Artwork／Footer 的 360／1200／440 高度。
+禁止改變 Header／Main Artwork／Footer 的 315／1051／386 高度。
+禁止以 1024 × 2000 建立新的完整卡面。
 禁止一次生成多張卡、拼圖、展示牆、桌面 Mockup、手持卡片、包裝盒或傾斜透視。
 ```
 
 ## 8. Review report
 
-每張只回報證據支持的欄位：IP、角色、成語與配對理由、四筆注音與 Gate、主題與 Asset ID、典故來源、五言四句、Logo／標籤狀態、Review identifier 或正式卡號、Artwork／Composite 尺寸、Drive ID、SHA-256、Registry／Manifest commit、findings 與下一步。
+每張只回報證據支持的欄位：IP、角色、成語與配對理由、四筆注音與 Gate、主題與 Asset ID、典故來源、五言四句、Logo／標籤狀態、Review identifier 或正式卡號、Artwork／Composite 尺寸與 `canvasProfile`、Drive ID、SHA-256、Registry／Manifest commit、findings 與下一步。
 
 沒有證據的欄位不得宣稱完成。
