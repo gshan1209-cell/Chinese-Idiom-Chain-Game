@@ -38,11 +38,12 @@ test('catalog matches the sixty-one chapter-one placements exactly', () => {
   assert.deepEqual(catalogKeys, placementKeys);
 });
 
-test('rarity card numbers are unique and contiguous in catalog order', () => {
-  assert.equal(cardNumberRegistry.schemaVersion, 1);
+test('chapter-one projection uses project-wide four-digit rarity sequences', () => {
+  assert.equal(cardNumberRegistry.schemaVersion, 2);
   assert.equal(cardNumberRegistry.chapterId, 'chapter-1');
-  assert.equal(cardNumberRegistry.numberingPolicy.format, '{rarity}-{sequence:000}');
-  assert.equal(cardNumberRegistry.numberingPolicy.scope, 'within-chapter-per-rarity');
+  assert.equal(cardNumberRegistry.canonicalRegistryPath, 'data/cards/card-number-registry.json');
+  assert.equal(cardNumberRegistry.numberingPolicy.format, '{rarity}-{sequence:0000}');
+  assert.equal(cardNumberRegistry.numberingPolicy.scope, 'project-wide-per-rarity');
   assert.equal(cardNumberRegistry.numberingPolicy.orderBy, 'catalogOrder');
   assert.equal(cardNumberRegistry.numberingPolicy.immutableAfterAssignment, true);
   assert.equal(cardNumberRegistry.cards.length, 61);
@@ -62,8 +63,9 @@ test('rarity card numbers are unique and contiguous in catalog order', () => {
     assert.equal(entry.catalogOrder, card.catalogOrder);
 
     counters[entry.rarity] += 1;
-    const expectedNumber = `${entry.rarity}-${String(counters[entry.rarity]).padStart(3, '0')}`;
+    const expectedNumber = `${entry.rarity}-${String(counters[entry.rarity]).padStart(4, '0')}`;
     assert.equal(entry.cardNumber, expectedNumber);
+    assert.equal(entry.sequence, counters[entry.rarity]);
     assert.equal(seenNumbers.has(entry.cardNumber), false, `duplicate card number ${entry.cardNumber}`);
     seenNumbers.add(entry.cardNumber);
   }
