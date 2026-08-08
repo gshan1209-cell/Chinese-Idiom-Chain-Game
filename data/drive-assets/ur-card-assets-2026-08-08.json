@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-08-08T20:23:25+08:00",
+  "recordedAt": "2026-08-08T20:51:02+08:00",
   "project": "Chinese-Idiom-Chain-Game",
   "assetGroup": "ur-collaboration-card-shinobu-mian-li-cang-zhen",
   "driveFolder": {
@@ -11,6 +11,8 @@
   "card": {
     "rarity": "UR",
     "idiom": "綿裡藏針",
+    "idiomContentPackagePath": "data/idioms/review/mian-li-cang-zhen.json",
+    "idiomContentStatus": "NeedsReview",
     "themeCategory": "智謀",
     "ipName": "鬼滅之刃",
     "characterTitle": "蝶柱",
@@ -24,6 +26,7 @@
     "canonicalRendererOutput": false,
     "blockingReasons": [
       "The registered image is 897x1752 rather than the required 1024x2000 canonical renderer output.",
+      "The idiom content package is still NeedsReview.",
       "No auditable IP license evidence is registered.",
       "The asset must not consume UR-0001 or any formal UR sequence number."
     ]
@@ -58,8 +61,41 @@
       "webViewLink": "https://drive.google.com/file/d/1cj5BCUOUuyA5pWbDfHDXwU4gEiZeBFKh/view?usp=drivesdk",
       "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
       "mimeType": "text/markdown",
-      "sizeBytes": 3950,
-      "sha256": "b8c3f37ea18cf78db69d1718485f27a38bd0e40550d70256f1c55884a0626ed3",
+      "sizeBytes": 4592,
+      "sha256": "946371a5110fc3053d75afb3f7256d90f2acbde8e41d5c282effbb28f752be71",
+      "driveModifiedTime": "2026-08-08T12:51:02.009Z",
+      "current": true,
+      "canonical": true,
+      "licenseEvidenceId": null
+    },
+    {
+      "assetId": "idiom-content-mian-li-cang-zhen-needs-review-v1.0",
+      "assetType": "idiom-content-package",
+      "role": "machine-readable-content-source",
+      "status": "NeedsReview",
+      "filename": "CICG_IdiomContent_MianLiCangZhen_NeedsReview_v1.0.json",
+      "driveFileId": "1VQRI4nHkb4p_DLbdXEvdzc5nnDwEL56j",
+      "webViewLink": "https://drive.google.com/file/d/1VQRI4nHkb4p_DLbdXEvdzc5nnDwEL56j/view?usp=drivesdk",
+      "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
+      "mimeType": "application/json",
+      "sizeBytes": 2888,
+      "sha256": "6d01809a438969ecd3f0844002bb4e5c023555003cb51022d6e51efba3fdf705",
+      "current": true,
+      "canonical": true,
+      "licenseEvidenceId": null
+    },
+    {
+      "assetId": "idiom-content-review-mian-li-cang-zhen-v1.0",
+      "assetType": "idiom-content-review",
+      "role": "human-readable-review-record",
+      "status": "NeedsReview",
+      "filename": "CICG_IdiomContentReview_MianLiCangZhen_v1.0.md",
+      "driveFileId": "1WYtwEgIn9LGn2eVsMW-PO4WwHObjm9tX",
+      "webViewLink": "https://drive.google.com/file/d/1WYtwEgIn9LGn2eVsMW-PO4WwHObjm9tX/view?usp=drivesdk",
+      "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
+      "mimeType": "text/markdown",
+      "sizeBytes": 3042,
+      "sha256": "a962b0db40e12d7b4fff37e4af721441081e8b246d2e947de6fb795f931035df",
       "current": true,
       "canonical": true,
       "licenseEvidenceId": null
