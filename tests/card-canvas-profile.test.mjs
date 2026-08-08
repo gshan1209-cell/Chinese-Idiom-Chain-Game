@@ -6,9 +6,12 @@ import { validateCardCanvas } from '../scripts/card-canvas-profile.mjs';
 
 const repoUrl = new URL('../', import.meta.url);
 
+async function readText(relativePath) {
+  return readFile(new URL(relativePath, repoUrl), 'utf8');
+}
+
 async function readJson(relativePath) {
-  const content = await readFile(new URL(relativePath, repoUrl), 'utf8');
-  return JSON.parse(content);
+  return JSON.parse(await readText(relativePath));
 }
 
 test('canvas profile registry declares 897x1752 as the only canonical production profile', async () => {
@@ -117,4 +120,46 @@ test('integer multiples are valid only as derivative exports', () => {
   });
   assert.equal(invalid.valid, false);
   assert.match(invalid.reason, /derivative/i);
+});
+
+test('governed generation and registration contracts use the canonical canvas profile', async () => {
+  const paths = [
+    '.agents/skills/generating-cicg-idiom-cards/SKILL.md',
+    '.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md',
+    '.agents/skills/registering-cicg-card-assets/SKILL.md',
+    'docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md',
+  ];
+
+  for (const path of paths) {
+    const content = await readText(path);
+    assert.match(
+      content,
+      /cicg-card-897x1752-v1/,
+      `${path} must reference the canonical canvas profile`,
+    );
+    assert.match(
+      content,
+      /897\s*[×x]\s*1752/,
+      `${path} must declare the canonical composite dimensions`,
+    );
+    assert.doesNotMatch(
+      content,
+      /(?:exact composite canvas|final|complete|canonical|current)[^\n]{0,80}1024\s*[×x]\s*2000/i,
+      `${path} must not describe 1024x2000 as the current complete-card standard`,
+    );
+  }
+
+  const generalSkill = await readText(
+    '.agents/skills/generating-cicg-idiom-cards/SKILL.md',
+  );
+  const urSkill = await readText(
+    '.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md',
+  );
+  const masterPrompt = await readText(
+    'docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md',
+  );
+
+  assert.match(generalSkill, /1024\s*[×x]\s*1200\s*px/);
+  assert.match(urSkill, /1024\s*[×x]\s*1200\s*px/);
+  assert.match(masterPrompt, /1024\s*[×x]\s*1200\s*px/);
 });
