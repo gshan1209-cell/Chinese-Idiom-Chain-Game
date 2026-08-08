@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gshan1209-cell.github.io/Chinese-Idiom-Chain-Game/schemas/idiom-content-package.schema.json",
+  "title": "CICG Idiom Content Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "idiomId",
+    "displayText",
+    "traditionalText",
+    "bopomofo",
+    "sourceHeadword",
+    "variantRelation",
+    "meaning",
+    "allusionSummary",
+    "primarySource",
+    "supportingSources",
+    "exampleSentence",
+    "themeCategory",
+    "difficulty",
+    "positiveMeaningScore",
+    "contentStatus",
+    "reviewHistory",
+    "rendererProjection"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "idiomId": { "type": "string", "pattern": "^idiom-[a-z0-9-]+$" },
+    "displayText": { "type": "string", "pattern": "^[\\u3400-\\u9FFF]{4}$" },
+    "traditionalText": { "type": "string", "pattern": "^[\\u3400-\\u9FFF]{4}$" },
+    "bopomofo": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "type": "string", "pattern": "^[ㄅ-㆙ˊˇˋ˙]+$" }
+    },
+    "sourceHeadword": { "type": "string", "minLength": 1 },
+    "variantRelation": { "enum": ["canonical", "variant_of", "related"] },
+    "meaning": { "type": "string", "minLength": 1 },
+    "allusionSummary": { "type": "string", "minLength": 1 },
+    "primarySource": { "$ref": "#/$defs/sourceEvidence" },
+    "supportingSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/sourceEvidence" }
+    },
+    "exampleSentence": { "type": "string", "minLength": 1 },
+    "themeCategory": { "$ref": "#/$defs/themeCategory" },
+    "difficulty": { "enum": ["E", "D", "C", "B", "A", "S"] },
+    "positiveMeaningScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "contentStatus": { "enum": ["NeedsReview", "Approved", "Deprecated"] },
+    "reviewHistory": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reviewedAt", "reviewer", "status", "notes"],
+        "properties": {
+          "reviewedAt": { "type": "string", "format": "date-time" },
+          "reviewer": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["NeedsReview", "Approved", "Deprecated"] },
+          "notes": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rendererProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "bopomofo",
+        "meaning",
+        "allusionTitle",
+        "allusionBody",
+        "sourceLine",
+        "themeCategory"
+      ],
+      "properties": {
+        "title": { "type": "string", "pattern": "^[\\u3400-\\u9FFF]{4}$" },
+        "bopomofo": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "type": "string", "pattern": "^[ㄅ-㆙ˊˇˋ˙]+$" }
+        },
+        "meaning": { "type": "string", "minLength": 1 },
+        "allusionTitle": { "const": "典故" },
+        "allusionBody": { "type": "string", "minLength": 1 },
+        "sourceLine": { "type": "string", "minLength": 1 },
+        "themeCategory": { "$ref": "#/$defs/themeCategory" }
+      }
+    }
+  },
+  "$defs": {
+    "sourceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "authority",
+        "dynasty",
+        "author",
+        "work",
+        "chapter",
+        "excerpt",
+        "url",
+        "evidenceType",
+        "sourceStatus"
+      ],
+      "properties": {
+        "sourceId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "authority": { "type": "string", "minLength": 1 },
+        "dynasty": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "work": { "type": "string", "minLength": 1 },
+        "chapter": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "evidenceType": {
+          "enum": ["primary-text", "authoritative-dictionary", "supporting-reference"]
+        },
+        "sourceStatus": { "enum": ["verified", "NeedsReview"] }
+      }
+    },
+    "themeCategory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemValue", "displayName"],
+      "properties": {
+        "systemValue": {
+          "enum": [
+            "military",
+            "governance",
+            "strategy",
+            "arts",
+            "perseverance",
+            "selfCultivation",
+            "relationships",
+            "cautionary",
+            "perspective"
+          ]
+        },
+        "displayName": {
+          "enum": ["軍事", "內政", "智謀", "文藝", "勵志", "修身", "人際", "警世", "見識"]
+        }
+      }
+    }
+  }
+}
