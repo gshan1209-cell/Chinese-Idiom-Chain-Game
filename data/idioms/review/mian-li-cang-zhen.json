@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "idiomId": "idiom-mian-li-cang-zhen",
+  "displayText": "綿裡藏針",
+  "traditionalText": "綿裡藏針",
+  "bopomofo": [
+    "ㄇㄧㄢˊ",
+    "ㄌㄧˇ",
+    "ㄘㄤˊ",
+    "ㄓㄣ"
+  ],
+  "sourceHeadword": "綿裡針",
+  "variantRelation": "variant_of",
+  "meaning": "比喻外表或言語看似柔和，實際暗藏鋒芒、警策或不易察覺的意圖。",
+  "allusionSummary": "元代石君寶《曲江池》第二折以藏在柔軟綿絮中的尖針作比，描寫表面不顯鋒利，內裡卻足以傷人的特質。後來「綿裡藏針」沿用這個意象，表示柔和外表之下暗藏尖銳力量。",
+  "primarySource": {
+    "sourceId": "moe-revised-mian-li-zhen-31453",
+    "authority": "教育部《重編國語辭典修訂本》",
+    "dynasty": "元",
+    "author": "石君寶",
+    "work": "《曲江池》",
+    "chapter": "第二折",
+    "excerpt": "笑裡刀剮皮割肉，綿裡針剔髓挑觔。",
+    "url": "https://dict.revised.moe.edu.tw/dictView.jsp?ID=31453&la=0&powerMode=0",
+    "evidenceType": "authoritative-dictionary",
+    "sourceStatus": "verified"
+  },
+  "supportingSources": [
+    {
+      "sourceId": "moe-concised-mian-li-zhen-4611",
+      "authority": "教育部《國語辭典簡編本》",
+      "dynasty": "現代",
+      "author": "教育部",
+      "work": "《國語辭典簡編本》",
+      "chapter": "綿裡針詞條",
+      "excerpt": "藏在綿絮裡的針。比喻不易察覺的陰謀。",
+      "url": "https://dict.concised.moe.edu.tw/dictView.jsp?ID=4611&la=0&powerMode=0",
+      "evidenceType": "authoritative-dictionary",
+      "sourceStatus": "verified"
+    }
+  ],
+  "exampleSentence": "她的語氣始終溫和，提醒卻句句切中要害，頗有綿裡藏針的意味。",
+  "themeCategory": {
+    "systemValue": "strategy",
+    "displayName": "智謀"
+  },
+  "difficulty": "A",
+  "positiveMeaningScore": 42,
+  "contentStatus": "NeedsReview",
+  "reviewHistory": [
+    {
+      "reviewedAt": "2026-08-08T21:00:00+08:00",
+      "reviewer": "ChatGPT",
+      "status": "NeedsReview",
+      "notes": "已確認教育部詞頭、異形關係、注音與元代出處；現代釋義、例句、難度及正面意義分數仍待人工文字校訂。"
+    }
+  ],
+  "rendererProjection": {
+    "title": "綿裡藏針",
+    "bopomofo": [
+      "ㄇㄧㄢˊ",
+      "ㄌㄧˇ",
+      "ㄘㄤˊ",
+      "ㄓㄣ"
+    ],
+    "meaning": "比喻外表或言語看似柔和，實際暗藏鋒芒、警策或不易察覺的意圖。",
+    "allusionTitle": "典故",
+    "allusionBody": "元代石君寶《曲江池》第二折以綿絮藏針為喻，描寫柔和表象之下暗藏尖銳力量，後演變為「綿裡藏針」的說法。",
+    "sourceLine": "典出：元・石君寶《曲江池》第二折",
+    "themeCategory": {
+      "systemValue": "strategy",
+      "displayName": "智謀"
+    }
+  }
+}
