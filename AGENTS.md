@@ -143,9 +143,10 @@ Key：chapter-1
 ```text
 1. .agents/skills/generating-cicg-idiom-cards/SKILL.md
 2. docs/card-prompts/state/current-batch.json
-3. data/cards/card-number-registry.json
-4. data/cards/theme-badge-registry.json
-5. data/drive-assets/idiom-card-assets.json
+3. data/cards/card-canvas-profiles.json
+4. data/cards/card-number-registry.json
+5. data/cards/theme-badge-registry.json
+6. data/drive-assets/idiom-card-assets.json
 ```
 
 凡指定外部 IP 與角色、要求 UR 卡或接續 UR 聯名卡時，還必須讀取：
@@ -183,39 +184,44 @@ Key：chapter-1
 14. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
 15. docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
 16. docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md
-17. docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md（UR 任務）
-18. docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md（UR 任務）
-19. docs/card-prompts/PROJECT_PROMPT.md
+17. docs/superpowers/specs/2026-08-08-card-dimension-standard-897x1752-design.md
+18. data/cards/card-canvas-profiles.json
+19. docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md（UR 任務）
+20. docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md（UR 任務）
+21. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
-`v2.6.1` 是 current geometry contract；發生畫布、區域高度、元件位置、裁切、圖層或 SSR overlay 衝突時，以 v2.6.1 為準。
+`v2.6.1` 保留版面語意與元件關係；完整卡畫布與實際座標由 `2026-08-08-card-dimension-standard-897x1752-design.md` 與 `data/cards/card-canvas-profiles.json` 覆寫。發生尺寸衝突時，以 Canvas Profile Registry 為準。
 
-### 5.2 v2.6.1 永久版型規則
+### 5.2 現行 Canvas Profile 與 scaled v2.6.1 版型
+
+新產製完整圖卡唯一標準：
 
 ```text
-Canvas       x=0, y=0,    width=1024, height=2000
-Header       x=0, y=0,    width=1024, height=360
-Main Artwork x=0, y=360,  width=1024, height=1200
-Footer       x=0, y=1560, width=1024, height=440
+canvasProfile = cicg-card-897x1752-v1
+Canvas       x=0, y=0,    width=897, height=1752
+Header       x=0, y=0,    width=897, height=315
+Main Artwork x=0, y=315,  width=897, height=1051
+Footer       x=0, y=1366, width=897, height=386
 ```
 
 固定 Bounding Box：
 
 ```text
-rarity badge    x=24–252,  y=18–326
-title           x=250–788, y=42–158
-Zhuyin          x=278–756, y=166–232
-subtitle        x=258–782, y=254–330
-difficulty      x=792–1000,y=24–318
-theme badge     x=28–300,  y=1576–1920
-allusion panel  x=286–724, y=1582–1920
-motto plaque    x=730–988, y=1570–1922
-source line     x=178–846, y=1936–1986
-card number     x=410–614, y=1936–1986
+rarity badge    x=21–221,  y=16–286
+title           x=219–690, y=37–138
+Zhuyin          x=244–662, y=145–203
+subtitle        x=226–685, y=223–289
+difficulty      x=694–876, y=21–279
+theme badge     x=25–263,  y=1381–1682
+allusion panel  x=251–634, y=1386–1682
+motto plaque    x=639–865, y=1508–1684
+source line     x=156–349, y=1696–1740
+card number     x=359–538, y=1696–1740
 ```
 
-- 所有元件必須使用 v2.6.1 Bounding Box，實際幾何允許誤差最多 `±2 px`。
-- 任何稀有度均不得改變 `360／1200／440` 三區高度。
+- 完整卡 Canvas 尺寸不得使用容差；元件定位幾何允許誤差最多 `±2 px`。
+- 任何稀有度均不得改變 `315／1051／386` 三區高度。
 - 圖片模型只能生成 `1024 × 1200 px`、無文字、無 UI、無外框的 artwork。
 - 圖片模型不得生成主標題、注音、卡號或完整卡面。
 - Renderer 必須使用已驗證的 `bopomofo[4]` 與 canonical `cardNumber`。
@@ -223,9 +229,13 @@ card number     x=410–614, y=1936–1986
 - 日文假名 finding code 為 `japanese-kana-in-bopomofo`；其他不合法注音為 `invalid-bopomofo`。
 - 漢語拼音可留在資料層，但不得顯示於卡面。
 - 中央 artwork 只允許等比 `cover + center crop`，禁止拉伸或壓縮。
-- SSR 霓虹框是 `1024 × 2000` full-canvas top overlay，不得造成 reflow。
-- SSR 霓虹光效向內延伸不得超過 `20 px`，不得全面染色其他元件。
-- 相同資料、Asset ID 與 renderer 版本必須產生相同 geometry manifest。
+- SSR 霓虹框是 `897 × 1752` full-canvas top overlay，不得造成 reflow。
+- SSR 霓虹光效向內延伸不得超過新 Profile 對應的 scaled token，不得全面染色其他元件。
+- 箴言區固定靠下排列，不得回到 Footer 上緣。
+- 招式可驅動畫面動作與特效，但卡面不得顯示招式名稱欄位。
+- 相同資料、Asset ID、Canvas Profile 與 renderer 版本必須產生相同 geometry manifest。
+- 既有 `1024 × 2000` 完整卡只可標記 `legacy-compatible`，不得作為新產圖標準。
+- 高解析衍生圖必須是 `897 × 1752` 的整數倍數並標記 `derivative`。
 
 ### 5.3 稀有度、難易度、卡號與 SSR
 
