@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { URL } from 'node:url';
 
 import {
   CANONICAL_CARD_CANVAS_PROFILE_ID,
