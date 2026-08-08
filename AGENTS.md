@@ -147,6 +147,12 @@ Key：chapter-1
 4. data/drive-assets/idiom-card-assets.json
 ```
 
+凡指定外部 IP 與角色、要求 UR 卡或接續 UR 聯名卡時，還必須讀取：
+
+```text
+.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md
+```
+
 當使用者只說「繼續產圖」、「下一批」、「修正上一批」、「審核圖卡」或「上傳素材」時，Agent 必須依 GitHub `main`、狀態檔、Registry、Manifest 與 Drive 證據接續，不得要求使用者重新貼完整規格。
 
 若狀態檔與 Drive／Manifest／Registry 不一致，必須先回報漂移，不得猜測已完成。
@@ -166,7 +172,9 @@ Key：chapter-1
 10. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
 11. docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
 12. docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md
-13. docs/card-prompts/PROJECT_PROMPT.md
+13. docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md（UR 任務）
+14. docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md（UR 任務）
+15. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
 `v2.6.1` 是 current geometry contract；發生畫布、區域高度、元件位置、裁切、圖層或 SSR overlay 衝突時，以 v2.6.1 為準。
@@ -198,6 +206,9 @@ source line     x=178–846, y=1936–1986
 - 任何稀有度均不得改變 `360／1200／440` 三區高度。
 - 圖片模型只能生成 `1024 × 1200 px`、無文字、無 UI、無外框的 artwork。
 - 不得讓圖片模型生成完整卡面、十張拼圖總覽或把正式文字烙入 canonical artwork。
+- 圖片模型不得生成主標題或注音；Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
+- 注音固定四筆逐字對齊，平假名、片假名、片假名擴充、半形片假名、拼音、羅馬字與近似假字均為 Blocking failure。
+- 日文假名專屬 finding code 為 `japanese-kana-in-bopomofo`；其他不合法注音為 `invalid-bopomofo`。
 - 漢語拼音可保留於資料層，但不得顯示於卡面。
 - 中央 artwork 只允許等比 `cover + center crop`，禁止拉伸或壓縮。
 - SSR 霓虹框是 `1024 × 2000` full-canvas top overlay；不得縮小內容、改變區域高度、移動元件或觸發 reflow。
@@ -213,6 +224,7 @@ source line     x=178–846, y=1936–1986
 - SSR 必須同時具備傳奇級金龍稀有度徽章、v2.8 全框虹彩霓虹 overlay，以及英雄姿態、宏大場景、電影式構圖與高強度傳奇光效。
 - N／R／SR 不得使用 SSR 徽章或完整多色虹彩外框。
 - 右上難易度徽章必須使用 current Approved 元件，不得因稀有度改色。
+- UR 卡資料層保留原始難度，但卡面省略難度徽章並改掛 IP 專屬聯名標籤。
 
 ### 5.4 九大主題徽章
 

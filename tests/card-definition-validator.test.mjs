@@ -69,6 +69,21 @@ test('requires exactly four aligned bopomofo and pinyin readings', () => {
   assert.ok(missingPinyin.findings.some((finding) => finding.code === 'invalid-pinyin'));
 });
 
+test('rejects Japanese kana in the bopomofo field with a dedicated finding', () => {
+  for (const bopomofo of [
+    ['すい', 'ㄉㄧ', 'ㄕˊ', 'ㄔㄨㄢ'],
+    ['スイ', 'ㄉㄧ', 'ㄕˊ', 'ㄔㄨㄢ'],
+    ['ㄕㄨㄟす', 'ㄉㄧ', 'ㄕˊ', 'ㄔㄨㄢ'],
+    ['ｽｲ', 'ㄉㄧ', 'ㄕˊ', 'ㄔㄨㄢ']
+  ]) {
+    const result = validate([validCard({ bopomofo })]);
+    assert.equal(result.validDefinitions.length, 0);
+    assert.ok(result.findings.some(
+      (finding) => finding.code === 'japanese-kana-in-bopomofo'
+    ));
+  }
+});
+
 test('rejects numeric tones uppercase pinyin and unknown romanization fields', () => {
   const numeric = validate([validCard({ pinyin: ['shui3', 'dī', 'shí', 'chuān'] })]);
   const uppercase = validate([validCard({ pinyin: ['SHUǏ', 'dī', 'shí', 'chuān'] })]);

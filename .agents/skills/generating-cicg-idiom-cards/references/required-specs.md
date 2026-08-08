@@ -18,16 +18,18 @@ Read the latest version from GitHub `main`. Later Approved specifications overri
 12. `docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md`
 13. `docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md`
 14. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`（UR／聯名任務必讀）
-15. `docs/card-prompts/PROJECT_PROMPT.md`
-16. `docs/card-prompts/shared/card-master-prompt.md`
-17. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`（UR／聯名任務必讀）
-18. `docs/card-prompts/shared/negative-constraints.md`
-19. Matching file under `docs/card-prompts/templates/`
-20. Matching file under `docs/card-prompts/idioms/`
-21. `docs/card-prompts/manifest.md`
-22. `docs/card-prompts/state/current-batch.json`
-23. `docs/card-prompts/components/rarity-frame-registry-v1.md`
-24. Drive Approved artwork, components, templates, composites, and relevant Inbox／Review assets
+15. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`（UR／聯名任務必讀）
+16. `.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md`（UR／聯名任務必讀）
+17. `docs/card-prompts/PROJECT_PROMPT.md`
+18. `docs/card-prompts/shared/card-master-prompt.md`
+19. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`（UR／聯名任務必讀）
+20. `docs/card-prompts/shared/negative-constraints.md`
+21. Matching file under `docs/card-prompts/templates/`
+22. Matching file under `docs/card-prompts/idioms/`
+23. `docs/card-prompts/manifest.md`
+24. `docs/card-prompts/state/current-batch.json`
+25. `docs/card-prompts/components/rarity-frame-registry-v1.md`
+26. Drive Approved artwork, components, templates, composites, and relevant Inbox／Review assets
 
 ## Truth priority
 
@@ -36,7 +38,8 @@ GitHub main
 → GitHub Actions
 → Approved specifications and this skill
 → v2.6.1 geometry contract
-→ UR collaboration standard when rarity is UR
+→ UR collaboration skill and standard when rarity is UR
+→ Taiwanese Zhuyin structured-data and Renderer Gate
 → rarity and review governance
 → v2.7 SSR badge amendment when rarity is SSR
 → four-tier rarity frame system
@@ -54,11 +57,17 @@ GitHub main
 - Review governance overrides an older asset status.
 - v2.6.1 controls canvas, section heights, Bounding Boxes, crop, layers and geometry for every rarity, including UR.
 - UR collaboration standard applies only when rarity is UR and auditable licensed-IP evidence exists.
+- A request naming an external IP and character routes through `.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md`.
 - UR omits the difficulty badge from the card face and uses the existing upper-right difficulty Bounding Box for the versioned IP-specific collaboration label; difficulty may remain in data but does not render on UR.
 - Every collaboration IP requires its own versioned label master. A generic label with only swapped text is not sufficient.
 - The collaboration label may display the IP name and character name only. The bottom of the card must not repeat the character name.
 - UR allusion, meaning and source remain idiom content. They must not be rewritten as character or franchise story.
 - A generated collaboration image or chat approval is not license evidence. Without auditable authorization, UR assets remain Draft／Review and cannot be Approved or published.
+- Four-character idioms require exactly four aligned `bopomofo[4]` entries from structured data.
+- Images must not contain title or Zhuyin. Renderer text nodes are the only canonical card-face pronunciation source.
+- Hiragana, Katakana, Katakana extensions, halfwidth Katakana, Pinyin, romanization, Han characters, lookalikes or malformed symbols in `bopomofo` are Blocking failures.
+- Japanese kana uses finding `japanese-kana-in-bopomofo`; other malformed Zhuyin uses `invalid-bopomofo`.
+- Missing font coverage, replacement boxes, or fallback to a Japanese font blocks composition approval.
 - v2.7 overrides older SSR badge visuals only; it does not alter semantic rarity, dimensions, pronunciation, or non-SSR badges.
 - Four-tier rarity frame specification controls `frame-skin` and `effect-overlay`: N emerald antique gold, R frost blue steel, SR royal violet, SSR v2.8 rainbow neon.
 - SSR v2.8 expands iridescence to the outer frame and effect overlay, but the v2.7 legendary golden-dragon badge remains mandatory.

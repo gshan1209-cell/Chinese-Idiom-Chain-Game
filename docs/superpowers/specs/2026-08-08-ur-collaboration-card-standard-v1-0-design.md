@@ -1,4 +1,4 @@
-# UR 聯名成語圖卡標準 v1.0
+# UR 聯名成語圖卡標準 v1.1
 
 狀態：Approved Design Standard  
 日期：2026-08-08  
@@ -172,7 +172,67 @@ compositionStatus
 
 來源、授權、Drive File ID、SHA-256 或獨立核准證據不足時，對應欄位保持 `null`／`NeedsReview`，不得猜測。
 
-## 9. 審核 Gate
+## 9. 臺灣注音永久 Gate
+
+### 9.1 資料規則
+
+- 四字成語必須恰好有四筆非空 `bopomofo[4]`。
+- 四筆注音必須與四個漢字逐字對齊。
+- 注音只能來自已校訂的結構化成語資料，不得由圖片模型、OCR 或人工目測轉錄後直接核准。
+- 漢語拼音可以保留於資料層，但不得渲染於卡面。
+
+### 9.2 字元白名單
+
+每筆注音只允許：
+
+```text
+Bopomofo       U+3105–U+312F
+輕聲           U+02D9
+二聲           U+02CA
+三聲           U+02C7
+四聲           U+02CB
+```
+
+### 9.3 日文與非注音黑名單
+
+以下任一內容都是 Blocking failure：
+
+```text
+平假名         U+3040–U+309F
+片假名         U+30A0–U+30FF
+片假名擴充     U+31F0–U+31FF
+半形片假名     U+FF65–U+FF9F
+拉丁字母、漢語拼音、羅馬拼音、漢字、日文音節、裝飾符號、近似假字或亂碼
+```
+
+偵測到任何日文假名時，finding code 固定為：
+
+```text
+japanese-kana-in-bopomofo
+```
+
+其他缺字、多字、非注音字元或結構錯誤使用：
+
+```text
+invalid-bopomofo
+```
+
+### 9.4 Renderer 與字型 Gate
+
+- 圖片模型不得生成主標題或注音。
+- Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
+- Render plan／SVG 文字節點必須能追溯到結構化資料，不接受 artwork 內的烙字。
+- 正式字型必須完整覆蓋臺灣注音；缺字、方框、錯誤 fallback 或 fallback 成日文字型時停止輸出。
+- 視覺複核只能補充資料與 Render Plan Gate，不得取代它們。
+
+注音 Gate 失敗時：
+
+```text
+compositionStatus = changes-requested 或 blocked
+approvalStatus    = 不得為 Approved
+```
+
+## 10. 審核 Gate
 
 ### Artwork Gate
 
@@ -188,6 +248,7 @@ compositionStatus
 - `360／1200／440` 三區固定。
 - 所有 Bounding Box 誤差不超過 `±2 px`。
 - 只顯示繁體中文與正確注音。
+- 通過四筆逐字對齊、日文假名黑名單、Renderer 來源與字型覆蓋 Gate。
 - UR 無難度徽章；右上為正確 IP 專屬聯名標籤。
 - 主題徽章 Asset ID 與 Registry 一致。
 - 典故屬於成語本身，來源已校訂。
@@ -197,7 +258,7 @@ compositionStatus
 
 任一 Blocking Gate 失敗，狀態必須為 `changes-requested` 或 `blocked`。
 
-## 10. 首個已核准版型實例
+## 11. 首個已核准版型實例
 
 鬼滅之刃 UR 聯名卡版型：
 
