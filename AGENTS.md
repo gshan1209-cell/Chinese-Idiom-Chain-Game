@@ -154,6 +154,12 @@ Key：chapter-1
 .agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md
 ```
 
+凡涉及圖卡註冊、Drive 上傳、資產改名、Manifest／Registry 回寫或漂移核對時，必須讀取：
+
+```text
+.agents/skills/registering-cicg-card-assets/SKILL.md
+```
+
 當使用者只說「繼續產圖」、「下一批」、「修正上一批」、「審核圖卡」或「上傳素材」時，Agent 必須依 GitHub `main`、狀態檔、Registry、Manifest 與 Drive 證據接續，不得要求使用者重新貼完整規格。
 
 若狀態檔與 Drive／Manifest／Registry 不一致，必須先回報漂移，不得猜測已完成。
