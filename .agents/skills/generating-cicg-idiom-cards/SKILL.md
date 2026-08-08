@@ -14,9 +14,10 @@ Use GitHub `main` and the batch-state file as the continuity layer. New cards us
 1. Read `AGENTS.md`.
 2. Read `references/required-specs.md`.
 3. Read `docs/card-prompts/state/current-batch.json`.
-4. Read `data/cards/theme-badge-registry.json`.
-5. Read `data/drive-assets/idiom-card-assets.json`.
-6. Read the matching rarity template, idiom prompt, Manifest, and available Drive evidence.
+4. Read `data/cards/card-number-registry.json`.
+5. Read `data/cards/theme-badge-registry.json`.
+6. Read `data/drive-assets/idiom-card-assets.json`.
+7. Read the matching rarity template, idiom prompt, Manifest, and available Drive evidence.
 
 If Repository files cannot be read, state that the continuation source is unavailable. Do not guess the previous batch.
 
@@ -30,7 +31,7 @@ When the request names an external IP and character, asks for rarity UR, or cont
 
 The dedicated UR skill accepts IP and character as the only required user inputs, selects or validates the idiom, resolves the original difficulty and theme, enforces the license Gate, and preserves the v2.6.1 modular workflow.
 
-圖片模型不得生成主標題或注音。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
+圖片模型不得生成主標題、注音或卡號。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點與 Canonical Registry 的 `cardNumber`。
 
 注音必須恰好四筆並與四字成語逐字對齊；平假名、片假名、片假名擴充、半形片假名、羅馬拼音、漢字或近似假字都是 Blocking failure。
 
@@ -59,6 +60,7 @@ Before generation, each card must have:
 - subtitle
 - difficulty
 - rarity and rationale
+- canonical `cardNumber` or a clearly non-formal Review identifier
 - `themeCategory` from the fixed nine-category registry
 - `themeBadgeAssetId` resolved from the registry
 - optional `secondaryThemeTags`, which must not render on the card
@@ -81,11 +83,41 @@ no frame
 no badges
 no title／Zhuyin／Pinyin／subtitle
 no allusion／motto／source text
+no card number or card-number-plaque
 ```
 
 Then compose the final `1024 × 2000 px` card with approved components and structured data.
 
 Generate only Review assets unless an independent human approval is explicitly recorded. The producing Agent cannot self-approve its own artwork or composite.
+
+## Project-Wide Four-Digit Card Number Contract
+
+Canonical source:
+
+```text
+data/cards/card-number-registry.json
+```
+
+Format and independent sequences:
+
+```text
+N-0001
+R-0001
+SR-0001
+SSR-0001
+UR-0001
+```
+
+- Format is exactly `{rarity}-{sequence:0000}`; every formal number uses four digits.
+- Scope is `project-wide-per-rarity`; each rarity increments independently and chapters never reset counters.
+- Assigned and retired numbers are immutable and never reused.
+- A rarity change retires the old number and obtains a new number from the new rarity sequence.
+- `chapter-1-card-number-registry.json` is a compatibility projection, not an assignment authority.
+- The image model must not generate, guess, redraw, or repair card numbers.
+- The Renderer must add exactly one `bottom-center card-number-plaque = {{CARD_NUMBER}}` to every N／R／SR／SSR／UR composite.
+- The plaque occupies the bottom-center sub-box `x=410–614, y=1936–1986` and may contain only the Registry value.
+- No other card number may appear on the card.
+- Without auditable `licenseEvidenceId`, UR may use only a Review identifier and must not consume `UR-####`.
 
 ## Theme Badge Contract v2.6
 
@@ -130,9 +162,9 @@ Permanent rules:
 - New cards default to `renderMode: modular`.
 - Existing indivisible PNG cards remain `flat-legacy` until intentionally migrated.
 - Artwork is canonical visual source; Review／Approved composite PNG is derived output.
-- Rarity, difficulty, theme badge, title, pronunciation, allusion, motto, source and frame must remain replaceable.
-- Changing difficulty, rarity, or theme badge must not change `artworkAssetId`, artwork version, or artwork SHA-256.
-- Unknown Drive IDs, checksums, approvals, source verification, or license evidence remain `null`.
+- Rarity, difficulty, theme badge, title, pronunciation, allusion, motto, source, card-number-plaque and frame must remain replaceable.
+- Changing difficulty, rarity, theme badge, or number plaque must not change `artworkAssetId`, artwork version, or artwork SHA-256.
+- Unknown Drive IDs, checksums, approvals, source verification, card numbers, or license evidence remain `null`; never invent them.
 
 ## Permanent Gates
 
@@ -144,7 +176,7 @@ Permanent rules:
 - Traditional Chinese four-character idiom.
 - First row below the title: four aligned Zhuyin groups.
 - No Hanyu Pinyin or other Romanized pronunciation line on the card.
-- Rarity at upper left; difficulty at upper right; theme badge at lower left; never mix them.
+- Rarity at upper left; difficulty at upper right; theme badge at lower left; never mix them. UR replaces difficulty badge with the IP-specific label.
 - New SSR cards use the v2.7 legendary iridescent golden-dragon badge: large dimensional gold `SSR`, purple-blue-magenta nebula core, and a purple diamond main gemstone.
 - The SSR badge must differ clearly from SR in silhouette, material, light effects, and main gemstone; changing only letters, brightness, or saturation is a Blocking failure.
 - SSR iridescence remains confined to the approved rarity frame/effects and must not recolor the theme badge.
@@ -153,10 +185,11 @@ Permanent rules:
 - Full current Approved theme badge at lower left, with the exact Registry label.
 - Section label is `典故`, not `典故說明`.
 - Low-height, narrow, vertical motto plaque at lower right.
-- One-line source at the bottom.
+- One-line source in the lower-left portion of the original source-line slot.
+- Exactly one bottom-center `card-number-plaque`, with a four-digit Registry number and no other text.
 - N–SSR follow positive meaning and spiritual value.
-- UR requires auditable licensed-IP evidence.
-- Canonical artwork contains no formal card UI or text fields.
+- UR requires auditable licensed-IP evidence before formal numbering or approval.
+- Canonical artwork contains no formal card UI, text fields, or card numbers.
 
 Use `references/review-checklist.md` after every generated artwork and composite. Any Blocking failure means `changes-requested`, not Approved.
 
@@ -170,9 +203,10 @@ Update `docs/card-prompts/state/current-batch.json` after:
 - composition render or review
 - independent approval
 - Drive upload or movement
+- card-number assignment or retirement
 - completion or blocking
 
-Update `docs/card-prompts/manifest.md` whenever an artwork, component, composite, Drive reference, checksum, version, or publication status changes.
+Update `docs/card-prompts/manifest.md` whenever an artwork, component, composite, card number, Drive reference, checksum, version, or publication status changes.
 
 ## Completion Response
 
@@ -181,6 +215,7 @@ Report only evidence-backed facts:
 - batch ID and card list
 - render mode, layout version and component set
 - artwork and composition status per card
+- canonical four-digit card number or Review identifier
 - artwork and composite filenames
 - actual artwork and composite dimensions
 - Zhuyin review status
