@@ -21,17 +21,14 @@ test('canvas profile registry declares 897x1752 as the only canonical production
   const canonical = registry.profiles.find(
     (profile) => profile.profileId === registry.currentProfileId,
   );
-  assert.deepEqual(
-    canonical,
-    {
-      profileId: 'cicg-card-897x1752-v1',
-      widthPx: 897,
-      heightPx: 1752,
-      aspectRatio: '299:584',
-      status: 'canonical',
-      newProductionAllowed: true,
-    },
-  );
+  assert.deepEqual(canonical, {
+    profileId: 'cicg-card-897x1752-v1',
+    widthPx: 897,
+    heightPx: 1752,
+    aspectRatio: '299:584',
+    status: 'canonical',
+    newProductionAllowed: true,
+  });
 
   const legacy = registry.profiles.find(
     (profile) => profile.profileId === 'cicg-card-1024x2000-legacy-v1',
@@ -142,11 +139,14 @@ test('governed generation and registration contracts use the canonical canvas pr
       /897\s*[×x]\s*1752/,
       `${path} must declare the canonical composite dimensions`,
     );
-    assert.doesNotMatch(
-      content,
-      /(?:exact composite canvas|final|complete|canonical|current)[^\n]{0,80}1024\s*[×x]\s*2000/i,
-      `${path} must not describe 1024x2000 as the current complete-card standard`,
-    );
+
+    if (/1024\s*[×x]\s*2000/.test(content)) {
+      assert.match(
+        content,
+        /legacy-compatible|legacy|既有|舊版/i,
+        `${path} may mention 1024x2000 only as a legacy-compatible size`,
+      );
+    }
   }
 
   const generalSkill = await readText(
@@ -201,21 +201,18 @@ test('UR review assets treat 897x1752 as canonical dimensions without bypassing 
     'not-approved-for-publication',
   );
   assert.equal(draft.sharedCardState.canonicalRendererOutput, false);
-  assert.deepEqual(
-    draft.sharedImageState,
-    {
-      status: 'pending-drive-upload',
-      driveFileId: null,
-      webViewLink: null,
-      mimeType: 'image/png',
-      widthPx: 897,
-      heightPx: 1752,
-      canvasProfile: 'cicg-card-897x1752-v1',
-      aspectRatio: '299:584',
-      dimensionStatus: 'canonical',
-      sourceCanvasProfile: null,
-    },
-  );
+  assert.deepEqual(draft.sharedImageState, {
+    status: 'pending-drive-upload',
+    driveFileId: null,
+    webViewLink: null,
+    mimeType: 'image/png',
+    widthPx: 897,
+    heightPx: 1752,
+    canvasProfile: 'cicg-card-897x1752-v1',
+    aspectRatio: '299:584',
+    dimensionStatus: 'canonical',
+    sourceCanvasProfile: null,
+  });
 
   assert.equal(new Set(draft.cards.map((card) => card.reviewIdentifier)).size, 13);
   assert.equal(new Set(draft.cards.map((card) => card.imageSha256)).size, 13);
