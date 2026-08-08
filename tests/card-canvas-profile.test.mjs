@@ -195,26 +195,41 @@ test('UR review assets treat 897x1752 as canonical dimensions without bypassing 
   assert.equal(draft.registrationStatus, 'pending-drive-upload');
   assert.equal(draft.registryEffects.formalUrAssignedCountDelta, 0);
   assert.equal(draft.registryEffects.formalUrNextSequenceDelta, 0);
+  assert.equal(draft.sharedCardState.formalCardNumber, null);
+  assert.equal(
+    draft.sharedCardState.publicationStatus,
+    'not-approved-for-publication',
+  );
+  assert.equal(draft.sharedCardState.canonicalRendererOutput, false);
+  assert.deepEqual(
+    draft.sharedImageState,
+    {
+      status: 'pending-drive-upload',
+      driveFileId: null,
+      webViewLink: null,
+      mimeType: 'image/png',
+      widthPx: 897,
+      heightPx: 1752,
+      canvasProfile: 'cicg-card-897x1752-v1',
+      aspectRatio: '299:584',
+      dimensionStatus: 'canonical',
+      sourceCanvasProfile: null,
+    },
+  );
 
-  for (const card of draft.cards) {
-    assert.equal(card.formalCardNumber, null);
-    assert.equal(card.publicationStatus, 'not-approved-for-publication');
-    assert.equal(card.canonicalRendererOutput, false);
-    assert.equal(card.imageAsset.widthPx, 897);
-    assert.equal(card.imageAsset.heightPx, 1752);
-    assert.equal(card.imageAsset.canvasProfile, 'cicg-card-897x1752-v1');
-    assert.equal(card.imageAsset.dimensionStatus, 'canonical');
-    assert.equal(card.imageAsset.aspectRatio, '299:584');
-    assert.equal(
-      card.blockingReasons.some((reason) => /1024x2000|required 1024/i.test(reason)),
-      false,
-    );
-  }
+  assert.equal(new Set(draft.cards.map((card) => card.reviewIdentifier)).size, 13);
+  assert.equal(new Set(draft.cards.map((card) => card.imageSha256)).size, 13);
+  assert.equal(
+    [...draft.sharedBlockingReasons, ...draft.batchBlockingReasons].some(
+      (reason) => /1024x2000|required 1024/i.test(reason),
+    ),
+    false,
+  );
 
   const uzui = draft.cards.find(
     (card) => card.reviewIdentifier === 'RV-UR-0009',
   );
   assert.equal(uzui.qualityStatus, 'blocked-text-mismatch');
-  assert.equal(uzui.textVerification.expectedIdiomTitle, '豪氣干雲');
-  assert.equal(uzui.textVerification.observedIdiomTitle, '豪氣千雲');
+  assert.equal(uzui.expectedIdiomTitle, '豪氣干雲');
+  assert.equal(uzui.observedIdiomTitle, '豪氣千雲');
 });
