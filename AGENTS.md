@@ -66,16 +66,16 @@ src/puzzle       填字盤面與導航
 src/progress     闖關進度與 IndexedDB
 src/bonus        打地鼠
 src/pwa          PWA
-src/cards        圖卡資料、版面、元件解析與 render plan
+src/cards        圖卡資料、獎勵、收藏、升級、版面與 render plan
 src/app          React UI 與瀏覽器事件
-src/app/cards    圖卡 React／SVG 顯示與 PNG 輸出 adapter
+src/app/cards    圖卡顯示、收藏與升級 UI adapter
 ```
 
 - 領域規則使用純 TypeScript。
-- React 只負責畫面與瀏覽器事件。
+- React 只負責畫面、瀏覽器事件與呼叫已測試服務。
 - 不得把核心規則寫進 DOM、動畫 callback 或不可測試的亂數流程。
-- 圖卡 React 元件不得重新判定稀有度、難易度、來源、授權或卡池資格。
-- 不得直接修改既有 `cicg-progress` Schema，除非任務明確核准 Schema migration。
+- 圖卡 React 元件不得重新判定稀有度、難易度、來源、授權、卡池資格、隱藏積分或升級素材。
+- `cicg-progress` 保持 Version 1；未經明確 migration 核准不得加入卡牌欄位。
 
 所有功能與 Bug 修正使用 TDD：
 
@@ -133,18 +133,19 @@ Key：chapter-1
 - 產生成語圖卡、繼續產圖或下一批
 - 修正上一批、審核或上傳圖卡
 - 圖卡元件、模板、renderer 或 PNG 輸出
-- 稀有度、稀有度外框或難易度
-- 九大主題徽章
+- 稀有度、難易度、卡號或主題徽章
+- 收藏頁、每關贈卡、隱藏積分、卡池、重複卡升級或卡包
 - Drive 圖卡素材盤點、搬移、改名、歸檔或漂移修復
-- 收藏頁、卡池、卡包或 UR 聯名
+- UR 聯名
 
 必須先讀取：
 
 ```text
 1. .agents/skills/generating-cicg-idiom-cards/SKILL.md
 2. docs/card-prompts/state/current-batch.json
-3. data/cards/theme-badge-registry.json
-4. data/drive-assets/idiom-card-assets.json
+3. data/cards/card-number-registry.json
+4. data/cards/theme-badge-registry.json
+5. data/drive-assets/idiom-card-assets.json
 ```
 
 凡指定外部 IP 與角色、要求 UR 卡或接續 UR 聯名卡時，還必須讀取：
@@ -164,17 +165,21 @@ Key：chapter-1
 2. docs/superpowers/specs/2026-08-06-idiom-card-review-governance-design.md
 3. docs/superpowers/specs/2026-08-06-idiom-card-collection-design.md
 4. docs/superpowers/specs/2026-08-06-idiom-card-collection-data-integrity-amendment.md
-5. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
-6. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
-7. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
-8. docs/superpowers/specs/2026-08-06-card-rarity-frame-system-amendment.md
-9. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
-10. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
-11. docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
-12. docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md
-13. docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md（UR 任務）
-14. docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md（UR 任務）
-15. docs/card-prompts/PROJECT_PROMPT.md
+5. docs/superpowers/specs/2026-08-06-card-collection-core-v1-design.md
+6. docs/superpowers/specs/2026-08-08-card-reward-and-upgrade-system-design.md
+7. docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md
+8. data/cards/card-number-registry.json
+9. docs/superpowers/specs/2026-08-06-card-template-v2.1-layout-amendment.md
+10. docs/superpowers/specs/2026-08-06-card-template-v2.6-dimension-and-pronunciation-amendment.md
+11. docs/superpowers/specs/2026-08-06-card-template-v2.7-ssr-badge-amendment.md
+12. docs/superpowers/specs/2026-08-06-card-rarity-frame-system-amendment.md
+13. docs/superpowers/specs/2026-08-06-idiom-card-modularization-design.md
+14. docs/superpowers/specs/2026-08-06-drive-asset-governance-design.md
+15. docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md
+16. docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md
+17. docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md（UR 任務）
+18. docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md（UR 任務）
+19. docs/card-prompts/PROJECT_PROMPT.md
 ```
 
 `v2.6.1` 是 current geometry contract；發生畫布、區域高度、元件位置、裁切、圖層或 SSR overlay 衝突時，以 v2.6.1 為準。
@@ -200,31 +205,35 @@ theme badge     x=28–300,  y=1576–1920
 allusion panel  x=286–724, y=1582–1920
 motto plaque    x=730–988, y=1570–1922
 source line     x=178–846, y=1936–1986
+card number     x=410–614, y=1936–1986
 ```
 
 - 所有元件必須使用 v2.6.1 Bounding Box，實際幾何允許誤差最多 `±2 px`。
 - 任何稀有度均不得改變 `360／1200／440` 三區高度。
 - 圖片模型只能生成 `1024 × 1200 px`、無文字、無 UI、無外框的 artwork。
-- 不得讓圖片模型生成完整卡面、十張拼圖總覽或把正式文字烙入 canonical artwork。
-- 圖片模型不得生成主標題或注音；Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
-- 注音固定四筆逐字對齊，平假名、片假名、片假名擴充、半形片假名、拼音、羅馬字與近似假字均為 Blocking failure。
-- 日文假名專屬 finding code 為 `japanese-kana-in-bopomofo`；其他不合法注音為 `invalid-bopomofo`。
-- 漢語拼音可保留於資料層，但不得顯示於卡面。
+- 圖片模型不得生成主標題、注音、卡號或完整卡面。
+- Renderer 必須使用已驗證的 `bopomofo[4]` 與 canonical `cardNumber`。
+- 注音固定四筆逐字對齊；日文假名、拼音、羅馬字與近似假字均為 Blocking failure。
+- 日文假名 finding code 為 `japanese-kana-in-bopomofo`；其他不合法注音為 `invalid-bopomofo`。
+- 漢語拼音可留在資料層，但不得顯示於卡面。
 - 中央 artwork 只允許等比 `cover + center crop`，禁止拉伸或壓縮。
-- SSR 霓虹框是 `1024 × 2000` full-canvas top overlay；不得縮小內容、改變區域高度、移動元件或觸發 reflow。
-- SSR 霓虹光效向內延伸不得超過 `20 px`，不得全面染色難度徽章、主題徽章、典故區或箴言牌匾。
+- SSR 霓虹框是 `1024 × 2000` full-canvas top overlay，不得造成 reflow。
+- SSR 霓虹光效向內延伸不得超過 `20 px`，不得全面染色其他元件。
 - 相同資料、Asset ID 與 renderer 版本必須產生相同 geometry manifest。
 
-### 5.3 稀有度、難易度與 SSR
+### 5.3 稀有度、難易度、卡號與 SSR
 
 - 稀有度與難易度分欄保存，彼此獨立。
 - N～SSR 依成語正面意義、勵志程度、精神象徵、共鳴力與代表性判定。
 - UR 只保留給具有可稽核正式授權的外部 IP 聯名。
 - N、R、SR、SSR 各自使用 current Approved 專屬外框。
-- SSR 必須同時具備傳奇級金龍稀有度徽章、v2.8 全框虹彩霓虹 overlay，以及英雄姿態、宏大場景、電影式構圖與高強度傳奇光效。
+- SSR 必須具備金龍稀有度徽章、v2.8 全框虹彩霓虹 overlay 與史詩級構圖。
 - N／R／SR 不得使用 SSR 徽章或完整多色虹彩外框。
-- 右上難易度徽章必須使用 current Approved 元件，不得因稀有度改色。
-- UR 卡資料層保留原始難度，但卡面省略難度徽章並改掛 IP 專屬聯名標籤。
+- 右上難易度元件不得因稀有度改色；UR 省略難易度徽章並使用 IP 專屬聯名標籤。
+- 正式卡號唯一來源為 `data/cards/card-number-registry.json`。
+- 卡號格式固定 `{rarity}-{sequence:0000}`，各稀有度全專案獨立流水，章節不得重置。
+- 已分配或退役的卡號不得改寫或重用。
+- 沒有可稽核授權的 UR 不得消耗正式 `UR-####` 卡號。
 
 ### 5.4 九大主題徽章
 
@@ -234,7 +243,7 @@ source line     x=178–846, y=1936–1986
 data/cards/theme-badge-registry.json
 ```
 
-解析以下九類：
+解析：
 
 ```text
 軍事、內政、智謀、文藝、勵志、修身、人際、警世、見識
@@ -252,6 +261,62 @@ data/cards/theme-badge-registry.json
 - Review／Approved composite 是 derived output，不能成為唯一 canonical source。
 - 產製 Agent 不得自行把自己的輸出標記為最終 Approved。
 - 來源、授權、Drive File ID、SHA-256 或獨立核准不足時，只能維持 Draft／Review。
+
+### 5.6 每關贈卡、隱藏積分與升級永久規則
+
+每個主線關卡必須具備跨章永久 `campaignOrdinal`。
+
+```text
+一般關：首次完成後，從該關出現過的成語抽 1 張，最低 N
+全域 10 倍數關：從已完成範圍抽 1 張，最低 R
+全域 100 倍數關：從已完成範圍抽 1 張，最低 SR
+```
+
+- 第 100 關只發一張，不另外疊加第 10 關獎勵。
+- 重玩、升星或刷新最佳紀錄不得再次發卡。
+- 抽卡完全隨機並允許重複；不採未持有優先。
+- UR 永久排除一般主線贈卡與一般升級。
+- 卡池為空時 grant 保持 `pending`，不得降到該關保底以下。
+
+隱藏積分：
+
+```text
+E=1、D=2、C=3、B=4、A=5、S=6
+SR tickets  = min(hiddenRewardScore, 400)
+SSR tickets = min(floor(hiddenRewardScore / 10), 100)
+```
+
+- 前十關合計 50 分時：SR 50／1000、SSR 5／1000。
+- 隱藏積分跨章累積，不因每 10／100 關重置。
+- 正式玩家 UI 不得顯示積分、機率或 roll value。
+- 機率快照與卡片結果必須先持久化，再播放動畫。
+
+重複卡升級：
+
+```text
+10 張可消耗 N  → 1 張隨機 R
+10 張可消耗 R  → 1 張隨機 SR
+10 張可消耗 SR → 1 張隨機 SSR
+```
+
+- 每種卡至少保留 1 張，只能消耗 `ownedCount - 1`。
+- 素材可混合不同成語與已完成章節，但不得混合不同稀有度。
+- 自動選材先依可消耗數量降冪，再依 canonical 四位數卡號升冪。
+- 產物只來自已通關內容的下一稀有度，完全隨機且可重複。
+- 無合法產物時不得扣除素材。
+- 扣料、入庫、upgrade record 與 metadata 必須在同一 readwrite transaction。
+
+收藏資料庫：
+
+```text
+Database：cicg-card-collection
+Version：2
+Stores：grants、inventory、metadata、upgrades
+```
+
+- Version 1 legacy grants 與 inventory 必須無損保留。
+- legacy 十關 grant 已覆蓋的關卡不得在 migration 時重複發卡。
+- `cicg-progress` 仍維持 Version 1，不得因收藏功能修改。
 
 ---
 
