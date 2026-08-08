@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "currentProfileId": "cicg-card-897x1752-v1",
+  "profiles": [
+    {
+      "profileId": "cicg-card-897x1752-v1",
+      "widthPx": 897,
+      "heightPx": 1752,
+      "aspectRatio": "299:584",
+      "status": "canonical",
+      "newProductionAllowed": true
+    },
+    {
+      "profileId": "cicg-card-1024x2000-legacy-v1",
+      "widthPx": 1024,
+      "heightPx": 2000,
+      "aspectRatio": "64:125",
+      "status": "legacy-compatible",
+      "newProductionAllowed": false
+    }
+  ],
+  "derivativePolicy": {
+    "sourceProfileId": "cicg-card-897x1752-v1",
+    "minimumIntegerScale": 2,
+    "dimensionStatus": "derivative"
+  }
+}
