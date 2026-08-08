@@ -81,15 +81,18 @@ test('all production card prompts require one renderer-owned bottom-center card 
   const urPrompt = loadText('../docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md');
   const generalSkill = loadText('../.agents/skills/generating-cicg-idiom-cards/SKILL.md');
   const urSkill = loadText('../.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md');
+  const requiredSpecs = loadText('../.agents/skills/generating-cicg-idiom-cards/references/required-specs.md');
+  const numberingSpec = loadText('../docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md');
   const agents = loadText('../AGENTS.md');
 
-  for (const text of [cardPrompt, urPrompt, generalSkill, urSkill, agents]) {
+  for (const text of [cardPrompt, urPrompt, generalSkill, urSkill, requiredSpecs, numberingSpec]) {
     assert.match(text, /card-number-plaque/u);
     assert.match(text, /bottom-center/u);
     assert.match(text, /\{\{CARD_NUMBER\}\}|cardNumber/u);
     assert.match(text, /四碼|four-digit/u);
   }
 
+  assert.match(agents, /\.agents\/skills\/generating-cicg-idiom-cards\/SKILL\.md/u);
   assert.doesNotMatch(urPrompt, /最底部不得再次顯示角色名稱、聯名名稱或額外卡號/u);
   assert.match(urPrompt, /最底部只能有一個 canonical card-number-plaque/u);
   assert.match(cardPrompt, /圖片模型不得生成卡號|image model must not generate card numbers/u);
