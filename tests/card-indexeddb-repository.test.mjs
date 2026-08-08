@@ -13,26 +13,27 @@ test('exports an IndexedDB repository factory', () => {
   assert.equal(typeof createIndexedDbCardCollectionRepository, 'function');
 });
 
-test('uses a separate version-one database with three exact stores', async () => {
+test('uses a separate version-two database with four exact stores', async () => {
   const source = await readFile(sourceUrl, 'utf8');
 
   assert.match(source, /const DATABASE_NAME = 'cicg-card-collection';/u);
-  assert.match(source, /const DATABASE_VERSION = 1;/u);
+  assert.match(source, /const DATABASE_VERSION = 2;/u);
   assert.match(source, /const GRANTS_STORE = 'grants';/u);
   assert.match(source, /const INVENTORY_STORE = 'inventory';/u);
   assert.match(source, /const METADATA_STORE = 'metadata';/u);
+  assert.match(source, /const UPGRADES_STORE = 'upgrades';/u);
   assert.match(source, /const METADATA_KEY = 'collection';/u);
   assert.doesNotMatch(source, /cicg-progress/u);
-  assert.doesNotMatch(source, /DATABASE_VERSION = 2/u);
+  assert.doesNotMatch(source, /cicg-progress/u);
 });
 
-test('transacts grants inventory and metadata atomically', async () => {
+test('transacts grants inventory metadata and upgrades atomically', async () => {
   const source = await readFile(sourceUrl, 'utf8');
   const normalized = source.replace(/\s+/gu, ' ');
 
   assert.match(
     normalized,
-    /database\.transaction\( \[GRANTS_STORE, INVENTORY_STORE, METADATA_STORE\], 'readwrite' \)/u
+    /database\.transaction\( ALL_STORES, 'readwrite' \)/u
   );
   assert.match(source, /transaction\.oncomplete\s*=/u);
   assert.match(source, /transaction\.onerror\s*=/u);
@@ -40,10 +41,10 @@ test('transacts grants inventory and metadata atomically', async () => {
   assert.match(source, /transaction\.abort\(\)/u);
 });
 
-test('creates every store during the version-one upgrade', async () => {
+test('creates only missing stores during the version-two upgrade', async () => {
   const source = await readFile(sourceUrl, 'utf8');
 
-  for (const store of ['GRANTS_STORE', 'INVENTORY_STORE', 'METADATA_STORE']) {
+  for (const store of ['GRANTS_STORE', 'INVENTORY_STORE', 'METADATA_STORE', 'UPGRADES_STORE']) {
     assert.match(
       source,
       new RegExp(`createObjectStore\\(${store}\\)`, 'u'),

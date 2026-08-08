@@ -19,6 +19,14 @@ test('provides exactly twenty sequential levels', () => {
   assert.equal(new Set(PUZZLE_LEVELS.map((level) => level.id)).size, 20);
 });
 
+test('locks chapter-one global campaign ordinals to 1 through 20', () => {
+  assert.deepEqual(
+    PUZZLE_LEVELS.map((level) => level.campaignOrdinal),
+    Array.from({ length: 20 }, (_, index) => index + 1)
+  );
+  assert.equal(new Set(PUZZLE_LEVELS.map((level) => level.campaignOrdinal)).size, 20);
+});
+
 test('uses sixty-one unique idioms across chapter one', () => {
   const placements = PUZZLE_LEVELS.flatMap((level) => level.placements);
   const ids = placements.map((placement) => placement.idiomId);

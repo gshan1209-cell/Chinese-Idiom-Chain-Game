@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  syncCardCollectionLevelRewards,
   syncCardCollectionMilestones
 } from '../.test-dist/src/cards/collection-service.js';
 import {
@@ -9,6 +10,12 @@ import {
 } from '../.test-dist/src/cards/collection-repository.js';
 
 const NOW = '2026-08-06T13:30:00.000Z';
+
+const LEVEL_TEXTS = Object.freeze([
+  '一心一意', '意氣風發', '發揚光大', '大公無私', '私心雜念',
+  '念念不忘', '忘恩負義', '義不容辭', '辭舊迎新', '新陳代謝'
+]);
+
 const ACTIVE_IDIOMS = Object.freeze([
   Object.freeze({ id: 'idiom-water-drops-stone', text: '水滴石穿' })
 ]);
@@ -187,4 +194,222 @@ test('transaction failure rejects without partially storing grant or inventory',
   const stored = await base.load();
   assert.deepEqual(stored.grants, []);
   assert.deepEqual(stored.inventory, []);
+});
+
+
+function rewardLevel(number, idiomId = `idiom-${number}`) {
+  return Object.freeze({
+    id: `level-${String(number).padStart(3, '0')}`,
+    chapterId: 'chapter-1',
+    levelNumber: number,
+    campaignOrdinal: number,
+    placements: Object.freeze([Object.freeze({ idiomId })])
+  });
+}
+
+function completedProgress(levels) {
+  return Object.freeze({
+    schemaVersion: 1,
+    campaignId: 'chapter-1',
+    highestUnlockedLevel: Math.min(levels.length + 1, 20),
+    lastPlayedLevel: levels.at(-1)?.levelNumber ?? 1,
+    levelProgressById: Object.freeze(Object.fromEntries(levels.map((level) => [
+      level.id,
+      Object.freeze({
+        levelId: level.id,
+        completed: true,
+        stars: 1,
+        bestScore: 100,
+        bestMistakes: 0,
+        bestHintsUsed: 0,
+        completionCount: 1,
+        firstCompletedAt: NOW,
+        lastCompletedAt: NOW
+      })
+    ]))),
+    updatedAt: NOW
+  });
+}
+
+function levelCard(number, overrides = {}) {
+  const idiomId = `idiom-${number}`;
+  return approvedCard({
+    id: `card-${number}`,
+    idiomId,
+    title: LEVEL_TEXTS[number - 1],
+    rarity: 'N',
+    difficulty: 'E',
+    acquisitionMethods: ['milestone-reward'],
+    ...overrides
+  });
+}
+
+function levelRewardInput(repository, levels, overrides = {}) {
+  const activeIdioms = levels.map((level) => Object.freeze({
+    id: level.placements[0].idiomId,
+    text: LEVEL_TEXTS[level.levelNumber - 1]
+  }));
+  return {
+    repository,
+    levels,
+    progress: completedProgress(levels),
+    definitions: levels.map((level) => levelCard(level.levelNumber)),
+    activeIdioms,
+    difficultyById: new Map(levels.map((level) => [
+      level.placements[0].idiomId,
+      'E'
+    ])),
+    random: { next: () => 0.9 },
+    now: NOW,
+    ...overrides
+  };
+}
+
+test('first completion of level one creates and resolves one per-level grant', async () => {
+  const repository = createMemoryCardCollectionRepository(NOW);
+  const levels = [rewardLevel(1)];
+  const values = [0.9, 0];
+  const result = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { random: { next: () => values.shift() } }
+  ));
+
+  assert.equal(result.createdGrantCount, 1);
+  assert.equal(result.resolvedGrantCount, 1);
+  assert.equal(result.pendingGrantCount, 0);
+  assert.equal(result.state.grants[0].campaignOrdinal, 1);
+  assert.equal(result.state.inventory[0].acquisitionHistory[0].method, 'level-reward');
+});
+
+test('repeat level sync creates no grant and consumes no random input', async () => {
+  const repository = createMemoryCardCollectionRepository(NOW);
+  const levels = [rewardLevel(1)];
+  const values = [0.9, 0];
+  await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { random: { next: () => values.shift() } }
+  ));
+  let calls = 0;
+
+  const repeated = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { random: { next: () => { calls += 1; return 0; } } }
+  ));
+
+  assert.equal(calls, 0);
+  assert.equal(repeated.createdGrantCount, 0);
+  assert.equal(repeated.state.inventory[0].ownedCount, 1);
+});
+
+test('completed levels one and two create grants in global ordinal order', async () => {
+  const repository = createMemoryCardCollectionRepository(NOW);
+  const levels = [rewardLevel(2), rewardLevel(1)];
+  const values = [0.9, 0, 0.9, 0];
+
+  const result = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { random: { next: () => values.shift() } }
+  ));
+
+  assert.deepEqual(
+    result.state.grants.map((grant) => grant.campaignOrdinal),
+    [1, 2]
+  );
+  assert.equal(result.createdGrantCount, 2);
+});
+
+test('legacy milestone ten suppresses only per-level ordinal ten', async () => {
+  const levels = Array.from({ length: 10 }, (_, index) => rewardLevel(index + 1));
+  const repository = createMemoryCardCollectionRepository(NOW, {
+    grants: [{
+      rewardId: 'card-grant:main-levels:10',
+      milestoneLevelCount: 10,
+      status: 'pending',
+      createdAt: NOW,
+      resolvedAt: null,
+      revealedAt: null,
+      resolvedCardId: null,
+      acquisitionId: null
+    }],
+    inventory: [],
+    metadata: { schemaVersion: 1, updatedAt: NOW }
+  });
+
+  const result = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { definitions: [] }
+  ));
+
+  const perLevel = result.state.grants.filter((grant) => 'campaignOrdinal' in grant);
+  assert.deepEqual(perLevel.map((grant) => grant.campaignOrdinal), [1,2,3,4,5,6,7,8,9]);
+  assert.equal(result.state.grants[0].rewardId, 'card-grant:main-levels:10');
+});
+
+test('pending empty-pool grants preserve hidden score snapshots', async () => {
+  const repository = createMemoryCardCollectionRepository(NOW);
+  const levels = [rewardLevel(1), rewardLevel(2)];
+
+  const result = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    levels,
+    { definitions: [] }
+  ));
+
+  assert.deepEqual(result.state.grants.map((grant) => grant.scoreSnapshot), [
+    { levelHiddenScore: 1, hiddenRewardScore: 1 },
+    { levelHiddenScore: 1, hiddenRewardScore: 2 }
+  ]);
+  assert.equal(result.pendingGrantCount, 2);
+});
+
+test('resolved per-level grant missing inventory is repaired without RNG', async () => {
+  const level = rewardLevel(1);
+  const rewardId = 'card-grant:main-level:chapter-1:1';
+  const acquisitionId = `card-acquisition:${rewardId}`;
+  const repository = createMemoryCardCollectionRepository(NOW, {
+    grants: [{
+      rewardId,
+      chapterId: 'chapter-1',
+      levelNumber: 1,
+      campaignOrdinal: 1,
+      scoreSnapshot: { levelHiddenScore: 1, hiddenRewardScore: 1 },
+      probabilitySnapshot: {
+        levelHiddenScore: 1,
+        hiddenRewardScore: 1,
+        srTickets: 1,
+        ssrTickets: 0,
+        baseTickets: 999,
+        minimumRarity: 'N',
+        rolledRarity: 'N',
+        resolvedRarity: 'N',
+        rollValue: 900
+      },
+      status: 'resolved',
+      createdAt: NOW,
+      resolvedAt: NOW,
+      revealedAt: null,
+      resolvedCardId: 'card-1',
+      acquisitionId,
+      legacyCoverage: false
+    }],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  });
+  let calls = 0;
+
+  const result = await syncCardCollectionLevelRewards(levelRewardInput(
+    repository,
+    [level],
+    { random: { next: () => { calls += 1; return 0; } } }
+  ));
+
+  assert.equal(calls, 0);
+  assert.equal(result.state.inventory[0].cardId, 'card-1');
+  assert.equal(result.state.inventory[0].acquisitionHistory[0].acquisitionId, acquisitionId);
 });

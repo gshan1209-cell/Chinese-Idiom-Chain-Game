@@ -139,6 +139,7 @@ function makeLevel(chain: readonly number[], index: number): PuzzleLevel {
     id: `level-${String(levelNumber).padStart(3, '0')}`,
     chapterId: 'chapter-1',
     levelNumber,
+    campaignOrdinal: levelNumber,
     title: levelNumber <= 5 ? '初試身手' : levelNumber <= 12 ? '漸入佳境' : '博學多聞',
     width,
     height,

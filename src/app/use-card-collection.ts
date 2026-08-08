@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IDIOM_CARD_DEFINITIONS } from '../cards/card-definitions';
 import { createCollectionWriteQueue } from '../cards/collection-write-queue';
 import { createIndexedDbCardCollectionRepository } from '../cards/indexeddb-collection-repository';
-import { countCompletedUniqueMainLevels } from '../cards/milestone-grants';
-import { syncCardCollectionMilestones } from '../cards/collection-service';
+import { CHAPTER_ONE_CARD_DIFFICULTY_BY_ID } from '../cards/generated-card-difficulties';
+import { syncCardCollectionLevelRewards } from '../cards/collection-service';
 import type {
   ActiveIdiomReference,
   CardCollectionRepository,
@@ -12,6 +12,7 @@ import type {
 } from '../cards/card-types';
 import type { CampaignProgress } from '../domain/progress';
 import { loadDictionary } from '../idioms/load-dictionary';
+import { PUZZLE_LEVELS } from '../puzzle/levels';
 
 export const COLLECTION_STORAGE_WARNING = '目前無法保存圖卡收藏；闖關進度不受影響。';
 
@@ -48,9 +49,16 @@ export function useCardCollection(
   }, []);
   const writeQueue = useMemo(() => createCollectionWriteQueue(), []);
   const random = useMemo(() => createBrowserRandomSource(), []);
+  const difficultyById = useMemo(
+    () => CHAPTER_ONE_CARD_DIFFICULTY_BY_ID,
+    []
+  );
   const dictionaryPromiseRef = useRef<Promise<readonly ActiveIdiomReference[]> | null>(null);
   const initialSyncStartedRef = useRef(false);
   const [pendingGrantCount, setPendingGrantCount] = useState(0);
+  const [latestResolvedGrantId, setLatestResolvedGrantId] = useState<
+    string | null
+  >(null);
   const [storageWarning, setStorageWarning] = useState<string | null>(null);
 
   const getActiveIdioms = useCallback(() => {
@@ -78,22 +86,36 @@ export function useCardCollection(
         const activeIdioms = IDIOM_CARD_DEFINITIONS.length === 0
           ? EMPTY_ACTIVE_IDIOMS
           : await getActiveIdioms();
-        const result = await syncCardCollectionMilestones({
+        const result = await syncCardCollectionLevelRewards({
           repository,
-          completedUniqueMainLevels: countCompletedUniqueMainLevels(savedProgress),
+          levels: PUZZLE_LEVELS,
+          progress: savedProgress,
           definitions: IDIOM_CARD_DEFINITIONS,
           activeIdioms,
+          difficultyById,
           random,
           now: currentTimestamp()
         });
         setPendingGrantCount(result.pendingGrantCount);
+        const latestResolved = [...result.state.grants]
+          .filter((grant) =>
+            'campaignOrdinal' in grant && grant.status !== 'pending'
+          )
+          .sort((left, right) => {
+            if (!('campaignOrdinal' in left) || !('campaignOrdinal' in right)) {
+              return 0;
+            }
+            return left.campaignOrdinal - right.campaignOrdinal;
+          })
+          .at(-1);
+        setLatestResolvedGrantId(latestResolved?.rewardId ?? null);
         setStorageWarning(null);
       } catch (error) {
         setStorageWarning(COLLECTION_STORAGE_WARNING);
         throw error;
       }
     });
-  }, [getActiveIdioms, random, repository, writeQueue]);
+  }, [difficultyById, getActiveIdioms, random, repository, writeQueue]);
 
   useEffect(() => {
     if (progressLoading || initialSyncStartedRef.current) return;
@@ -110,6 +132,7 @@ export function useCardCollection(
       try {
         await repository.clear(currentTimestamp());
         setPendingGrantCount(0);
+        setLatestResolvedGrantId(null);
         setStorageWarning(null);
       } catch (error) {
         setStorageWarning(COLLECTION_STORAGE_WARNING);
@@ -120,6 +143,7 @@ export function useCardCollection(
 
   return Object.freeze({
     pendingGrantCount,
+    latestResolvedGrantId,
     storageWarning,
     syncAfterProgressSaved,
     clearCollection

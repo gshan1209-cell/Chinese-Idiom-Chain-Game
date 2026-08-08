@@ -14,6 +14,7 @@ export interface PuzzleLevel {
   readonly id: string;
   readonly chapterId: string;
   readonly levelNumber: number;
+  readonly campaignOrdinal: number;
   readonly title: string;
   readonly width: number;
   readonly height: number;
