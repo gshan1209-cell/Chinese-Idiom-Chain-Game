@@ -7,29 +7,32 @@ description: Use when a Chinese-Idiom-Chain-Game request names an external IP an
 
 ## Overview
 
-Use this skill for a single UR external-IP collaboration card. The skill accepts an IP and character, prepares the idiom content, generates illustration-only artwork, and coordinates the approved modular card composition workflow.
+Use this skill for one external-IP UR idiom card at a time. Required user input is only the IP name and official character name; the workflow resolves the character title, best-fitting four-character idiom, validated Taiwanese Zhuyin, theme, allusion, source, five-character-quatrain motto, artwork, Review identifier or licensed card number, and modular composition.
 
-必填輸入只有 IP 名稱與角色正式名稱。使用者可另外指定成語；未指定成語時自動從啟用中的四字成語選擇最符合角色核心行動、來源可校訂且未重複者。
+The image model only generates illustration-only artwork. It never generates the canonical full card.
 
 ## Required Reading
 
-Before deciding or generating anything, read the latest GitHub `main` in this order:
+Before deciding, generating, repairing, reviewing, uploading, or composing anything, read current GitHub `main` in this order:
 
 1. `AGENTS.md`
 2. `.agents/skills/generating-cicg-idiom-cards/SKILL.md`
-3. `docs/card-prompts/state/current-batch.json`
-4. `docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md`
-5. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`
-6. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`
-7. `docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md`
-8. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
-9. `data/cards/card-number-registry.json`
-10. `data/cards/theme-badge-registry.json`
-11. `data/cards/chapter-1-card-number-registry.json`
-12. `data/drive-assets/idiom-card-assets.json`
-13. Card Catalog, Manifest, matching collaboration-label Registry, Drive evidence, and license records
+3. `.agents/skills/generating-cicg-idiom-cards/references/required-specs.md`
+4. `docs/card-prompts/state/current-batch.json`
+5. `docs/superpowers/specs/2026-08-07-idiom-card-standard-v2-6-design.md`
+6. `docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md`
+7. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`
+8. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`
+9. `docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md`
+10. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
+11. `data/cards/card-number-registry.json`
+12. `data/cards/theme-badge-registry.json`
+13. `data/drive-assets/idiom-card-assets.json`
+14. Matching Card Catalog, Manifest, IP-label Registry, Drive evidence, license records, and Approved component records
 
-If Repository, Registry, Catalog, state, Manifest, or Drive evidence conflicts, report drift and stop approval claims. Do not reconstruct truth from a previous chat or a flat PNG.
+The UR standard file path is unchanged, but its current document version is **v1.2**. Its UR-specific rules override conflicting older wording about the collaboration label, allusion body, motto columns, and motto height.
+
+If Repository, Registry, Catalog, Manifest, state, or Drive evidence conflicts, report drift and stop approval claims. Never reconstruct truth from a previous chat, a flattened PNG, or model-generated text.
 
 ## Inputs
 
@@ -43,61 +46,78 @@ characterName
 Optional:
 
 ```text
+characterTitle
 idiom
 licenseEvidenceId
 existingCardId
 existingArtworkAssetId
 existingCollaborationLabelAssetId
+existingIpLogoAssetId
 existingCardNumberPlaqueAssetId
 ```
 
-Do not ask the user to manually provide fields that can be resolved from current Repository data. Automatically prepare or resolve:
+Resolve from Repository data whenever possible:
 
-- four-character idiom
+- official character title and display name
+- suitable four-character idiom
 - `bopomofo[4]`
-- data-layer Pinyin where the existing schema requires it; it never renders on the card
-- original idiom difficulty
-- UR rarity and Review identifier or licensed four-digit card number
-- `themeCategory`, exact Registry label, and `themeBadgeAssetId`
-- idiom meaning, original allusion, verified source status
-- one-line spirit subtitle and three-column motto
-- character action, setting, composition-safe pose, and character effects
-- IP-specific collaboration-label asset and status
-- `cardNumberPlaqueAssetId`
-- artwork and composite filenames
+- original idiom difficulty in data only
+- UR rarity and Review identifier or licensed `UR-####`
+- `themeCategory` and `themeBadgeAssetId`
+- original allusion and verified source
+- one-line spirit subtitle
+- four-line five-character motto, total 20 Han characters
+- character action, setting, safe composition, and effects
+- IP Logo Asset ID and IP-specific collaboration-label Asset ID
+- artwork and composite filenames and statuses
 
-## Idiom Selection
+Do not ask the user to provide values that current governed data can resolve. Never invent sources, license evidence, Asset IDs, checksums, approvals, or card numbers.
+
+## Character-Based Idiom Selection
 
 When the user does not specify an idiom:
 
-1. Inspect active idioms, Card Catalog, Canonical Card Number Registry, active batch, Manifest, and prior UR collaboration records.
-2. Exclude non-four-character, disabled, duplicate, unverified, or semantically unsuitable idioms.
-3. Match the idiom to the character's observable values and actions, not popularity, combat power, or visual spectacle.
-4. Prefer an idiom that the character can express through one clear action in the central illustration.
-5. Preserve the idiom's own meaning, allusion, source, difficulty, and theme category. Never rewrite those fields as franchise lore.
+1. Inspect active idioms, current batch, Card Catalog, card-number Registry, Manifest, and previous UR records.
+2. Exclude disabled, duplicate, non-four-character, semantically unsuitable, or untraceable entries.
+3. Match the idiom to the character's observable personality, values, choices, methods, and signature actions.
+4. Prefer an idiom expressible through one clear illustration action or situation.
+5. Preserve the idiom's own meaning, allusion, source, difficulty, and theme; never rewrite them as franchise lore.
 6. Record the selection reason before generation.
 
-If no eligible idiom has verified Traditional Chinese text, four aligned Zhuyin readings, and a source that can remain at least `NeedsReview`, stop content readiness instead of inventing one.
+Popularity, combat strength, costume color, and visual spectacle alone are not valid selection reasons.
 
-## UR and License Gate
+Example:
 
-UR is reserved for external-IP collaboration cards. `licenseEvidenceId` must resolve to auditable authorization before a card can enter formal numbering, Approved, or publication workflows.
+```text
+Character: 胡蝶忍
+Title: 蝶柱
+Idiom candidate: 綿裡藏針
+Reason: 溫和外表與輕柔言行之下藏有銳利決斷與致命用毒能力，符合表柔內銳的角色核心。
+```
 
-沒有可稽核正式授權的 `licenseEvidenceId` 時不得指派任何正式 `UR-####` 卡號，只能使用不占序列的 Review 識別碼，並且不得標記 Approved、發布、上架、加入正式收藏或移入 Drive Approved。
+This example does not approve the idiom source or license status; those remain independently gated.
 
-A chat image, franchise name, user approval, public character image, or generated artwork is not license evidence. Keep unknown evidence fields `null`.
+## UR License and Number Gate
 
-UR 永遠排除於一般里程碑免費卡池；this skill must not add `milestone-reward` eligibility or alter the collection database schema.
+UR is reserved for external-IP collaboration cards. Formal `Approved`, publication, store use, collection eligibility, and `UR-####` require an auditable `licenseEvidenceId`.
 
-## Project-Wide Four-Digit UR Card Number Gate
+Without valid license evidence:
 
-Canonical source:
+- use Draft／Review only
+- do not assign or consume formal `UR-####`
+- do not move assets to Drive Approved
+- do not claim official collaboration or commercial permission
+- keep IP Logo and character assets in governed Review status
+
+A franchise name, public image, chat approval, generated artwork, or user-provided reference is not license evidence.
+
+Canonical formal card number source:
 
 ```text
 data/cards/card-number-registry.json
 ```
 
-Formal UR card numbers are independent, project-wide, and four-digit:
+Formal format:
 
 ```text
 UR-0001
@@ -105,78 +125,11 @@ UR-0002
 UR-0003
 ```
 
-Permanent rules:
+Review identifiers such as `RV-UR-####` or `UR-REVIEW-####` do not consume the formal sequence and must come from governed state or Registry data. The image model must never generate, guess, redraw, or repair any identifier.
 
-- Format is exactly `{rarity}-{sequence:0000}`.
-- The UR counter never resets for a new IP, character, chapter, batch, or release.
-- Formal assigned or retired numbers are immutable and never reused.
-- The image model must not generate, guess, redraw, or repair a card number.
-- The Renderer must read `cardNumber` from the Canonical Registry.
-- Every formal UR composite contains exactly one `bottom-center card-number-plaque = {{CARD_NUMBER}}`.
-- The plaque uses `x=410–614, y=1936–1986` inside the original v2.6.1 source-line outer slot.
-- The plaque may show only the four-digit Registry value; it cannot show IP, character, difficulty, version, or other text.
-- A Review identifier is not a formal card number and never consumes `UR-####`.
+## UR Visual Standard
 
-## Difficulty and Collaboration Label
-
-- Resolve and retain the idiom's original E–S difficulty in structured data.
-- UR cards do not render the difficulty badge.
-- The v2.6.1 difficulty Bounding Box is occupied by a versioned IP-specific collaboration-label component.
-- Each IP needs its own approved visual language and label master; changing only text on a generic plaque is insufficient.
-- The label displays only the IP name and official character name.
-- The bottom of the card must not repeat the character name.
-- If no current Approved label master exists, create or request a Review component and keep composition `pending` or `blocked`; never fake an Approved Asset ID.
-
-## Taiwanese Zhuyin Gate
-
-Every four-character idiom requires exactly four non-empty Zhuyin entries, and the four entries must be 四筆逐字對齊 with the title.
-
-Allowed characters in each entry are limited to Bopomofo `U+3105–U+312F` and tone marks `U+02D9`, `U+02CA`, `U+02C7`, `U+02CB`.
-
-圖片模型不得生成主標題、注音或卡號。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點與 Canonical Registry 的 `cardNumber`。
-
-The Zhuyin field must not contain:
-
-- 平假名 `U+3040–U+309F`
-- 片假名 `U+30A0–U+30FF`
-- 片假名擴充 `U+31F0–U+31FF`
-- 半形片假名 `U+FF65–U+FF9F`
-- Latin letters, Hanyu Pinyin, other romanization, Han characters, Japanese readings, decorative symbols, replacement glyphs, or model-invented lookalikes
-
-Any Japanese kana produces the Blocking finding:
-
-```text
-japanese-kana-in-bopomofo
-```
-
-Other malformed, missing, misaligned, or non-Bopomofo values produce:
-
-```text
-invalid-bopomofo
-```
-
-The production 字型必須完整覆蓋臺灣注音；字型缺字、方框、錯誤 fallback、無法確認的近似字形或 fallback 成日文字型時，stop composition and set `compositionStatus` to `changes-requested` or `blocked`.
-
-Visual inspection supplements but never replaces structured-data and render-plan validation.
-
-## Artwork Generation
-
-When the user asks to generate the card or image, use the available image-generation tool. In ChatGPT, use `image_gen`; do not return only a prompt.
-
-圖片模型只生成 1024 × 1200 px 的 illustration-only artwork：人物、背景、情境、道具與角色特效。
-
-不得讓圖片模型生成完整卡面。The artwork must contain no:
-
-- title, Zhuyin, Pinyin, subtitle, card number, or any other text
-- frame, UR badge, difficulty badge, collaboration label, theme badge, or card-number-plaque
-- allusion, motto, source, official logo, imitation logo, copyright line, or watermark
-- multi-card overview, mockup, packaging, or montage
-
-Generate one artwork at a time. Keep the head, face, hands, primary weapon, and key action clear; reserve the upper-right collaboration-label safe area and the Footer crop boundary.
-
-## Composition
-
-Compose only through the approved renderer and versioned components:
+### Canvas
 
 ```text
 Canvas       1024 × 2000
@@ -186,46 +139,210 @@ Footer       440 px
 Geometry     ±2 px
 ```
 
-The canonical artwork is placed with proportional cover and center crop. The Renderer supplies the title, validated `bopomofo[4]`, spirit subtitle, UR badge, IP label, approved theme badge, idiom allusion, source, motto, UR overlay, and one bottom-center four-digit `card-number-plaque`.
+### UR Frame and Badge
 
-The bottom outer source slot remains `x=178–846, y=1936–1986`, partitioned as:
+- Apply the current Approved full-canvas rainbow neon Overlay.
+- The border must visibly carry continuous cyan, green, blue, purple, magenta, red, and orange-gold light.
+- Overlay cannot cause reflow, shrink content, recolor all Footer components, or cover text and faces.
+- Use the current Approved three-dimensional rainbow-metallic UR dragon emblem at the upper left.
+- The image model must not recreate the frame or badge.
+
+### Header
 
 ```text
-source-line          x=178–398, y=1936–1986
-card-number-plaque   x=410–614, y=1936–1986
+rarity badge       x=24–252,   y=18–326
+idiom title        x=250–788,  y=42–158
+bopomofo[4]        x=278–756,  y=166–232
+spirit subtitle    x=258–782,  y=254–330
+collaboration tag  x=792–1000, y=24–318
 ```
 
-If the Renderer, Approved UR components, IP-specific label, validated Zhuyin, canonical card number, number plaque, or font coverage is unavailable, keep `compositionStatus` as `pending`, `changes-requested`, or `blocked`. Do not fall back to a model-generated full card.
+- Title is exactly four Traditional Chinese characters.
+- Zhuyin is exactly four validated entries aligned character by character.
+- UR does not render the difficulty badge.
+- The upper-right slot uses the IP-specific label.
+
+## Collaboration Label
+
+Each IP needs a versioned label master. For the current Demon Slayer character layout, the label contains:
+
+```text
+Top: governed IP Logo Asset
+Middle: official character title
+Bottom: official character name
+Example: 蝶柱－胡蝶忍
+```
+
+Permanent rules:
+
+- retain the IP Logo location and aspect ratio
+- display the character title and official name
+- never display `聯名卡`
+- never display `角色名`, `聯名限定`, or `限定版`
+- never repeat the IP or character name at the bottom of the card
+- the image model must not draw, imitate, or repair the Logo or label
+- without license evidence, the label remains Review and cannot be publicly released or Approved
+
+## Taiwanese Zhuyin Gate
+
+Every four-character idiom requires exactly four non-empty `bopomofo[4]` entries aligned with the title.
+
+Allowed characters in each entry:
+
+```text
+Bopomofo U+3105–U+312F
+Tone marks U+02D9 U+02CA U+02C7 U+02CB
+```
+
+Blocking content:
+
+- Hiragana `U+3040–U+309F`
+- Katakana `U+30A0–U+30FF`
+- Katakana extensions `U+31F0–U+31FF`
+- half-width Katakana `U+FF65–U+FF9F`
+- Latin letters, Hanyu Pinyin, romanization, Han characters, decorative lookalikes, missing glyphs, or乱码
+
+Finding codes:
+
+```text
+japanese-kana-in-bopomofo
+invalid-bopomofo
+```
+
+The Renderer must use validated structured text and a font with complete Taiwanese Bopomofo coverage. The image model, OCR, and visual guessing cannot supply canonical Zhuyin.
+
+Any failure sets `compositionStatus` to `changes-requested` or `blocked` and prevents Approved.
+
+## Artwork Generation
+
+When the user asks to generate the card or image, use the available image-generation tool for the central artwork only.
+
+Canonical artwork:
+
+```text
+1024 × 1200 px
+single primary character
+character action + setting + props + effects
+no text
+no frame
+no UR badge
+no collaboration label
+no IP Logo
+no theme badge
+no allusion
+no motto
+no source
+no card number
+no watermark
+```
+
+Generate one artwork at a time. Keep the face, hands, primary weapon, and key action clear; reserve the upper-right label safe zone and Footer crop boundary.
+
+Never ask the image model to draw the complete card, even when the user provides a full-card reference.
+
+## UR Footer Composition
+
+UR v1.2 Footer geometry:
+
+```text
+theme badge       x=28–300,  y=1576–1920, width=272, height=344
+allusion panel    x=286–724, y=1582–1920, width=438, height=338
+motto plaque      x=730–988, y=1722–1922, width=258, height=200
+source line       x=178–398, y=1936–1986, width=220, height=50
+number plaque     x=410–614, y=1936–1986, width=204, height=50
+```
+
+The `258 × 200 px` motto plaque is a UR-specific override and replaces the older 352 px height.
+
+### Theme badge
+
+- Resolve from `data/cards/theme-badge-registry.json`.
+- Theme follows the idiom, not the franchise faction or character title.
+- Use the current Approved component; never repaint it with the image model.
+
+### Allusion panel
+
+Render only:
+
+1. `典故`
+2. the idiom's original allusion content
+3. its verified source
+
+Do not render `本義` or an idiom-meaning paragraph on the UR card. `idiomMeaning` may remain in structured data but is not displayed.
+
+Never turn character events or franchise lore into the idiom allusion.
+
+### Five-character-quatrain motto
+
+Render four vertical columns from right to left:
+
+```text
+motto[0] rightmost: 5 Traditional Chinese Han characters
+motto[1]:           5 Traditional Chinese Han characters
+motto[2]:           5 Traditional Chinese Han characters
+motto[3] leftmost:  5 Traditional Chinese Han characters
+Total:              20 Han characters
+```
+
+Rules:
+
+- no inline punctuation on the card
+- no three-column legacy layout
+- no extra blank lower area
+- no horizontal layout
+- the verse reflects the character and idiom spirit but is not historical evidence
+
+## Composition Workflow
+
+The Renderer supplies:
+
+- validated four-character title
+- validated `bopomofo[4]`
+- one-line spirit subtitle
+- Approved／Review UR badge and rainbow Overlay
+- governed IP Logo and collaboration-label component
+- Registry-resolved theme badge
+- original idiom allusion and source only
+- four-column five-character motto
+- exactly one formal card number or Review identifier plaque
+
+The Renderer places the 1024 × 1200 artwork by proportional cover and center crop. If the Renderer, components, fonts, Registry values, or evidence are unavailable, keep the composition pending or blocked. Never fall back to a model-generated full card.
 
 ## Review and State
 
-The producing Agent creates Review assets only and cannot independently approve its own output.
+The producing Agent can create Review assets but cannot independently approve its own output.
 
-After content preparation, artwork generation, card-number assignment, repair, composition, upload, approval, retirement, or blocking:
+After content preparation, artwork generation, composition, repair, upload, approval, blocking, or retirement, update the governed records as applicable:
 
-- update `data/cards/card-number-registry.json` when and only when a formal number is lawfully assigned or retired
-- update `docs/card-prompts/state/current-batch.json`
-- update `docs/card-prompts/manifest.md`
-- record actual card number or Review identifier, Asset IDs, Drive File IDs, checksums, dimensions, status, and findings
-- never invent numbers, IDs, SHA-256 values, approvals, sources, or license evidence
+- `docs/card-prompts/state/current-batch.json`
+- `docs/card-prompts/manifest.md`
+- `data/cards/card-number-registry.json` only for lawful formal assignment or retirement
+- card catalog and Drive asset manifest
 
-Upload new work only to the governed Review／Pending location until independent approval exists.
+Record actual values only:
+
+- Review identifier or formal card number
+- Asset IDs and lifecycle states
+- Drive File IDs
+- dimensions
+- SHA-256
+- source and license evidence states
+- validation findings
 
 ## Completion Report
 
-Report only evidence-backed facts:
+Report:
 
-- IP and official character name
+- IP, character title, and official character name
 - selected idiom and selection reason
 - four Zhuyin entries and Gate result
-- data-layer idiom difficulty
-- formal four-digit card number or Review identifier
-- UR status and `licenseEvidenceId` state
-- theme category, exact label, and theme badge Asset ID
-- collaboration-label and card-number-plaque Asset IDs and lifecycle states
-- artwork and composite filenames, actual dimensions, and statuses
-- actual Drive File IDs and SHA-256 values
-- Registry, Manifest, and state commit
+- theme category and theme badge Asset ID
+- allusion source status
+- four five-character motto lines
+- IP Logo and collaboration-label Asset IDs and statuses
+- Review identifier or licensed formal number
+- artwork and composite filenames and dimensions
+- Drive IDs, checksums, Registry／Manifest commit when actually available
 - Blocking findings and exact next action
 
-No Repository, Renderer, Drive, checksum, canonical card number, or license evidence means that part is not complete.
+No evidence means that item is not complete.
