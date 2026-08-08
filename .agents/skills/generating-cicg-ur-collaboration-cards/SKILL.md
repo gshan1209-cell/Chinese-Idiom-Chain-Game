@@ -24,13 +24,15 @@ description: Use when a Chinese-Idiom-Chain-Game request names an external IP an
 7. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`
 8. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`
 9. `docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md`
-10. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
-11. `data/idioms/idiom-content-package.schema.json`
-12. `data/card-variants/card-variant.schema.json`
-13. `data/cards/card-number-registry.json`
-14. `data/cards/theme-badge-registry.json`
-15. `data/drive-assets/idiom-card-assets.json`
-16. 對應成語內容包、聯名覆寫、Card Catalog、Manifest、授權與 Drive 證據
+10. `docs/superpowers/specs/2026-08-08-card-dimension-standard-897x1752-design.md`
+11. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
+12. `data/cards/card-canvas-profiles.json`
+13. `data/idioms/idiom-content-package.schema.json`
+14. `data/card-variants/card-variant.schema.json`
+15. `data/cards/card-number-registry.json`
+16. `data/cards/theme-badge-registry.json`
+17. `data/drive-assets/idiom-card-assets.json`
+18. 對應成語內容包、聯名覆寫、Card Catalog、Manifest、授權與 Drive 證據
 
 Repository、Registry、Catalog、Manifest、Drive 或授權證據衝突時，停止 Approved、發布與完成宣稱；不得從聊天記憶、扁平 PNG 或模型生成文字反推正式資料。
 
@@ -87,6 +89,8 @@ data/card-variants/<status>/<ip>/<slug>.json
 7. 保留成語自己的典故、來源、難度與主題，不得改寫成角色劇情。
 
 人氣、戰力、服裝顏色或畫面華麗度不能單獨作為選詞理由。
+
+主要招式只存在於資料與插畫演出層。卡面不得另外顯示招式名稱、型名或招式標籤。
 
 ## 授權與發布 Gate
 
@@ -151,26 +155,51 @@ no card number
 no watermark
 ```
 
-角色必須以清楚行動表現成語精神。保留臉部、雙手、主要武器、右上聯名標籤安全區與 Footer 裁切安全區。官方招式名稱可作資料欄位，但卡面演出必須重新構圖，不照搬動畫截圖或官方構圖。
+角色必須以清楚行動表現成語精神。保留臉部、雙手、主要武器、右上聯名標籤安全區與 Footer 裁切安全區。官方招式名稱可作資料欄位，但卡面演出必須重新構圖，不照搬動畫截圖或官方構圖；卡面不得顯示招式名稱。
+
+## 完整卡 Canvas Profile
+
+現行唯一新產圖標準：
+
+```text
+canvasProfile = cicg-card-897x1752-v1
+Canvas       897 × 1752
+Aspect Ratio 299:584
+dimensionStatus = canonical
+```
+
+既有 `1024 × 2000` 完整卡只能標記：
+
+```text
+canvasProfile = cicg-card-1024x2000-legacy-v1
+dimensionStatus = legacy-compatible
+newProductionAllowed = false
+```
+
+高解析輸出必須是 `897 × 1752` 的整數倍數，標記 `derivative` 並引用 `sourceCanvasProfile = cicg-card-897x1752-v1`。
+
+尺寸符合只代表 Canvas Gate 通過，不代表文字、Renderer、來源、授權、發布或正式卡號已核准。
 
 ## UR 組裝幾何
 
 ```text
-Canvas       1024 × 2000
-Header       y=0–359, height=360
-Main Artwork y=360–1559, height=1200
-Footer       y=1560–1999, height=440
-Geometry tolerance ±2 px
+Canvas       x=0, y=0,    width=897, height=1752
+Header       x=0, y=0,    width=897, height=315
+Main Artwork x=0, y=315,  width=897, height=1051
+Footer       x=0, y=1366, width=897, height=386
+Geometry tolerance ±2 px for component placement only
 ```
+
+畫布尺寸本身不得套用容差。
 
 Header：
 
 ```text
-UR badge           x=24–252,   y=18–326
-idiom title        x=250–788,  y=42–158
-bopomofo[4]        x=278–756,  y=166–232
-spirit subtitle    x=258–782,  y=254–330
-collaboration tag  x=792–1000, y=24–318
+UR badge           x=21–221,  y=16–286
+idiom title        x=219–690, y=37–138
+bopomofo[4]        x=244–662, y=145–203
+spirit subtitle    x=226–685, y=223–289
+collaboration tag  x=694–876, y=21–279
 ```
 
 UR 不顯示難度徽章。右上聯名標籤使用受治理 IP Logo、角色職稱與正式名稱，不得顯示「聯名卡」「角色名」「聯名限定」或「限定版」。
@@ -180,19 +209,21 @@ UR 不顯示難度徽章。右上聯名標籤使用受治理 IP Logo、角色職
 Footer：
 
 ```text
-theme badge         x=28–300,  y=1576–1920, width=272, height=344
-allusion panel      x=286–724, y=1582–1920, width=438, height=338
-motto plaque        x=730–988, y=1722–1922, width=258, height=200
-source line         x=178–398, y=1936–1986, width=220, height=50
-card-number-plaque  x=410–614, y=1936–1986, width=204, height=50, bottom-center
+theme badge         x=25–263,  y=1381–1682, width=238, height=301
+allusion panel      x=251–634, y=1386–1682, width=383, height=296
+motto plaque        x=639–865, y=1508–1684, width=226, height=176
+source line         x=156–349, y=1696–1740, width=193, height=44
+card-number-plaque  x=359–538, y=1696–1740, width=179, height=44, bottom-center
 ```
 
 典故區只顯示「典故」、成語自己的卡面短版典故與來源。不得顯示本義段落，也不得把角色劇情當成語典故。
-箴言固定四欄直式、由右至左，每句五個繁體漢字，共二十字；不加行內標點，不得使用三欄、橫排或大面積留白。
+箴言牌匾靠下排列於右側，固定四欄直式、由右至左，每句五個繁體漢字，共二十字；不加行內標點，不得使用三欄、橫排或大面積留白。
 
 ## 組裝責任
 
 Renderer 負責四字成語、`bopomofo[4]`、精神副標、UR 徽章與 Overlay、IP Logo 與聯名標籤、Registry 主題徽章、共用成語典故與來源、角色專屬五言四句，以及唯一 bottom-center card-number-plaque。
+
+Renderer 必須讀取 `data/cards/card-canvas-profiles.json`，不得在 React、DOM、圖片模型 Prompt 或隨機流程中分散寫死完整卡尺寸。
 
 Renderer、字型、Registry、元件或證據不可用時，保持 pending／blocked；不得退回模型生成完整卡面。
 
@@ -202,14 +233,15 @@ Renderer、字型、Registry、元件或證據不可用時，保持 pending／bl
 
 - `docs/card-prompts/state/current-batch.json`
 - `docs/card-prompts/manifest.md`
+- `data/cards/card-canvas-profiles.json`，僅限核准的 Profile 變更
 - `data/cards/card-number-registry.json`，僅限合法正式指派或退役
 - 共用成語內容包與聯名覆寫
 - Card Catalog 與 Drive Asset Manifest
 
-只記錄真實值：Review identifier／正式卡號、Asset ID、Drive File ID、尺寸、SHA-256、來源、授權與 findings。
+只記錄真實值：Review identifier／正式卡號、Asset ID、Drive File ID、尺寸、Canvas Profile、SHA-256、來源、授權與 findings。
 
 ## 完成回報
 
-回報 IP、角色職稱與正式名稱、成語與配對理由、四筆注音與 Gate、主題與徽章 Asset ID、典故來源狀態、五言四句、Logo／標籤狀態、Review identifier 或正式卡號、Artwork／Composite 尺寸、Drive ID、SHA-256、Registry／Manifest commit、阻擋事項與下一步。
+回報 IP、角色職稱與正式名稱、成語與配對理由、四筆注音與 Gate、主題與徽章 Asset ID、典故來源狀態、五言四句、Logo／標籤狀態、Review identifier 或正式卡號、Artwork／Composite 尺寸與 `canvasProfile`、Drive ID、SHA-256、Registry／Manifest commit、阻擋事項與下一步。
 
 沒有證據的欄位不得宣稱完成。
