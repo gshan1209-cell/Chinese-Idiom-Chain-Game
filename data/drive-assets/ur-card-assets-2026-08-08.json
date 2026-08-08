@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-08-08T20:51:02+08:00",
+  "recordedAt": "2026-08-08T23:59:00+08:00",
   "project": "Chinese-Idiom-Chain-Game",
   "assetGroup": "ur-collaboration-card-shinobu-mian-li-cang-zhen",
   "driveFolder": {
@@ -23,9 +23,11 @@
     "licenseStatus": "needs-review",
     "lifecycleStatus": "approved-design-reference",
     "publicationStatus": "not-approved-for-publication",
+    "canvasProfile": "cicg-card-897x1752-v1",
+    "dimensionStatus": "canonical",
     "canonicalRendererOutput": false,
     "blockingReasons": [
-      "The registered image is 897x1752 rather than the required 1024x2000 canonical renderer output.",
+      "The composite contains model-rendered text and must be rebuilt or verified by the canonical Renderer.",
       "The idiom content package is still NeedsReview.",
       "No auditable IP license evidence is registered.",
       "The asset must not consume UR-0001 or any formal UR sequence number."
@@ -46,6 +48,10 @@
       "sha256": "f84b7508353a1c9152cddfd88b21c2b4f82bef6ea0921e185b643dfe1f1599e5",
       "widthPx": 897,
       "heightPx": 1752,
+      "canvasProfile": "cicg-card-897x1752-v1",
+      "aspectRatio": "299:584",
+      "dimensionStatus": "canonical",
+      "sourceCanvasProfile": null,
       "driveModifiedTime": "2026-08-08T12:23:25.674Z",
       "current": true,
       "canonical": false,
