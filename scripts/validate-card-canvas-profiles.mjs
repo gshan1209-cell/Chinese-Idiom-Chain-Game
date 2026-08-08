@@ -19,6 +19,10 @@ function assert(condition, message) {
   }
 }
 
+function containsOldDimensionBlocker(reason) {
+  return /1024x2000|required 1024|897x1752.*not.*canonical/i.test(reason);
+}
+
 async function validateProfileRegistry() {
   const registry = await readJson('data/cards/card-canvas-profiles.json');
   assert(registry.schemaVersion === 1, 'Canvas profile schemaVersion must be 1.');
@@ -106,12 +110,105 @@ async function validateDeclaredUrAssets() {
     validated += 1;
   }
 
+  assert(
+    assetRegistry.card.canonicalRendererOutput === false,
+    'Dimension migration must not claim canonical Renderer output.',
+  );
+  assert(
+    assetRegistry.card.publicationStatus === 'not-approved-for-publication',
+    'Dimension migration must not approve publication.',
+  );
+  assert(
+    assetRegistry.card.formalCardNumber === null,
+    'Dimension migration must not assign a formal UR number.',
+  );
+  assert(
+    !(assetRegistry.card.blockingReasons ?? []).some(containsOldDimensionBlocker),
+    'Registered 897x1752 asset must not retain the old dimension blocker.',
+  );
+
   return validated;
+}
+
+async function validateKimetsuRegistrationDraft() {
+  const draft = await readJson(
+    'data/drive-assets/ur-kimetsu-review-registration-draft-2026-08-08.json',
+  );
+
+  assert(
+    draft.registrationStatus === 'pending-drive-upload',
+    'Registration draft must remain pending-drive-upload.',
+  );
+  assert(draft.cards.length === 13, 'Registration draft must contain 13 cards.');
+  assert(
+    draft.sharedCardState.formalCardNumber === null,
+    'Registration draft must not assign a formal UR number.',
+  );
+  assert(
+    draft.sharedCardState.publicationStatus === 'not-approved-for-publication',
+    'Registration draft must remain not-approved-for-publication.',
+  );
+  assert(
+    draft.sharedCardState.canonicalRendererOutput === false,
+    'Registration draft must not claim canonical Renderer output.',
+  );
+
+  const canvasResult = validateCardCanvas(draft.sharedImageState);
+  assert(
+    canvasResult.valid,
+    `Registration draft has invalid shared canvas metadata: ${canvasResult.reason}`,
+  );
+  assert(
+    canvasResult.profileId === draft.sharedImageState.canvasProfile,
+    'Registration draft canvasProfile does not match its dimensions.',
+  );
+
+  const reviewIds = draft.cards.map((card) => card.reviewIdentifier);
+  const hashes = draft.cards.map((card) => card.imageSha256);
+  assert(
+    new Set(reviewIds).size === reviewIds.length,
+    'Registration draft Review identifiers must be unique.',
+  );
+  assert(
+    new Set(hashes).size === hashes.length,
+    'Registration draft image SHA-256 values must be unique.',
+  );
+  assert(
+    hashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)),
+    'Registration draft image SHA-256 values must be lowercase 64-character hex.',
+  );
+
+  assert(
+    draft.registryEffects.formalUrAssignedCountDelta === 0 &&
+      draft.registryEffects.formalUrNextSequenceDelta === 0,
+    'Registration draft must not mutate formal UR sequence counters.',
+  );
+  assert(
+    ![
+      ...(draft.sharedBlockingReasons ?? []),
+      ...(draft.batchBlockingReasons ?? []),
+    ].some(containsOldDimensionBlocker),
+    'Registration draft must not retain the old dimension blocker.',
+  );
+
+  const uzui = draft.cards.find(
+    (card) => card.reviewIdentifier === 'RV-UR-0009',
+  );
+  assert(uzui, 'RV-UR-0009 must be present in the registration draft.');
+  assert(
+    uzui.qualityStatus === 'blocked-text-mismatch' &&
+      uzui.expectedIdiomTitle === '豪氣干雲' &&
+      uzui.observedIdiomTitle === '豪氣千雲',
+    'RV-UR-0009 must preserve its visible title mismatch finding.',
+  );
+
+  return draft.cards.length;
 }
 
 const registry = await validateProfileRegistry();
 const validatedAssets = await validateDeclaredUrAssets();
+const draftCards = await validateKimetsuRegistrationDraft();
 
 console.log(
-  `Card canvas profiles valid: current=${registry.currentProfileId} declared-assets=${validatedAssets}`,
+  `Card canvas profiles valid: current=${registry.currentProfileId} declared-assets=${validatedAssets} draft-cards=${draftCards}`,
 );
