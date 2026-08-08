@@ -208,16 +208,43 @@ PWA precache：12 entries
 
 ## 6. GitHub Actions 與 Audit Gate
 
-合併前必須確認：
+第一輪正式 PR head 驗證：
 
-- PR head CI 使用 `./scripts/verify.sh` 完整成功。
-- `npm install`／`npm audit` 回報 0 vulnerabilities。
+```text
+CI Run ID：31248310876
+CI Run Number：518
+Head SHA：dc9f6913064a753b280a60cfa3ef3fca5a146d3b
+Workflow：CI / verify
+Command：./scripts/verify.sh
+Conclusion：success
+```
+
+GitHub Actions 證據：
+
+```text
+npm install：added 418 packages
+npm audit：419 packages audited，0 vulnerabilities
+全部 Node tests：401／401
+Card tests：149／149
+Puzzle tests：38／38
+TypeScript strict：PASS
+ESLint：PASS
+Production Vite／PWA Build：PASS
+Vite transformed modules：96
+PWA mode：generateSW
+PWA precache：12 entries（412.91 KiB）
+```
+
+合併前永久 Gate：
+
+- PR head CI 必須使用 `./scripts/verify.sh` 完整成功。
+- `npm install`／`npm audit` 必須回報 0 vulnerabilities。
 - `behind_by = 0`。
 - unresolved review threads = 0。
-- 暫時 source export workflow 已從 PR 淨變更移除。
-- ChatGPT Audit 無 Critical／Important findings。
+- 暫時 source export workflow 不得存在於 PR 淨變更或 `main`。
+- ChatGPT Audit 不得有 Critical／Important findings。
 
-最終 CI Run ID、head SHA 與 merge SHA 於 Gate 通過後補入本報告。
+本次報告更新會產生新的 PR head，因此必須再執行一次不可變更的最終 CI；只有最新 head 全綠後才可 Squash Merge。Merge SHA 由 GitHub PR merge record 作為唯一正式證據，不回寫已合併前的分支文件。
 
 ## 7. Drive 漂移與素材
 
