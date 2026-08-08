@@ -48,6 +48,8 @@ const ACQUISITION_METHODS = new Set<CardAcquisitionMethod>([
 ]);
 
 const BOPOMOFO_PATTERN = /^[\u3105-\u312f\u02d9\u02ca\u02c7\u02cb]+$/u;
+const JAPANESE_KANA_PATTERN =
+  /[\u3040-\u309f\u30a0-\u30ff\u31f0-\u31ff\uff65-\uff9f]/u;
 const PINYIN_PATTERN = /^[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹḿ]+$/u;
 const PINYIN_TONE_MARK_PATTERN = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹḿ]/u;
 const ISO_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u;
@@ -75,6 +77,13 @@ function hasExactlyFourStrings(value: unknown): value is [string, string, string
   return Array.isArray(value) &&
     value.length === 4 &&
     value.every((entry) => typeof entry === 'string' && entry.trim() !== '');
+}
+
+function containsJapaneseKana(value: unknown): boolean {
+  return Array.isArray(value) && value.some(
+    (entry) =>
+      typeof entry === 'string' && JAPANESE_KANA_PATTERN.test(entry)
+  );
 }
 
 function isValidBopomofo(value: unknown): value is [string, string, string, string] {
@@ -180,7 +189,14 @@ function validateRecord(
     add('idiom-mismatch', '圖卡標題必須是對應的四字繁體成語。');
   }
 
-  if (!isValidBopomofo(record.bopomofo)) add('invalid-bopomofo', '注音必須恰好四筆並使用注音符號。');
+  if (containsJapaneseKana(record.bopomofo)) {
+    add(
+      'japanese-kana-in-bopomofo',
+      '注音欄不得包含平假名、片假名、片假名擴充或半形片假名。'
+    );
+  } else if (!isValidBopomofo(record.bopomofo)) {
+    add('invalid-bopomofo', '注音必須恰好四筆並使用臺灣注音符號。');
+  }
   if (!isValidPinyin(record.pinyin)) add('invalid-pinyin', '拼音必須恰好四筆、小寫並使用正式聲調符號。');
   if (!isNonEmptyString(record.subtitle)) add('invalid-subtitle', '副標題不可為空。');
   if (typeof record.rarity !== 'string' || !RARITIES.has(record.rarity as CardRarity)) add('invalid-rarity', '稀有度無效。');
