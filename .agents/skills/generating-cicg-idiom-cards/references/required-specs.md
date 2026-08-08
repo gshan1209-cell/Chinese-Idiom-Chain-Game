@@ -20,18 +20,19 @@ Read the latest version from GitHub `main`. Later Approved specifications overri
 14. `docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md`
 15. `data/cards/card-number-registry.json`
 16. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`（UR／聯名任務必讀）
-17. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`（UR／聯名任務必讀）
-18. `.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md`（UR／聯名任務必讀）
-19. `docs/card-prompts/PROJECT_PROMPT.md`
-20. `docs/card-prompts/shared/card-master-prompt.md`
-21. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`（UR／聯名任務必讀）
-22. `docs/card-prompts/shared/negative-constraints.md`
-23. Matching file under `docs/card-prompts/templates/`
-24. Matching file under `docs/card-prompts/idioms/`
-25. `docs/card-prompts/manifest.md`
-26. `docs/card-prompts/state/current-batch.json`
-27. `docs/card-prompts/components/rarity-frame-registry-v1.md`
-28. Drive Approved artwork, components, templates, composites, and relevant Inbox／Review assets
+17. `docs/superpowers/specs/2026-08-08-ur-allusion-inline-source-amendment.md`（UR／聯名任務必讀，覆寫獨立來源列）
+18. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`（UR／聯名任務必讀）
+19. `.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md`（UR／聯名任務必讀）
+20. `docs/card-prompts/PROJECT_PROMPT.md`
+21. `docs/card-prompts/shared/card-master-prompt.md`
+22. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`（UR／聯名任務必讀）
+23. `docs/card-prompts/shared/negative-constraints.md`
+24. Matching file under `docs/card-prompts/templates/`
+25. Matching file under `docs/card-prompts/idioms/`
+26. `docs/card-prompts/manifest.md`
+27. `docs/card-prompts/state/current-batch.json`
+28. `docs/card-prompts/components/rarity-frame-registry-v1.md`
+29. Drive Approved artwork, components, templates, composites, and relevant Inbox／Review assets
 
 ## Truth priority
 
@@ -42,6 +43,7 @@ GitHub main
 → v2.6.1 geometry contract
 → project-wide four-digit Card Number Registry
 → UR collaboration skill and standard when rarity is UR
+→ UR allusion inline-source amendment
 → Taiwanese Zhuyin structured-data and Renderer Gate
 → rarity and review governance
 → v2.7 SSR badge amendment when rarity is SSR
@@ -72,6 +74,9 @@ GitHub main
 - Every collaboration IP requires its own versioned label master. A generic label with only swapped text is not sufficient.
 - The collaboration label may display the IP name and character name only. The bottom of the card must not repeat the character name.
 - UR allusion, meaning and source remain idiom content. They must not be rewritten as character or franchise story.
+- `2026-08-08-ur-allusion-inline-source-amendment.md` overrides conflicting wording in the UR standard, UR skill and UR master prompt: the card must show a complete allusion summary, then `出處：{{SOURCE}}` as the final line inside the same allusion panel.
+- UR cards must not render a separate source field, source plaque or bottom source line; the former source-line slot remains decorative or transparent only.
+- A missing allusion, an allusion panel containing only the idiom name or meaning, or a source rendered outside the allusion panel is a Blocking failure.
 - A generated collaboration image or chat approval is not license evidence. Without auditable authorization, UR assets remain Draft／Review and cannot be Approved or published.
 - Four-character idioms require exactly four aligned `bopomofo[4]` entries from structured data.
 - Images must not contain title or Zhuyin. Renderer text nodes are the only canonical card-face pronunciation source.
