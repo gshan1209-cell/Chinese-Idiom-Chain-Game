@@ -21,11 +21,13 @@ Before deciding or generating anything, read the latest GitHub `main` in this or
 4. `docs/superpowers/specs/2026-08-07-idiom-card-layout-lock-v2-6-1-design.md`
 5. `docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`
 6. `docs/superpowers/specs/2026-08-08-ur-collaboration-generation-skill-and-zhuyin-gate-design.md`
-7. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
-8. `data/cards/theme-badge-registry.json`
-9. `data/cards/chapter-1-card-number-registry.json`
-10. `data/drive-assets/idiom-card-assets.json`
-11. Card Catalog, Manifest, matching collaboration-label Registry, Drive evidence, and license records
+7. `docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md`
+8. `docs/card-prompts/shared/ur-collaboration-master-prompt-v1.md`
+9. `data/cards/card-number-registry.json`
+10. `data/cards/theme-badge-registry.json`
+11. `data/cards/chapter-1-card-number-registry.json`
+12. `data/drive-assets/idiom-card-assets.json`
+13. Card Catalog, Manifest, matching collaboration-label Registry, Drive evidence, and license records
 
 If Repository, Registry, Catalog, state, Manifest, or Drive evidence conflicts, report drift and stop approval claims. Do not reconstruct truth from a previous chat or a flat PNG.
 
@@ -46,6 +48,7 @@ licenseEvidenceId
 existingCardId
 existingArtworkAssetId
 existingCollaborationLabelAssetId
+existingCardNumberPlaqueAssetId
 ```
 
 Do not ask the user to manually provide fields that can be resolved from current Repository data. Automatically prepare or resolve:
@@ -54,19 +57,20 @@ Do not ask the user to manually provide fields that can be resolved from current
 - `bopomofo[4]`
 - data-layer Pinyin where the existing schema requires it; it never renders on the card
 - original idiom difficulty
-- UR rarity and Review identifier or licensed card number
+- UR rarity and Review identifier or licensed four-digit card number
 - `themeCategory`, exact Registry label, and `themeBadgeAssetId`
 - idiom meaning, original allusion, verified source status
 - one-line spirit subtitle and three-column motto
 - character action, setting, composition-safe pose, and character effects
 - IP-specific collaboration-label asset and status
+- `cardNumberPlaqueAssetId`
 - artwork and composite filenames
 
 ## Idiom Selection
 
 When the user does not specify an idiom:
 
-1. Inspect active idioms, Card Catalog, number Registry, active batch, Manifest, and prior UR collaboration records.
+1. Inspect active idioms, Card Catalog, Canonical Card Number Registry, active batch, Manifest, and prior UR collaboration records.
 2. Exclude non-four-character, disabled, duplicate, unverified, or semantically unsuitable idioms.
 3. Match the idiom to the character's observable values and actions, not popularity, combat power, or visual spectacle.
 4. Prefer an idiom that the character can express through one clear action in the central illustration.
@@ -77,13 +81,41 @@ If no eligible idiom has verified Traditional Chinese text, four aligned Zhuyin 
 
 ## UR and License Gate
 
-UR is reserved for external-IP collaboration cards. `licenseEvidenceId` must resolve to auditable authorization before a card can enter Approved or publication workflows.
+UR is reserved for external-IP collaboration cards. `licenseEvidenceId` must resolve to auditable authorization before a card can enter formal numbering, Approved, or publication workflows.
 
-沒有可稽核授權證據時只能維持 Review，並且不得標記 Approved、發布、上架、加入正式收藏或移入 Drive Approved。
+沒有可稽核正式授權的 `licenseEvidenceId` 時不得指派任何正式 `UR-####` 卡號，只能使用不占序列的 Review 識別碼，並且不得標記 Approved、發布、上架、加入正式收藏或移入 Drive Approved。
 
 A chat image, franchise name, user approval, public character image, or generated artwork is not license evidence. Keep unknown evidence fields `null`.
 
 UR 永遠排除於一般里程碑免費卡池；this skill must not add `milestone-reward` eligibility or alter the collection database schema.
+
+## Project-Wide Four-Digit UR Card Number Gate
+
+Canonical source:
+
+```text
+data/cards/card-number-registry.json
+```
+
+Formal UR card numbers are independent, project-wide, and four-digit:
+
+```text
+UR-0001
+UR-0002
+UR-0003
+```
+
+Permanent rules:
+
+- Format is exactly `{rarity}-{sequence:0000}`.
+- The UR counter never resets for a new IP, character, chapter, batch, or release.
+- Formal assigned or retired numbers are immutable and never reused.
+- The image model must not generate, guess, redraw, or repair a card number.
+- The Renderer must read `cardNumber` from the Canonical Registry.
+- Every formal UR composite contains exactly one `bottom-center card-number-plaque = {{CARD_NUMBER}}`.
+- The plaque uses `x=410–614, y=1936–1986` inside the original v2.6.1 source-line outer slot.
+- The plaque may show only the four-digit Registry value; it cannot show IP, character, difficulty, version, or other text.
+- A Review identifier is not a formal card number and never consumes `UR-####`.
 
 ## Difficulty and Collaboration Label
 
@@ -101,7 +133,7 @@ Every four-character idiom requires exactly four non-empty Zhuyin entries, and t
 
 Allowed characters in each entry are limited to Bopomofo `U+3105–U+312F` and tone marks `U+02D9`, `U+02CA`, `U+02C7`, `U+02CB`.
 
-圖片模型不得生成主標題或注音。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
+圖片模型不得生成主標題、注音或卡號。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點與 Canonical Registry 的 `cardNumber`。
 
 The Zhuyin field must not contain:
 
@@ -135,8 +167,8 @@ When the user asks to generate the card or image, use the available image-genera
 
 不得讓圖片模型生成完整卡面。The artwork must contain no:
 
-- title, Zhuyin, Pinyin, subtitle, number, or any other text
-- frame, UR badge, difficulty badge, collaboration label, or theme badge
+- title, Zhuyin, Pinyin, subtitle, card number, or any other text
+- frame, UR badge, difficulty badge, collaboration label, theme badge, or card-number-plaque
 - allusion, motto, source, official logo, imitation logo, copyright line, or watermark
 - multi-card overview, mockup, packaging, or montage
 
@@ -154,20 +186,28 @@ Footer       440 px
 Geometry     ±2 px
 ```
 
-The canonical artwork is placed with proportional cover and center crop. The renderer supplies the title, validated `bopomofo[4]`, spirit subtitle, UR badge, IP label, approved theme badge, idiom allusion, source, motto, and UR overlay.
+The canonical artwork is placed with proportional cover and center crop. The Renderer supplies the title, validated `bopomofo[4]`, spirit subtitle, UR badge, IP label, approved theme badge, idiom allusion, source, motto, UR overlay, and one bottom-center four-digit `card-number-plaque`.
 
-If the renderer, Approved UR components, IP-specific label, validated Zhuyin, or font coverage is unavailable, keep `compositionStatus` as `pending`, `changes-requested`, or `blocked`. Do not fall back to a model-generated full card.
+The bottom outer source slot remains `x=178–846, y=1936–1986`, partitioned as:
+
+```text
+source-line          x=178–398, y=1936–1986
+card-number-plaque   x=410–614, y=1936–1986
+```
+
+If the Renderer, Approved UR components, IP-specific label, validated Zhuyin, canonical card number, number plaque, or font coverage is unavailable, keep `compositionStatus` as `pending`, `changes-requested`, or `blocked`. Do not fall back to a model-generated full card.
 
 ## Review and State
 
 The producing Agent creates Review assets only and cannot independently approve its own output.
 
-After content preparation, artwork generation, repair, composition, upload, approval, or blocking:
+After content preparation, artwork generation, card-number assignment, repair, composition, upload, approval, retirement, or blocking:
 
+- update `data/cards/card-number-registry.json` when and only when a formal number is lawfully assigned or retired
 - update `docs/card-prompts/state/current-batch.json`
 - update `docs/card-prompts/manifest.md`
-- record actual Asset IDs, Drive File IDs, checksums, dimensions, status, and findings
-- never invent IDs, SHA-256 values, approvals, sources, or license evidence
+- record actual card number or Review identifier, Asset IDs, Drive File IDs, checksums, dimensions, status, and findings
+- never invent numbers, IDs, SHA-256 values, approvals, sources, or license evidence
 
 Upload new work only to the governed Review／Pending location until independent approval exists.
 
@@ -179,12 +219,13 @@ Report only evidence-backed facts:
 - selected idiom and selection reason
 - four Zhuyin entries and Gate result
 - data-layer idiom difficulty
+- formal four-digit card number or Review identifier
 - UR status and `licenseEvidenceId` state
 - theme category, exact label, and theme badge Asset ID
-- collaboration-label Asset ID and lifecycle state
+- collaboration-label and card-number-plaque Asset IDs and lifecycle states
 - artwork and composite filenames, actual dimensions, and statuses
 - actual Drive File IDs and SHA-256 values
-- Manifest and state commit
+- Registry, Manifest, and state commit
 - Blocking findings and exact next action
 
-No Repository, renderer, Drive, checksum, or license evidence means that part is not complete.
+No Repository, Renderer, Drive, checksum, canonical card number, or license evidence means that part is not complete.

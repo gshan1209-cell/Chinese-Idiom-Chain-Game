@@ -1,10 +1,16 @@
-# UR 聯名成語圖卡正式母提示語 v1.1
+# UR 聯名成語圖卡正式母提示語 v1.2
 
 用途：正式授權外部 IP 聯名 UR 卡之內容準備、中央插畫生成與模板組裝。  
 幾何基準：`layoutVersion = 2.6.1`  
-規格來源：`docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md`
+規格來源：
 
-> 本文件不能取代授權證據。未具可稽核正式授權時，只能產生 Draft／Review 素材，不得 Approved 或公開發布。
+```text
+docs/superpowers/specs/2026-08-08-ur-collaboration-card-standard-v1-0-design.md
+docs/superpowers/specs/2026-08-08-project-wide-four-digit-card-numbering-design.md
+data/cards/card-number-registry.json
+```
+
+> 本文件不能取代授權證據。未具可稽核正式授權時，只能產生 Draft／Review 素材，不得指派正式 `UR-####`、Approved 或公開發布。
 
 ## 1. 變數
 
@@ -25,6 +31,8 @@
 {{SCENE_DESCRIPTION}}
 {{CHARACTER_EFFECT}}
 {{COLLABORATION_LABEL_ASSET_ID}}
+{{CARD_NUMBER_PLAQUE_ASSET_ID}}
+{{LICENSE_EVIDENCE_ID}}
 ```
 
 ## 2. 中央插畫生成提示語
@@ -55,7 +63,7 @@
 美術要求：
 高精緻日韓動漫手遊插畫、收藏級 UR 角色立繪、電影級光影、清晰五官、精緻材質、自然人體結構、強烈景深、動態粒子、高反差但保留暗部細節。
 
-圖片模型不得生成主標題或注音。
+圖片模型不得生成主標題、注音或卡號。
 
 只生成中央插畫，不得生成：
 - 完整卡面
@@ -64,34 +72,25 @@
 - 難度徽章
 - 聯名標籤
 - 主題徽章
+- card-number-plaque
 - 任何文字、注音、拼音、假名、數字或符號
 - 典故、箴言、來源
 - Logo、浮水印或版權文字
 - 多張卡片拼圖
 ```
 
-## 3. 鬼滅之刃專屬聯名標籤提示語
+## 3. IP 專屬聯名標籤
 
-正式生產優先直接使用 Approved 母件，不得由圖片模型自由重設計。新增角色版本時只替換下段角色名稱。
+正式生產優先直接使用該 IP 的 Approved 母件，不得由圖片模型自由重設計。每個聯名 IP 必須有獨立視覺語言；不得只在共用標籤上替換文字。
+
+鬼滅之刃角色版本固定：
 
 ```text
-以已核准的「鬼滅之刃 UR 專屬聯名標籤母件」作為不可變更的幾何基底，建立角色版本。
-
-完整保留：
-- 黑色漆面中央底板
-- 古金色立體雕花框
-- 頂部紅色寶石
-- 紫藤花與紫藤藤蔓
-- 月霧與煙霧裝飾
-- 底部藍色寶石
-- 尖形底座
-- 原始長寬比例、座標與裝飾位置
-
 上方主要直式文字：鬼滅之刃
 下方獨立小牌直式文字：{{CHARACTER_NAME}}
-
-只能替換角色名稱，不得加入「聯名限定」「角色名」「限定版」「UR」、官方 Logo、仿官方 Logo 或其他文字。不得改變標籤高度、寬度、材質、花卉、寶石、色彩與裝飾位置。輸出為透明背景獨立元件。
 ```
+
+只能替換角色名稱，不得加入「聯名限定」「角色名」「限定版」「UR」、官方 Logo、仿官方 Logo或其他文字。不得改變標籤高度、寬度、材質、花卉、寶石、色彩與裝飾位置。
 
 ## 4. 臺灣注音資料與 Renderer Gate
 
@@ -108,7 +107,27 @@ Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
 
 注音驗證失敗時，`compositionStatus` 必須是 `changes-requested` 或 `blocked`，不得標記 Approved。
 
-## 5. 完整卡面組裝提示語
+## 5. 全專案四碼 UR 卡號 Gate
+
+正式卡號格式固定為：
+
+```text
+UR-0001
+UR-0002
+UR-0003
+```
+
+規則：
+
+- 格式為 `{rarity}-{sequence:0000}`，數字固定四碼。
+- UR 使用全專案獨立序列，新 IP 或新章節都不得歸零。
+- Renderer 只能從 `data/cards/card-number-registry.json` 取得 `cardNumber`。
+- 沒有可稽核 `{{LICENSE_EVIDENCE_ID}}` 時不得指派 `UR-####`，只能使用不占正式序列的 Review 識別碼。
+- 正式號碼一經指派不得變更或回收。
+- 圖片模型不得生成、猜測、重畫或修補卡號。
+- 卡面只能由 Renderer 顯示一個正式卡號。
+
+## 6. 完整卡面組裝提示語
 
 ```text
 使用已核准的 Chinese-Idiom-Chain-Game UR 聯名卡模板，組裝一張 1024 × 2000 px 的正式 Review composite。
@@ -122,6 +141,7 @@ Footer       x=0, y=1560, width=1024, height=440
 
 資料：
 卡號：{{CARD_NUMBER}}
+卡號牌匾 Asset ID：{{CARD_NUMBER_PLAQUE_ASSET_ID}}
 稀有度：UR
 成語：{{IDIOM}}
 注音：{{ZHUYIN}}
@@ -129,6 +149,7 @@ Footer       x=0, y=1560, width=1024, height=440
 聯名 IP：{{IP_NAME}}
 角色名稱：{{CHARACTER_NAME}}
 聯名標籤 Asset ID：{{COLLABORATION_LABEL_ASSET_ID}}
+授權證據：{{LICENSE_EVIDENCE_ID}}
 主題類別：{{THEME_CATEGORY}}
 成語本義：{{IDIOM_MEANING}}
 典故：{{IDIOM_STORY}}
@@ -152,33 +173,38 @@ Footer       x=0, y=1560, width=1024, height=440
 12. Footer 中央顯示成語本義、典故與正式來源。
 13. 典故只能描述成語本身，不得改寫成角色故事。
 14. 右下使用固定三欄直式箴言牌匾，由右至左排列。
-15. 卡片最底部不得再次顯示角色名稱、聯名名稱或額外卡號。
-16. 不得加入官方 Logo、仿官方 Logo、浮水印、星級、能力值、技能值或屬性欄。
-17. 最終輸出為 1024 × 2000 px PNG。
-18. 未具授權證據時，輸出狀態只能為 Review，不得標記 Approved。
-19. 注音不得來自圖片模型、OCR 或人工目測轉錄；只能來自已驗證結構化資料。
+15. 最底部只能有一個 canonical card-number-plaque，位於 bottom-center，內容固定為「{{CARD_NUMBER}}」。
+16. 最底部不得重複顯示角色名稱、聯名名稱、難度、版本或第二組卡號。
+17. `source-line` 與卡號牌匾共用 v2.6.1 原 source-line 外框，內部分割為：source-line x=178–398, y=1936–1986；card-number-plaque x=410–614, y=1936–1986。
+18. 卡號必須是 Canonical Registry 的四碼值；Review 識別碼不得冒充正式 `UR-####`。
+19. 不得加入官方 Logo、仿官方 Logo、浮水印、星級、能力值、技能值或屬性欄。
+20. 最終輸出為 1024 × 2000 px PNG。
+21. 未具授權證據時，輸出狀態只能為 Review，不得標記 Approved，也不得分配正式 UR 卡號。
+22. 注音不得來自圖片模型、OCR 或人工目測轉錄；只能來自已驗證結構化資料。
 ```
 
-## 6. 統一負面提示語
+## 7. 統一負面提示語
 
 ```text
 禁止錯字、簡體字、假注音、漢語拼音、羅馬拼音、平假名、片假名、片假名擴充、半形片假名、日文音節、亂碼、重複文字、五字成語、缺字或多字。
 禁止把成語典故改寫成聯名角色劇情，禁止虛構來源、偽造古籍引文或猜測授權狀態。
 禁止難度徽章、難度字母、星級、能力值、技能值、屬性欄、額外聯名標籤、底部角色名稱、官方 Logo、仿官方 Logo 或浮水印。
+禁止圖片模型生成卡號、三碼卡號、錯誤稀有度前綴、未授權 UR 正式號、第二組卡號或額外卡號牌匾。
 禁止改變 Header、Main Artwork、Footer 的 360／1200／440 高度，禁止壓縮 Footer、拉長 Header、拉伸 artwork、移動 UR 徽章、改變聯名標籤比例或移動主題徽章與箴言牌匾。
 禁止一次生成多張卡、拼圖、展示牆、桌面 Mockup、手持卡片、包裝盒或傾斜透視。
 ```
 
-## 7. 炭治郎示範資料
+## 8. 炭治郎 Review 示範資料
 
 ```text
-CARD_NUMBER = UR-001
+CARD_NUMBER = REVIEW-KIMETSU-TANJIRO-0001
 IDIOM = 百折不撓
 ZHUYIN = ㄅㄞˇ ㄓㄜˊ ㄅㄨˋ ㄋㄠˊ
 SPIRIT_LINE = 屢敗不餒，終能成功。
 IP_NAME = 鬼滅之刃
 CHARACTER_NAME = 竈門炭治郎
 THEME_CATEGORY = perseverance／勵志
+LICENSE_EVIDENCE_ID = null
 IDIOM_MEANING = 形容意志堅強，即使屢遭挫折，也不屈服退縮。
 IDIOM_STORY = 使用經校訂的成語原始典故，不得改寫成鬼滅之刃劇情。
 SOURCE = 經來源校訂後填入；未確認前標記 NeedsReview。
@@ -189,7 +215,9 @@ SCENE_DESCRIPTION = 竈門炭治郎在月夜戰場揮舞日輪刀，以持續迎
 CHARACTER_EFFECT = 水之呼吸形成具有方向性的水流刀勢，不包含文字或 Logo。
 ```
 
-## 8. 完成條件
+此示範沒有授權證據，因此使用 Review 識別碼，不占用 `UR-0001`。正式授權通過後，才由 Canonical Registry 分配下一個可用的四碼 UR 卡號。
+
+## 9. 完成條件
 
 只有在下列證據全部存在時，才能宣稱正式交付：
 
@@ -197,6 +225,7 @@ CHARACTER_EFFECT = 水之呼吸形成具有方向性的水流刀勢，不包含�
 - composite 實際尺寸與 geometry manifest
 - Drive File ID
 - Approved component Asset ID
+- Canonical Registry 四碼卡號
 - 正確注音與來源校訂
 - 可稽核正式授權證據
 - 獨立人工核准紀錄
