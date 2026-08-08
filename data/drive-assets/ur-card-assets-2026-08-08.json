@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-08T19:55:53+08:00",
+  "project": "Chinese-Idiom-Chain-Game",
+  "assetGroup": "ur-collaboration-card-shinobu-mian-li-cang-zhen",
+  "driveFolder": {
+    "path": "02_UI_UX_And_Visuals/Idiom_Cards/03_Templates/20_Approved/UR",
+    "folderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
+    "webViewLink": "https://drive.google.com/drive/folders/15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc"
+  },
+  "card": {
+    "rarity": "UR",
+    "idiom": "綿裡藏針",
+    "themeCategory": "智謀",
+    "ipName": "鬼滅之刃",
+    "characterTitle": "蝶柱",
+    "characterName": "胡蝶忍",
+    "formalCardNumber": null,
+    "reviewIdentifier": null,
+    "licenseEvidenceId": null,
+    "licenseStatus": "needs-review",
+    "lifecycleStatus": "approved-design-reference",
+    "publicationStatus": "not-approved-for-publication",
+    "canonicalRendererOutput": false,
+    "blockingReasons": [
+      "The uploaded image is 897x1752 rather than the required 1024x2000 canonical renderer output.",
+      "No auditable IP license evidence is registered.",
+      "The asset must not consume UR-0001 or any formal UR sequence number."
+    ]
+  },
+  "assets": [
+    {
+      "assetId": "ur-card-kimetsu-shinobu-mian-li-cang-zhen-design-reference-v1.0",
+      "assetType": "card-composite-reference",
+      "role": "user-approved-design-reference",
+      "status": "approved-design-reference",
+      "filename": "CICG_UR_Kimetsu_Shinobu_MianLiCangZhen_DesignReference_v1.0.png",
+      "driveFileId": "1CtiV-ER-C2ip-lJN3oXA6PJE4huTeRmW",
+      "webViewLink": "https://drive.google.com/file/d/1CtiV-ER-C2ip-lJN3oXA6PJE4huTeRmW/view?usp=drivesdk",
+      "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
+      "mimeType": "image/png",
+      "sizeBytes": 2984122,
+      "sha256": "63aadecb7903e4946b6437558f59245caad2399ef8553f3f3780e226ca5a0752",
+      "widthPx": 897,
+      "heightPx": 1752,
+      "current": true,
+      "canonical": false,
+      "licenseEvidenceId": null
+    },
+    {
+      "assetId": "ur-card-kimetsu-shinobu-mian-li-cang-zhen-full-prompt-v1.0",
+      "assetType": "generation-prompt",
+      "role": "complete-prompt",
+      "status": "approved-design-reference",
+      "filename": "CICG_UR_Kimetsu_Shinobu_MianLiCangZhen_FullPrompt_v1.0.md",
+      "driveFileId": "1cj5BCUOUuyA5pWbDfHDXwU4gEiZeBFKh",
+      "webViewLink": "https://drive.google.com/file/d/1cj5BCUOUuyA5pWbDfHDXwU4gEiZeBFKh/view?usp=drivesdk",
+      "parentFolderId": "15vXPQ7w4-aS6dlLcSCAZUzG_GjrRNJtc",
+      "mimeType": "text/markdown",
+      "sizeBytes": 3950,
+      "sha256": "b8c3f37ea18cf78db69d1718485f27a38bd0e40550d70256f1c55884a0626ed3",
+      "current": true,
+      "canonical": true,
+      "licenseEvidenceId": null
+    }
+  ]
+}
