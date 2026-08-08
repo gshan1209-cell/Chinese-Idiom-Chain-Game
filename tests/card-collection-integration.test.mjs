@@ -19,7 +19,7 @@ test('campaign owns card collection synchronization outside puzzle gameplay', as
   assert.match(campaign, /import \{ useCardCollection \}/u);
   assert.match(campaign, /const cards = useCardCollection\(/u);
   assert.match(campaign, /cards\.syncAfterProgressSaved\(completion\.progress\)/u);
-  assert.match(collectionHook, /syncCardCollectionMilestones/u);
+  assert.match(collectionHook, /syncCardCollectionLevelRewards/u);
   assert.match(collectionHook, /IDIOM_CARD_DEFINITIONS/u);
 });
 

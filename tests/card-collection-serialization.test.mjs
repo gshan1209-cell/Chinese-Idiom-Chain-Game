@@ -38,16 +38,18 @@ function inventoryItem(overrides = {}) {
   };
 }
 
-test('creates an immutable empty schema version one state', () => {
+test('creates an immutable empty schema version two state', () => {
   const state = createEmptyCardCollectionState(NOW);
   assert.deepEqual(state.grants, []);
   assert.deepEqual(state.inventory, []);
-  assert.deepEqual(state.metadata, { schemaVersion: 1, updatedAt: NOW });
+  assert.deepEqual(state.upgrades, []);
+  assert.deepEqual(state.metadata, { schemaVersion: 2, updatedAt: NOW });
   assert.equal(Object.isFrozen(state), true);
   assert.equal(Object.isFrozen(state.grants), true);
+  assert.equal(Object.isFrozen(state.upgrades), true);
 });
 
-test('parses and deeply isolates valid collection data', () => {
+test('parses version-one milestone state into version-two state without dropping ownership', () => {
   const raw = {
     grants: [pendingGrant()],
     inventory: [inventoryItem()],
@@ -63,6 +65,8 @@ test('parses and deeply isolates valid collection data', () => {
     'card-acquisition:card-grant:main-levels:10'
   );
   assert.equal(Object.isFrozen(state.inventory[0].acquisitionHistory), true);
+  assert.equal(state.metadata.schemaVersion, 2);
+  assert.deepEqual(state.upgrades, []);
 });
 
 test('unsupported or malformed top-level states fall back to empty', () => {
@@ -74,7 +78,7 @@ test('unsupported or malformed top-level states fall back to empty', () => {
     const state = parseCardCollectionState(value, NOW);
     assert.deepEqual(state.grants, []);
     assert.deepEqual(state.inventory, []);
-    assert.equal(state.metadata.schemaVersion, 1);
+    assert.equal(state.metadata.schemaVersion, 2);
   }
 });
 
@@ -170,4 +174,216 @@ test('rejects human-readable timestamps that are not ISO-8601', () => {
   }, NOW);
 
   assert.equal(state.grants.length, 0);
+});
+
+
+function pendingLevelGrant(overrides = {}) {
+  return {
+    rewardId: 'card-grant:main-level:chapter-1:1',
+    chapterId: 'chapter-1',
+    levelNumber: 1,
+    campaignOrdinal: 1,
+    scoreSnapshot: {
+      levelHiddenScore: 2,
+      hiddenRewardScore: 2
+    },
+    probabilitySnapshot: null,
+    status: 'pending',
+    createdAt: NOW,
+    resolvedAt: null,
+    revealedAt: null,
+    resolvedCardId: null,
+    acquisitionId: null,
+    legacyCoverage: false,
+    ...overrides
+  };
+}
+
+test('accepts version-two pending per-level grants and freezes snapshots', () => {
+  const raw = {
+    grants: [pendingLevelGrant()],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  };
+  const state = parseCardCollectionState(raw, NOW);
+
+  assert.equal(state.grants.length, 1);
+  assert.equal(state.grants[0].campaignOrdinal, 1);
+  assert.deepEqual(state.grants[0].scoreSnapshot, {
+    levelHiddenScore: 2,
+    hiddenRewardScore: 2
+  });
+  assert.equal(Object.isFrozen(state.grants[0].scoreSnapshot), true);
+});
+
+test('accepts a consistent resolved per-level grant and level acquisition', () => {
+  const rewardId = 'card-grant:main-level:chapter-1:1';
+  const acquisitionId = `card-acquisition:${rewardId}`;
+  const state = parseCardCollectionState({
+    grants: [pendingLevelGrant({
+      status: 'resolved',
+      probabilitySnapshot: {
+        levelHiddenScore: 2,
+        hiddenRewardScore: 2,
+        srTickets: 2,
+        ssrTickets: 0,
+        baseTickets: 998,
+        minimumRarity: 'N',
+        rolledRarity: 'N',
+        resolvedRarity: 'N',
+        rollValue: 500
+      },
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId
+    })],
+    inventory: [inventoryItem({
+      acquisitionHistory: [{
+        acquisitionId,
+        method: 'level-reward',
+        acquiredAt: NOW,
+        sourceReference: rewardId
+      }]
+    })],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 1);
+  assert.equal(state.inventory.length, 1);
+  assert.equal(state.inventory[0].acquisitionHistory[0].method, 'level-reward');
+});
+
+test('rejects a probability snapshot whose rolled rarity contradicts roll value', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingLevelGrant({
+      status: 'resolved',
+      probabilitySnapshot: {
+        levelHiddenScore: 2,
+        hiddenRewardScore: 2,
+        srTickets: 2,
+        ssrTickets: 0,
+        baseTickets: 998,
+        minimumRarity: 'N',
+        rolledRarity: 'SR',
+        resolvedRarity: 'SR',
+        rollValue: 500
+      },
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId: 'card-acquisition:card-grant:main-level:chapter-1:1'
+    })],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
+
+test('rejects a probability snapshot whose resolved rarity falls below the grant floor', () => {
+  const rewardId = 'card-grant:main-level:chapter-1:10';
+  const state = parseCardCollectionState({
+    grants: [pendingLevelGrant({
+      rewardId,
+      levelNumber: 10,
+      campaignOrdinal: 10,
+      status: 'resolved',
+      probabilitySnapshot: {
+        levelHiddenScore: 2,
+        hiddenRewardScore: 2,
+        srTickets: 2,
+        ssrTickets: 0,
+        baseTickets: 998,
+        minimumRarity: 'R',
+        rolledRarity: 'R',
+        resolvedRarity: 'N',
+        rollValue: 500
+      },
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId: `card-acquisition:${rewardId}`
+    })],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
+
+test('rejects a probability snapshot resolved above a non-base rolled rarity', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingLevelGrant({
+      scoreSnapshot: { levelHiddenScore: 50, hiddenRewardScore: 50 },
+      status: 'resolved',
+      probabilitySnapshot: {
+        levelHiddenScore: 50,
+        hiddenRewardScore: 50,
+        srTickets: 50,
+        ssrTickets: 5,
+        baseTickets: 945,
+        minimumRarity: 'N',
+        rolledRarity: 'SR',
+        resolvedRarity: 'SSR',
+        rollValue: 10
+      },
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId: 'card-acquisition:card-grant:main-level:chapter-1:1'
+    })],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
+
+test('rejects a base snapshot resolved outside the ordinary N or R pool', () => {
+  const state = parseCardCollectionState({
+    grants: [pendingLevelGrant({
+      status: 'resolved',
+      probabilitySnapshot: {
+        levelHiddenScore: 2,
+        hiddenRewardScore: 2,
+        srTickets: 2,
+        ssrTickets: 0,
+        baseTickets: 998,
+        minimumRarity: 'N',
+        rolledRarity: 'N',
+        resolvedRarity: 'SSR',
+        rollValue: 500
+      },
+      resolvedAt: NOW,
+      resolvedCardId: 'card-a',
+      acquisitionId: 'card-acquisition:card-grant:main-level:chapter-1:1'
+    })],
+    inventory: [],
+    upgrades: [],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 0);
+});
+
+test('skips malformed version-two entries without dropping valid entries', () => {
+  const state = parseCardCollectionState({
+    grants: [
+      pendingLevelGrant(),
+      pendingLevelGrant({
+        rewardId: 'card-grant:main-level:chapter-1:2',
+        levelNumber: 2,
+        campaignOrdinal: 2,
+        scoreSnapshot: { levelHiddenScore: -1, hiddenRewardScore: 1 }
+      })
+    ],
+    inventory: [],
+    upgrades: [{ upgradeId: '' }],
+    metadata: { schemaVersion: 2, updatedAt: NOW }
+  }, NOW);
+
+  assert.equal(state.grants.length, 1);
+  assert.deepEqual(state.upgrades, []);
 });

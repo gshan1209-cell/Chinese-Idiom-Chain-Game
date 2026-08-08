@@ -9,16 +9,18 @@ import type {
 } from './card-types.js';
 
 const DATABASE_NAME = 'cicg-card-collection';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const GRANTS_STORE = 'grants';
 const INVENTORY_STORE = 'inventory';
 const METADATA_STORE = 'metadata';
+const UPGRADES_STORE = 'upgrades';
 const METADATA_KEY = 'collection';
 
 const ALL_STORES = Object.freeze([
   GRANTS_STORE,
   INVENTORY_STORE,
-  METADATA_STORE
+  METADATA_STORE,
+  UPGRADES_STORE
 ]);
 
 function errorFrom(value: unknown, fallback: string): Error {
@@ -46,6 +48,9 @@ function openDatabase(factory: IDBFactory): Promise<IDBDatabase> {
       if (!database.objectStoreNames.contains(METADATA_STORE)) {
         database.createObjectStore(METADATA_STORE);
       }
+      if (!database.objectStoreNames.contains(UPGRADES_STORE)) {
+        database.createObjectStore(UPGRADES_STORE);
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(
@@ -61,6 +66,7 @@ interface RawCollectionState {
   grants: unknown;
   inventory: unknown;
   metadata: unknown;
+  upgrades: unknown;
 }
 
 function readStateFromTransaction(
@@ -71,9 +77,10 @@ function readStateFromTransaction(
   const raw: RawCollectionState = {
     grants: [],
     inventory: [],
-    metadata: null
+    metadata: null,
+    upgrades: []
   };
-  let remaining = 3;
+  let remaining = 4;
   let settled = false;
 
   const completeOne = () => {
@@ -96,6 +103,7 @@ function readStateFromTransaction(
   const metadataRequest = transaction
     .objectStore(METADATA_STORE)
     .get(METADATA_KEY);
+  const upgradesRequest = transaction.objectStore(UPGRADES_STORE).getAll();
 
   grantsRequest.onsuccess = () => {
     raw.grants = grantsRequest.result;
@@ -109,10 +117,15 @@ function readStateFromTransaction(
     raw.metadata = metadataRequest.result;
     completeOne();
   };
+  upgradesRequest.onsuccess = () => {
+    raw.upgrades = upgradesRequest.result;
+    completeOne();
+  };
 
   grantsRequest.onerror = () => fail(grantsRequest.error);
   inventoryRequest.onerror = () => fail(inventoryRequest.error);
   metadataRequest.onerror = () => fail(metadataRequest.error);
+  upgradesRequest.onerror = () => fail(upgradesRequest.error);
 }
 
 function replaceTransactionState(
@@ -122,16 +135,21 @@ function replaceTransactionState(
   const grantsStore = transaction.objectStore(GRANTS_STORE);
   const inventoryStore = transaction.objectStore(INVENTORY_STORE);
   const metadataStore = transaction.objectStore(METADATA_STORE);
+  const upgradesStore = transaction.objectStore(UPGRADES_STORE);
 
   grantsStore.clear();
   inventoryStore.clear();
   metadataStore.clear();
+  upgradesStore.clear();
 
   for (const grant of state.grants) {
     grantsStore.put(grant, grant.rewardId);
   }
   for (const item of state.inventory) {
     inventoryStore.put(item, item.cardId);
+  }
+  for (const upgrade of state.upgrades) {
+    upgradesStore.put(upgrade, upgrade.upgradeId);
   }
   metadataStore.put(state.metadata, METADATA_KEY);
 }
@@ -189,7 +207,7 @@ class IndexedDbCardCollectionRepository implements CardCollectionRepository {
     const database = await openDatabase(this.factory);
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(
-        [GRANTS_STORE, INVENTORY_STORE, METADATA_STORE],
+        ALL_STORES,
         'readwrite'
       );
       let value: T | undefined;
@@ -256,7 +274,7 @@ class IndexedDbCardCollectionRepository implements CardCollectionRepository {
     const database = await openDatabase(this.factory);
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(
-        [GRANTS_STORE, INVENTORY_STORE, METADATA_STORE],
+        ALL_STORES,
         'readwrite'
       );
       let settled = false;

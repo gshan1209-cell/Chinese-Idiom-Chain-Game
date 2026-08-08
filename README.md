@@ -2,7 +2,7 @@
 
 **中文成語填填字（CICG）**是一款手機優先、大字體、繁體中文、離線優先、可安裝 PWA 的成語填字闖關遊戲。
 
-主玩法是第一章 20 關縱橫成語填字；自由接龍、成語打地鼠、成語電台與影音中心均為附加功能。主線另提供完成第 5／10／15 關後解鎖的三階段陷阱玩法，以及每完成 10 個不同主線關卡建立一筆圖卡收藏獎勵的資料核心。
+主玩法是第一章 20 關縱橫成語填字；自由接龍、成語打地鼠、成語電台與影音中心均為附加功能。主線另提供完成第 5／10／15 關後解鎖的三階段陷阱玩法，以及每個不同主線關卡首次完成後建立一筆圖卡收藏獎勵的資料核心。
 
 ## 目前完成範圍
 
@@ -16,7 +16,7 @@
 - 頑固伏字：完成第 15 關後解鎖，三次有效連擊拔除。
 - 自由接龍、能量槽、15 秒成語打地鼠與四種難度。
 - HTTPS 成語電台、可見 YouTube iframe、媒體互斥播放與本機備份。
-- 圖卡收藏資料核心 v1：每十關里程碑、舊進度補發、決定性解析、冪等 inventory 與原子化 IndexedDB 交易。
+- 圖卡收藏資料核心 v2：每關贈卡、全域 10／100 關保底、隱藏積分、舊里程碑相容、冪等 inventory 與四 Store 原子化 IndexedDB 交易。
 - Android／Chromium 安裝提示、iPhone／iPad 加入主畫面與離線更新提示。
 
 ## 尚未實作
@@ -24,7 +24,7 @@
 - 第二章與更多關卡。
 - 正式核准的成語圖卡卡池。
 - 圖卡收藏圖鑑、卡片詳細頁與揭示動畫。
-- 圖卡購買、固定內容卡包、登入、雲端備份與跨裝置同步。
+- 重複卡 10：1 升級、圖卡購買、固定內容卡包、登入、雲端備份與跨裝置同步。
 - 60 秒限時模式、選擇題模式、成語小冊與完整設定頁。
 - 核准後的正式內建電台／YouTube 清單。
 - Lighthouse、瀏覽器 E2E、Android／iOS 實機與完整離線 PWA 驗收。
@@ -97,37 +97,49 @@ Key：chapter-1
 - 被占用格不允許一般放字；提示會先清除伏字再填入答案。
 - 支援 44px 觸控、Pointer Events、ARIA 進度與 reduced-motion。
 
-## 圖卡收藏資料核心 v1
+## 圖卡收藏資料核心 v2
 
-完成不同主線關卡數達 10、20、30……時，建立固定且不可重複的獎勵：
+每個不同主線關卡首次完成後，建立固定且不可重複的獎勵：
 
 ```text
-card-grant:main-levels:10
-card-grant:main-levels:20
+card-grant:main-level:chapter-1:1
+card-grant:main-level:chapter-1:2
 ```
 
-規則：
+取得規則：
 
-- 只計算首次完成的不同主線關卡；重玩與升星不增加里程碑。
-- 舊玩家載入後會依已保存進度補建缺少的里程碑 Grant。
-- 正式卡片必須有四字逐字注音與四字帶聲調漢語拼音。
-- Review、Legacy、NeedsReview、未核准稀有度、遠端素材與模板空框不得進池。
-- UR 僅保留給具正式授權證據的 IP 聯名，且不進一般十關卡池。
-- 未持有卡優先；核心使用注入 RNG，不直接散落呼叫 `Math.random()`。
-- `rewardId` 與 `acquisitionId` 均具冪等保護。
-- Grant 與 inventory 在同一 IndexedDB readwrite transaction 保存。
-- 已解析 Grant 若缺少 inventory，可依既有卡片與 acquisitionId 修復，不重新抽卡。
-- 空白正式卡池不需載入字典，仍可離線建立 pending Grant。
+- 一般關卡只從該關出現過的成語抽取，最低 N。
+- 跨章全域第 10、20、30……關從已完成範圍抽取，最低 R。
+- 跨章全域第 100、200、300……關最低 SR；第 100 關只發一張。
+- 重玩、升星與刷新最佳紀錄不會再次發卡。
+- 抽取完全隨機並允許重複，不採未持有優先。
+- Review、Legacy、NeedsReview、未核准稀有度、遠端素材、模板空框與 UR 不進一般主線卡池。
+
+隱藏積分由 Card Catalog 的成語難易度累積：
+
+```text
+E=1、D=2、C=3、B=4、A=5、S=6
+SR tickets  = min(hiddenRewardScore, 400)
+SSR tickets = min(floor(hiddenRewardScore / 10), 100)
+```
+
+- 機率採 1000 tickets，先決定稀有度，再在該稀有度內依正式權重抽卡。
+- 積分、精確機率與 `rollValue` 只保存於資料層，不顯示於正式玩家 UI。
+- Grant、機率快照與 inventory 必須先保存，UI 才能宣稱取得卡片。
+- 已解析 Grant 若缺少 inventory，會依既有卡片與 `acquisitionId` 修復，不重新抽卡。
+- Version 1 的 `card-grant:main-levels:<10n>` 保留為 legacy Grant；已覆蓋的全域序號不重複補發。
 - 關卡進度保存成功後才同步收藏；收藏失敗不回滾闖關結果。
 
 ```text
 Database：cicg-card-collection
-Version：1
-Stores：grants、inventory、metadata
+Version：2
+Stores：grants、inventory、metadata、upgrades
 Metadata key：collection
 ```
 
-目前 `IDIOM_CARD_DEFINITIONS` 為空陣列，因此第 10／20 關獎勵會安全保持 `pending`，不會使用未核准圖片冒充已取得圖卡。
+`cicg-progress` 仍維持 Version 1，不加入任何卡牌欄位。
+
+目前 `IDIOM_CARD_DEFINITIONS` 仍為空陣列，因此已完成關卡會安全建立含隱藏積分快照的 `pending` Grant，不會使用未核准圖片冒充正式卡。重複卡 10：1 升級已有核准規格與 Implementation Plan，但尚未進入 production code。
 
 ## 自由接龍與成語打地鼠
 
@@ -172,7 +184,7 @@ src/idioms       字典索引與載入
 src/puzzle       填字關卡、盤面與導航
 src/progress     星級、解鎖與闖關 IndexedDB
 src/traps        三階段陷阱純 TypeScript 引擎
-src/cards        圖卡定義、里程碑、Inventory 與收藏 IndexedDB
+src/cards        圖卡定義、每關獎勵、隱藏積分、Inventory 與收藏 IndexedDB
 src/game         自由接龍
 src/bonus        打地鼠
 src/media        媒體清單、播放政策與 IndexedDB
@@ -192,7 +204,7 @@ Pull Request CI 執行 `./scripts/verify.sh`，包含資料建置、全部 Node 
 - Puzzle 導航、逐關可完成性與進度保存。
 - 三階段陷阱解鎖、安全字／安全格、操作隔離、重玩重設與 reduced-motion。
 - 媒體 URL 安全、播放互斥、打地鼠降音、本機保存與可見 iframe。
-- 圖卡定義 allowlist、注音／拼音、核准 Gate、里程碑補發、決定性解析、冪等 inventory、snapshot 隔離、原子 IndexedDB transaction 與闖關保存順序。
+- 圖卡定義 allowlist、注音／拼音、核准 Gate、每關 Grant、10／100 關保底、隱藏積分、legacy migration、冪等 inventory、Version 2 原子 IndexedDB transaction 與闖關保存順序。
 
 ## 文件
 
@@ -204,3 +216,6 @@ Pull Request CI 執行 `./scripts/verify.sh`，包含資料建置、全部 Node 
 - [收藏資料核心 v1 設計規格](docs/superpowers/specs/2026-08-06-card-collection-core-v1-design.md)
 - [收藏資料核心 v1 Implementation Plan](docs/superpowers/plans/2026-08-06-card-collection-core-v1.md)
 - [收藏資料核心 v1 交付報告](docs/superpowers/reports/2026-08-06-card-collection-core-v1-delivery.md)
+- [每關贈卡、隱藏積分與升級系統規格](docs/superpowers/specs/2026-08-08-card-reward-and-upgrade-system-design.md)
+- [每關贈卡與隱藏積分 Implementation Plan](docs/superpowers/plans/2026-08-08-per-level-card-reward-hidden-score.md)
+- [每關贈卡與隱藏積分交付報告](docs/superpowers/reports/2026-08-08-per-level-card-reward-hidden-score-delivery.md)

@@ -318,6 +318,13 @@ Stores：grants、inventory、metadata、upgrades
 - legacy 十關 grant 已覆蓋的關卡不得在 migration 時重複發卡。
 - `cicg-progress` 仍維持 Version 1，不得因收藏功能修改。
 
+目前 production baseline：
+
+- 每關贈卡、全域 10／100 關保底、隱藏積分、機率快照、Version 2 migration 與 save-first React 接線已實作。
+- `src/cards/generated-card-difficulties.ts` 必須由 Card Catalog seed 決定性重建，固定涵蓋第一章 61 個 `idiomId`。
+- Hook 只可暴露 `pendingGrantCount`、`latestResolvedGrantId` 與保存警告；不得暴露隱藏積分、tickets 或 `rollValue`。
+- 重複卡 10：1 升級目前只有 Approved 規格與 Implementation Plan；在第二階段 production code 合併前不得宣稱已可使用。
+
 ---
 
 ## 6. GitHub 與 Drive 分工
