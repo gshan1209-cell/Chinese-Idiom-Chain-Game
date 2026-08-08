@@ -1,0 +1,25 @@
+name: Export source temporary
+
+on:
+  push:
+    branches:
+      - feat/per-level-card-rewards
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Pack source
+        run: tar --exclude=.git --exclude=node_modules -czf /tmp/cicg-source.tgz .
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: cicg-source
+          path: /tmp/cicg-source.tgz
+          if-no-files-found: error
+          retention-days: 1
