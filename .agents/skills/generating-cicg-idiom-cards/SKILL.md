@@ -20,6 +20,20 @@ Use GitHub `main` and the batch-state file as the continuity layer. New cards us
 
 If Repository files cannot be read, state that the continuation source is unavailable. Do not guess the previous batch.
 
+## UR Collaboration Routing
+
+When the request names an external IP and character, asks for rarity UR, or continues an existing UR collaboration card, read and use:
+
+```text
+.agents/skills/generating-cicg-ur-collaboration-cards/SKILL.md
+```
+
+The dedicated UR skill accepts IP and character as the only required user inputs, selects or validates the idiom, resolves the original difficulty and theme, enforces the license Gate, and preserves the v2.6.1 modular workflow.
+
+圖片模型不得生成主標題或注音。Renderer 必須直接使用已驗證的 `bopomofo[4]` 文字節點。
+
+注音必須恰好四筆並與四字成語逐字對齊；平假名、片假名、片假名擴充、半形片假名、羅馬拼音、漢字或近似假字都是 Blocking failure。
+
 ## Resume Decision
 
 | Observed state | Required action |
