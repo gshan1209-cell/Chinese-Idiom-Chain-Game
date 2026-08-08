@@ -163,3 +163,58 @@ test('governed generation and registration contracts use the canonical canvas pr
   assert.match(urSkill, /1024\s*[×x]\s*1200\s*px/);
   assert.match(masterPrompt, /1024\s*[×x]\s*1200\s*px/);
 });
+
+test('UR review assets treat 897x1752 as canonical dimensions without bypassing other gates', async () => {
+  const registry = await readJson(
+    'data/drive-assets/ur-card-assets-2026-08-08.json',
+  );
+  const composite = registry.assets.find(
+    (asset) => asset.assetType === 'card-composite-reference',
+  );
+
+  assert.equal(composite.widthPx, 897);
+  assert.equal(composite.heightPx, 1752);
+  assert.equal(composite.canvasProfile, 'cicg-card-897x1752-v1');
+  assert.equal(composite.aspectRatio, '299:584');
+  assert.equal(composite.dimensionStatus, 'canonical');
+  assert.equal(composite.sourceCanvasProfile, null);
+  assert.equal(registry.card.canonicalRendererOutput, false);
+  assert.equal(registry.card.publicationStatus, 'not-approved-for-publication');
+  assert.equal(registry.card.formalCardNumber, null);
+  assert.equal(
+    registry.card.blockingReasons.some((reason) =>
+      /1024x2000|required 1024|dimension/i.test(reason),
+    ),
+    false,
+  );
+
+  const draft = await readJson(
+    'data/drive-assets/ur-kimetsu-review-registration-draft-2026-08-08.json',
+  );
+  assert.equal(draft.cards.length, 13);
+  assert.equal(draft.registrationStatus, 'pending-drive-upload');
+  assert.equal(draft.registryEffects.formalUrAssignedCountDelta, 0);
+  assert.equal(draft.registryEffects.formalUrNextSequenceDelta, 0);
+
+  for (const card of draft.cards) {
+    assert.equal(card.formalCardNumber, null);
+    assert.equal(card.publicationStatus, 'not-approved-for-publication');
+    assert.equal(card.canonicalRendererOutput, false);
+    assert.equal(card.imageAsset.widthPx, 897);
+    assert.equal(card.imageAsset.heightPx, 1752);
+    assert.equal(card.imageAsset.canvasProfile, 'cicg-card-897x1752-v1');
+    assert.equal(card.imageAsset.dimensionStatus, 'canonical');
+    assert.equal(card.imageAsset.aspectRatio, '299:584');
+    assert.equal(
+      card.blockingReasons.some((reason) => /1024x2000|required 1024/i.test(reason)),
+      false,
+    );
+  }
+
+  const uzui = draft.cards.find(
+    (card) => card.reviewIdentifier === 'RV-UR-0009',
+  );
+  assert.equal(uzui.qualityStatus, 'blocked-text-mismatch');
+  assert.equal(uzui.textVerification.expectedIdiomTitle, '豪氣干雲');
+  assert.equal(uzui.textVerification.observedIdiomTitle, '豪氣千雲');
+});
